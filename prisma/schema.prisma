@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum RsvpStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+}
+
+model Guest {
+  id                 String     @id @default(cuid())
+  firstName          String
+  lastName           String
+  email              String?
+  phone              String?
+  token              String     @unique
+  /// Jours d'invitation : 12, 13 et/ou 14 juin 2026 (1 à n)
+  eventDays          DateTime[] @db.Date
+  rsvpStatus         RsvpStatus @default(PENDING)
+  confirmedAt        DateTime?
+  invitationSentAt   DateTime?
+  invitationSentVia  String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  accessOtps         InvitationAccessOtp[]
+}
+
+/// Code OTP pour accéder à l'invitation depuis la home (email ou WhatsApp)
+model InvitationAccessOtp {
+  id        String   @id @default(cuid())
+  guestId   String
+  guest     Guest    @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  channel   String
+  address   String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([address, channel])
+  @@index([guestId])
+}

@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+/* Vodafone brand — public/fonts/ */
+@font-face {
+  font-family: Vodafone;
+  src: url("/fonts/VodafoneLt.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vodafone;
+  src: url("/fonts/VodafoneRg.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vodafone;
+  src: url("/fonts/VodafoneRg_Bd.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Vodafone;
+  src: url("/fonts/VodafoneExB.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --vodacom-red: #e60000;
+  --vodacom-red-dark: #b30000;
+  --vodacom-silver: #c0c0c0;
+  --vodacom-black: #1a1a1a;
+  --vodacom-cream: #faf8f5;
+  --font-vodafone: Vodafone, system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-vodacom-red: var(--vodacom-red);
+  --color-vodacom-red-dark: var(--vodacom-red-dark);
+  --color-vodacom-silver: var(--vodacom-silver);
+  --color-vodacom-black: var(--vodacom-black);
+  --color-vodacom-cream: var(--vodacom-cream);
+  --font-sans: var(--font-vodafone);
+}
+
+/* Fichiers dédiés — évite le faux gras navigateur sur la pile Vodafone */
+@font-face {
+  font-family: "Vodafone ExB";
+  src: url("/fonts/VodafoneExB.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vodafone Rg";
+  src: url("/fonts/VodafoneRg.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vodafone Rg Bd";
+  src: url("/fonts/VodafoneRg_Bd.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vodafone Lt";
+  src: url("/fonts/VodafoneLt.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-vodafone-exb {
+  font-family: "Vodafone ExB", var(--font-vodafone), sans-serif;
+  font-weight: normal;
+  font-synthesis: none;
+}
+
+.font-vodafone-rg {
+  font-family: "Vodafone Rg", var(--font-vodafone), sans-serif;
+  font-weight: normal;
+  font-synthesis: none;
+}
+
+.font-vodafone-rg-bd {
+  font-family: "Vodafone Rg Bd", var(--font-vodafone), sans-serif;
+  font-weight: normal;
+  font-synthesis: none;
+}
+
+.font-vodafone-lt {
+  font-family: "Vodafone Lt", var(--font-vodafone), sans-serif;
+  font-weight: normal;
+  font-synthesis: none;
+}
+
+html,
+body {
+  font-family: var(--font-vodafone);
+}
+
+body {
+  background: var(--vodacom-cream);
+  color: var(--vodacom-black);
+}
+
+/* Admin dashboard — thème sombre */
+.admin-dark {
+  --admin-bg: #0c0c0c;
+  --admin-surface: #161616;
+  --admin-surface-2: #1f1f1f;
+  --admin-border: rgb(255 255 255 / 0.08);
+  --admin-muted: rgb(255 255 255 / 0.55);
+}
+
+/* react-toastify — alignement charte Vodacom */
+.toastify-container {
+  z-index: 9999;
+  font-family: var(--font-vodafone);
+}
+
+.toastify-toast {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgb(26 26 26 / 12%);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  max-width: min(20rem, calc(100vw - 2rem));
+}
+
+.Toastify__toast-body {
+  word-break: break-word;
+}
+
+/* Thème dark uniforme — fond sombre pour tous les types (pas de toast vert/rouge plein) */
+.Toastify__toast-theme--dark,
+.Toastify__toast-theme--dark.Toastify__toast--default,
+.Toastify__toast-theme--dark.Toastify__toast--success,
+.Toastify__toast-theme--dark.Toastify__toast--error,
+.Toastify__toast-theme--dark.Toastify__toast--warning,
+.Toastify__toast-theme--dark.Toastify__toast--info {
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.Toastify__toast-theme--dark .Toastify__toast-icon {
+  color: rgb(255 255 255 / 0.9);
+}
+
+.Toastify__toast-theme--dark.Toastify__toast--success .Toastify__toast-icon {
+  color: #34d399;
+}
+
+.Toastify__toast-theme--dark.Toastify__toast--error .Toastify__toast-icon {
+  color: var(--vodacom-red);
+}
+
+.Toastify__toast-theme--dark.Toastify__toast--warning .Toastify__toast-icon {
+  color: #fbbf24;
+}
+
+.Toastify__toast-theme--dark.Toastify__toast--info .Toastify__toast-icon {
+  color: rgb(255 255 255 / 0.75);
+}
+
+.Toastify__toast-theme--dark .Toastify__progress-bar--success {
+  background: #34d399;
+}
+
+.Toastify__toast-theme--dark .Toastify__progress-bar--error {
+  background: var(--vodacom-red);
+}
+
+.Toastify__toast-theme--dark .Toastify__progress-bar--warning {
+  background: #fbbf24;
+}
+
+.Toastify__toast-theme--dark .Toastify__progress-bar--info {
+  background: rgb(255 255 255 / 0.45);
+}
+
+.Toastify__toast-theme--dark .Toastify__progress-bar-theme--dark {
+  background: rgb(255 255 255 / 0.35);
+}
+
+/* Invitation mobile onboarding */
+.invitation-onboarding {
+  overscroll-behavior: none;
+}
+
+.invitation-onboarding-carousel {
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+}
+
+/* Overlay slide — fondu progressif bas → haut (plus opaque en bas) */
+.invitation-slide-overlay {
+  background: linear-gradient(
+    to top,
+    #1a1a1a 0%,
+    rgb(26 26 26 / 0.98) 14%,
+    rgb(26 26 26 / 0.9) 28%,
+    rgb(26 26 26 / 0.72) 42%,
+    rgb(26 26 26 / 0.48) 56%,
+    rgb(26 26 26 / 0.26) 70%,
+    rgb(26 26 26 / 0.1) 84%,
+    transparent 100%
+  );
+}
+
+.invitation-slide-overlay--welcome {
+  background: linear-gradient(
+    to top,
+    #1a1a1a 0%,
+    rgb(26 26 26 / 0.99) 16%,
+    rgb(26 26 26 / 0.92) 32%,
+    rgb(26 26 26 / 0.74) 46%,
+    rgb(26 26 26 / 0.5) 60%,
+    rgb(26 26 26 / 0.28) 74%,
+    rgb(26 26 26 / 0.1) 88%,
+    transparent 100%
+  );
+}
+
+/* Slide date / RSVP — rouge opaque en bas, fondu vers le haut */
+.invitation-slide-overlay--red {
+  background: linear-gradient(
+    to top,
+    #f70118 0%,
+    #f70118 48%,
+    rgb(247 1 24 / 0.96) 52%,
+    rgb(247 1 24 / 0.9) 58%,
+    rgb(247 1 24 / 0.78) 66%,
+    rgb(247 1 24 / 0.62) 74%,
+    rgb(247 1 24 / 0.42) 84%,
+    rgb(247 1 24 / 0.18) 94%,
+    transparent 100%
+  );
+}
+
+.invitation-onboarding-footer {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+@keyframes invitation-sheet-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes invitation-sheet-panel-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.invitation-bottom-sheet-backdrop {
+  animation: invitation-sheet-backdrop-in 0.28s ease-out forwards;
+}
+
+.invitation-bottom-sheet-panel {
+  animation: invitation-sheet-panel-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.invitation-bottom-sheet-handle {
+  touch-action: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invitation-bottom-sheet-backdrop,
+  .invitation-bottom-sheet-panel {
+    animation: none;
+  }
+}

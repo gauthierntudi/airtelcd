@@ -1,0 +1,111 @@
+le parcours utilisateur pour la Carte Visa devrait être présenté ainsi :
+
+Veuillez Sélectionner
+
+1. M-Pesa USD
+2. M-Pesa FC
+3. Inviter un proche
+4. Balance Rallonge
+5. Petit Commerce
+6. Achat Produits
+7. M-Pesa Carte Visa
+8. Compte Bonus
+
+L'utilisateur sélectionne **7**.
+
+---
+
+M-PESA CARTE VISA
+
+1. Créer une carte Visa
+2. Ma carte Visa
+3. Historique des transactions
+4. Assistance
+0. Retour
+```
+
+### Si aucune carte n'existe encore
+
+M-PESA CARTE VISA
+
+Vous ne disposez pas encore
+d'une Carte Visa M-Pesa.
+
+1. Créer une carte Visa
+0. Retour
+```
+
+---
+
+### Création
+
+CRÉATION CARTE VISA
+
+Frais de création : 1 USD
+Validité : 6 mois
+
+1. Confirmer
+2. Annuler
+```
+
+Puis :
+
+Votre Carte Visa M-Pesa
+a été créée avec succès.
+
+1. Voir les détails
+0. Retour
+```
+
+---
+
+### Ma Carte Visa
+
+MA CARTE VISA
+
+1. Voir le numéro de carte
+2. Voir la date d'expiration
+3. Voir le CVV
+4. Statut de la carte
+5. Bloquer la carte
+6. Débloquer la carte
+7. Supprimer la carte
+0. Retour
+```
+
+---
+
+### Historique
+
+HISTORIQUE
+
+1. 5 dernières transactions
+2. 10 dernières transactions
+0. Retour
+```
+
+---
+
+### Assistance
+
+ASSISTANCE
+
+1. Comment utiliser ma carte ?
+2. Frais de la carte
+3. Conditions d'utilisation
+4. Contacter le service client
+0. Retour
+```
+
+Cependant, si Vodacom souhaite rester dans le même style que les autres menus M-Pesa (très peu d'options), je ferais encore plus simple :
+
+M-PESA CARTE VISA
+
+1. Créer une carte Visa
+2. Consulter ma carte
+3. Bloquer/Débloquer
+4. Supprimer la carte
+0. Retour
+```
+
+Ce parcours est plus proche de l'expérience USSD habituelle de M-Pesa RDC.

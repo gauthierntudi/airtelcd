@@ -1,0 +1,69 @@
+Invitation numérique – Vodacom Privilege Golf
+
+1️⃣ En-tête / Accroche
+
+Logo Vodacom Privilege en haut
+Titre de l’événement :
+
+> Vodacom Privilege Golf 2026
+* Accroche personnalisée :
+
+  > Cher/Chère {{Nom de l’invité}}, votre invitation exclusive vous attend !
+
+
+2️⃣ Message principal / Corps
+
+* Introduction :
+
+  > Nous avons le plaisir de vous convier à notre prestigieux événement Vodacom Privilege Golf, une journée exceptionnelle dédiée au sport, au networking et aux expériences exclusives.
+
+* Détails principaux :
+
+  * Date & Heure : Samedi 12 Juin 2026 – 08h00 à 17h00
+  * Lieu : Golf Club de Kinshasa, Gombe
+  * Tenue recommandée : Casual golf / Polo
+
+* Bref résumé :
+
+  > Participez à des parties de golf, rencontrez d’autres membres privilèges et profitez de surprises exclusives tout au long de la journée.
+
+3️⃣ Programme / Agenda
+
+* 08h00 – 09h00 : Accueil & remise du kit participant
+* 09h00 – 12h00 : Début des parties – Round 1
+* 12h00 – 13h30 : Déjeuner et networking
+* 13h30 – 16h00 : Round 2 & concours de précision
+* 16h00 – 17h00 : Remise des prix & clôture
+
+4️⃣ Call-to-Action (CTA) / RSVP
+
+* Bouton principal :
+
+  > Je confirme ma présence, {{Nom de l’invité}} !
+* Lien alternatif :
+
+  > [Confirmer ma participation](#)
+* QR Code ou bouton : pour ajouter l’événement directement au calendrier du smartphone ou GPS pour le parcours.
+
+5️⃣ Visuel / Médias
+
+* Image principale / GIF : terrain de golf, balles, trophées, ambiance premium
+
+* Texte intégré dans le visuel :
+
+> « {{Nom de l’invité}}, votre place VIP vous attend au Vodacom Privilege Golf ! »
+
+* Option : ajouter animation légère du logo Vodacom pour dynamiser la page.
+
+6️⃣ Contacts / Support
+
+* Email : [contact@vodacomprivilege.com](mailto:contact@vodacomprivilege.com)
+* Téléphone : +243 81 000 0000
+* Lien vers FAQ / plan du parcours / instructions pour venir.
+
+
+7️⃣ Pied de page / Mentions légales
+
+* Organisateur : Vodacom Privilege
+* Sponsors / partenaires
+* Mentions légales pour l’utilisation de données personnelles (RGPD)
