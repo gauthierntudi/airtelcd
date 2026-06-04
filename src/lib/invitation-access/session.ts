@@ -52,7 +52,15 @@ export function parseInvitationSessionValue(
   return { guestId };
 }
 
-export function invitationSessionCookieOptions() {
+export type InvitationSessionCookieOptions = {
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: "lax";
+  path: string;
+  maxAge: number;
+};
+
+export function invitationSessionCookieOptions(): InvitationSessionCookieOptions {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

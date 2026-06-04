@@ -1,4 +1,8 @@
-import { toast, type ToastOptions } from "react-toastify";
+import {
+  toast,
+  type ToastOptions,
+  type ToastPromiseParams,
+} from "react-toastify";
 
 const MAX_TOAST_CHARS = 48;
 
@@ -10,10 +14,10 @@ const defaults: ToastOptions = {
   theme: "dark",
 };
 
-export type NotifyPromiseMessages<T = unknown> = {
+export type NotifyPromiseMessages = {
   pending?: string;
-  success: string | ((value: T) => string);
-  error?: string | ((err: unknown) => string);
+  success: string;
+  error?: string;
 };
 
 /** Messages courts pour les toasts (pas de texte long). */
@@ -26,59 +30,38 @@ export function truncateToastMessage(
   return `${compact.slice(0, max - 1).trim()}…`;
 }
 
-function resolveErrorMessage(err: unknown, fallback: string): string {
-  if (typeof err === "string") return truncateToastMessage(err);
-  if (err instanceof Error) return truncateToastMessage(err.message);
-  return fallback;
-}
-
 function normalizeMessages<T>(
-  messages: NotifyPromiseMessages<T>,
-): NotifyPromiseMessages<T> {
-  const success =
-    typeof messages.success === "function"
-      ? (value: T) => truncateToastMessage(messages.success(value))
-      : truncateToastMessage(messages.success);
-
-  const error = messages.error
-    ? typeof messages.error === "function"
-      ? (err: unknown) => truncateToastMessage(String(messages.error(err)))
-      : truncateToastMessage(messages.error)
-    : (err: unknown) => resolveErrorMessage(err, DEFAULT_ERROR);
-
+  messages: NotifyPromiseMessages,
+): ToastPromiseParams<T> {
   return {
     pending: messages.pending
       ? truncateToastMessage(messages.pending)
-      : undefined,
-    success,
-    error,
+      : DEFAULT_PENDING,
+    success: truncateToastMessage(messages.success),
+    error: messages.error
+      ? truncateToastMessage(messages.error)
+      : DEFAULT_ERROR,
   };
 }
 
 function promiseToast<T>(
   promise: Promise<T>,
-  messages: NotifyPromiseMessages<T>,
-  options?: ToastOptions,
-) {
-  const normalized = normalizeMessages(messages);
-  return toast.promise(
-    promise,
-    {
-      pending: normalized.pending ?? DEFAULT_PENDING,
-      success: normalized.success,
-      error: normalized.error,
-    },
-    { ...defaults, ...options },
-  );
+  messages: NotifyPromiseMessages,
+  options?: ToastOptions<T>,
+): Promise<T> {
+  return toast.promise<T>(promise, normalizeMessages<T>(messages), {
+    ...defaults,
+    ...options,
+  } as ToastOptions<T>);
 }
 
 /** Notifications plateforme — thème dark, Promise, messages courts */
 export const notify = {
   promise<T>(
     promise: Promise<T>,
-    messages: NotifyPromiseMessages<T>,
-    options?: ToastOptions,
-  ) {
+    messages: NotifyPromiseMessages,
+    options?: ToastOptions<T>,
+  ): Promise<T> {
     return promiseToast(promise, messages, options);
   },
 
