@@ -5,22 +5,25 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { UssdPhoneSimulator } from "@/components/mpesa/UssdPhoneSimulator";
 import { LucideIcon } from "@/components/ui/lucide-icon";
+import type { MpesaVisaExperienceState } from "@/lib/mpesa-visa/service";
 import { MPESA_USSD_COLORS, MPESA_USSD_Z_INDEX } from "@/lib/mpesa-ussd/theme";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  onAuthRequired?: () => void;
+  initialExperience?: MpesaVisaExperienceState | null;
 };
 
-export function MpesaVisaUssdModal({ open, onClose }: Props) {
+export function MpesaVisaUssdModal({
+  open,
+  onClose,
+  onAuthRequired,
+  initialExperience = null,
+}: Props) {
   const [mounted, setMounted] = useState(false);
-  const [simKey, setSimKey] = useState(0);
 
   useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    if (open) setSimKey((k) => k + 1);
-  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -63,7 +66,11 @@ export function MpesaVisaUssdModal({ open, onClose }: Props) {
         className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden"
         style={{ backgroundColor: MPESA_USSD_COLORS.dark }}
       >
-        <UssdPhoneSimulator key={simKey} onClose={onClose} />
+        <UssdPhoneSimulator
+          initialExperience={initialExperience}
+          onClose={onClose}
+          onAuthRequired={onAuthRequired}
+        />
       </div>
     </div>,
     document.body,

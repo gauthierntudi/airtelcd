@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Home, LayoutDashboard, Mail } from "lucide-react";
+import { Activity, CreditCard, Home, LayoutDashboard, Mail } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LucideIcon } from "@/components/ui/lucide-icon";
@@ -9,6 +9,12 @@ import { EVENT } from "@/lib/event";
 
 const NAV = [
   { href: "/admin", label: "Tableau de bord", icon: LayoutDashboard, exact: true },
+  {
+    href: "/admin/mpesa",
+    label: "M-Pesa & Carrefour",
+    icon: CreditCard,
+    exact: true,
+  },
   { href: "/admin/status", label: "Statut système", icon: Activity, exact: true },
   { href: "/", label: "Accueil plateforme", icon: Home, exact: false },
 ] as const;

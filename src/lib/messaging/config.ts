@@ -7,7 +7,11 @@ export type TwilioCredentials = {
   from: string | undefined;
 };
 
-function twilioWhatsappCredentials(): TwilioCredentials {
+export type TwilioWhatsappCredentials = TwilioCredentials & {
+  contentInviteSid: string | undefined;
+};
+
+function twilioWhatsappCredentials(): TwilioWhatsappCredentials {
   return {
     accountSid:
       process.env.TWILIO_WHATSAPP_ACCOUNT_SID?.trim() ||
@@ -16,6 +20,7 @@ function twilioWhatsappCredentials(): TwilioCredentials {
       process.env.TWILIO_WHATSAPP_AUTH_TOKEN?.trim() ||
       process.env.TWILIO_AUTH_TOKEN?.trim(),
     from: process.env.TWILIO_WHATSAPP_FROM?.trim(),
+    contentInviteSid: process.env.TWILIO_WHATSAPP_CONTENT_INVITE_SID?.trim(),
   };
 }
 
@@ -50,7 +55,12 @@ export function isBrevoConfigured(): boolean {
 
 export function isTwilioWhatsappConfigured(): boolean {
   const { whatsapp } = getMessagingConfig().twilio;
-  return Boolean(whatsapp.accountSid && whatsapp.authToken && whatsapp.from);
+  return Boolean(
+    whatsapp.accountSid &&
+      whatsapp.authToken &&
+      whatsapp.from &&
+      whatsapp.contentInviteSid,
+  );
 }
 
 /** @deprecated Alias — WhatsApp invitations */
@@ -161,6 +171,11 @@ export function getSystemMessagingReport(): SystemMessagingReport {
       label: "Numéro WhatsApp (from)",
       configured: Boolean(cfg.twilio.whatsapp.from),
     },
+    {
+      name: "TWILIO_WHATSAPP_CONTENT_INVITE_SID",
+      label: "Template invitation (Content SID)",
+      configured: Boolean(cfg.twilio.whatsapp.contentInviteSid),
+    },
   ];
 
   const twilioSmsChecks: EnvVarCheck[] = [
@@ -206,24 +221,31 @@ export function getSystemMessagingReport(): SystemMessagingReport {
     },
     appUrl: cfg.appUrl ?? null,
     sendPriority:
-      "Email prioritaire si Brevo est configuré et l'invité a un email ; sinon WhatsApp (compte Twilio dédié) si un numéro est renseigné. Les codes OTP utilisent Brevo + un compte Twilio SMS séparé.",
+      "Email et WhatsApp envoyés si l'invité a les deux contacts et que Brevo + Twilio sont configurés. Les codes OTP utilisent Brevo + un compte Twilio SMS séparé.",
   };
 }
 
-/**
- * Canal réellement utilisable : contact présent ET API configurée.
- * Email prioritaire si Brevo OK ; sinon WhatsApp si Twilio OK.
- */
+/** Canaux utilisables : contact présent ET API configurée pour ce canal. */
+export function getSendableMessageChannels(
+  guest: GuestContactFields,
+): ContactChannel[] {
+  const channels: ContactChannel[] = [];
+  if (guest.email?.trim() && isBrevoConfigured()) channels.push("email");
+  if (guest.phone?.trim() && isTwilioWhatsappConfigured()) {
+    channels.push("whatsapp");
+  }
+  return channels;
+}
+
+/** @deprecated Utiliser getSendableMessageChannels — premier canal ou null */
 export function getSendableMessageChannel(
   guest: GuestContactFields,
 ): ContactChannel | null {
-  if (guest.email?.trim() && isBrevoConfigured()) return "email";
-  if (guest.phone?.trim() && isTwilioWhatsappConfigured()) return "whatsapp";
-  return null;
+  return getSendableMessageChannels(guest)[0] ?? null;
 }
 
 export function canSendInvitationToGuest(guest: GuestContactFields): boolean {
-  return getSendableMessageChannel(guest) !== null;
+  return getSendableMessageChannels(guest).length > 0;
 }
 
 export function assertChannelConfigured(channel: ContactChannel): void {
@@ -234,32 +256,29 @@ export function assertChannelConfigured(channel: ContactChannel): void {
   }
   if (channel === "whatsapp" && !isTwilioWhatsappConfigured()) {
     throw new Error(
-      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN et TWILIO_WHATSAPP_FROM requis.",
+      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN, TWILIO_WHATSAPP_FROM et TWILIO_WHATSAPP_CONTENT_INVITE_SID requis.",
     );
   }
 }
 
-export function assertCanSendInvitation(guest: GuestContactFields): ContactChannel {
-  const channel = getSendableMessageChannel(guest);
-  if (!channel) {
-    const preferred = guest.email?.trim()
-      ? "email"
-      : guest.phone?.trim()
-        ? "whatsapp"
-        : null;
-    if (!preferred) {
-      throw new Error(
-        "Aucun canal de contact : renseignez un email ou un numéro valide.",
-      );
-    }
-    if (preferred === "email" && !isBrevoConfigured()) {
-      throw new Error(
-        "Brevo non configuré : l'envoi par email est désactivé tant que BREVO_API_KEY et BREVO_SENDER_EMAIL ne sont pas définis.",
-      );
-    }
+export function assertCanSendInvitation(guest: GuestContactFields): ContactChannel[] {
+  const channels = getSendableMessageChannels(guest);
+  if (channels.length > 0) return channels;
+
+  const hasEmail = Boolean(guest.email?.trim());
+  const hasPhone = Boolean(guest.phone?.trim());
+
+  if (!hasEmail && !hasPhone) {
     throw new Error(
-      "Twilio WhatsApp non configuré : variables TWILIO_WHATSAPP_* requises.",
+      "Aucun canal de contact : renseignez un email ou un numéro valide.",
     );
   }
-  return channel;
+  if (hasEmail && !isBrevoConfigured()) {
+    throw new Error(
+      "Brevo non configuré : l'envoi par email est désactivé tant que BREVO_API_KEY et BREVO_SENDER_EMAIL ne sont pas définis.",
+    );
+  }
+  throw new Error(
+    "Twilio WhatsApp non configuré : variables TWILIO_WHATSAPP_* requises.",
+  );
 }

@@ -4,13 +4,17 @@ import {
   getPreferredMessageChannel,
 } from "@/lib/guest-contact";
 import { eventDaysFromDbDates } from "@/lib/parse-event-day";
-import { canSendInvitationToGuest } from "@/lib/messaging/config";
+import {
+  canSendInvitationToGuest,
+  getSendableMessageChannels,
+} from "@/lib/messaging/config";
 import type { ContactChannel } from "@/lib/guest-contact";
 import type { GuestRow } from "@/lib/guest-types";
+import type { InvitationSentVia } from "@/lib/messaging/send-invitation";
 import { invitationAbsoluteUrl } from "@/lib/invitation-url";
 
-function asContactChannel(v: string | null): ContactChannel | null {
-  if (v === "email" || v === "whatsapp") return v;
+function asInvitationSentVia(v: string | null): InvitationSentVia | null {
+  if (v === "email" || v === "whatsapp" || v === "both") return v;
   return null;
 }
 
@@ -26,12 +30,13 @@ export function serializeGuest(g: Guest, baseUrl: string): GuestRow {
     rsvpStatus: g.rsvpStatus,
     confirmedAt: g.confirmedAt?.toISOString() ?? null,
     invitationSentAt: g.invitationSentAt?.toISOString() ?? null,
-    invitationSentVia: asContactChannel(g.invitationSentVia),
+    invitationSentVia: asInvitationSentVia(g.invitationSentVia),
     createdAt: g.createdAt.toISOString(),
     updatedAt: g.updatedAt.toISOString(),
     displayName: `${g.firstName} ${g.lastName}`.trim(),
     invitationUrl: invitationAbsoluteUrl(g.token, baseUrl),
     contactChannels: getGuestContactChannels(g),
+    sendChannels: getSendableMessageChannels(g),
     messageChannel: getPreferredMessageChannel(g),
     canSendInvitation: canSendInvitationToGuest(g),
   };

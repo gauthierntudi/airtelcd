@@ -1,15 +1,14 @@
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
+import { getMessagingConfig, isTwilioSmsConfigured } from "@/lib/messaging/config";
 import {
-  getMessagingConfig,
-  isTwilioSmsConfigured,
-} from "@/lib/messaging/config";
+  assertTwilioSmsConfigured,
+  sendTwilioSmsMessage,
+} from "@/lib/messaging/send-twilio-sms";
 import {
   otpEmailPlainText,
   otpEmailSubject,
   renderOtpEmailFromTemplate,
 } from "@/lib/messaging/otp-email-template";
-import twilio from "twilio";
-
 export function isOtpEmailConfigured(): boolean {
   const { brevo } = getMessagingConfig();
   return Boolean(brevo.apiKey && brevo.senderEmail);
@@ -23,14 +22,6 @@ function assertOtpEmailConfigured(): void {
   if (!isOtpEmailConfigured()) {
     throw new Error(
       "Envoi email impossible : BREVO_API_KEY et BREVO_SENDER_EMAIL requis.",
-    );
-  }
-}
-
-function assertOtpSmsConfigured(): void {
-  if (!isOtpSmsConfigured()) {
-    throw new Error(
-      "Envoi SMS impossible : TWILIO_SMS_ACCOUNT_SID, TWILIO_SMS_AUTH_TOKEN et TWILIO_SMS_FROM requis.",
     );
   }
 }
@@ -85,25 +76,11 @@ export async function sendOtpSms(params: {
   firstName: string;
   code: string;
 }): Promise<void> {
-  assertOtpSmsConfigured();
-  const { sms: cfg } = getMessagingConfig().twilio;
-
-  const client = twilio(cfg.accountSid!, cfg.authToken!);
-  const from = cfg.from!;
-
-  try {
-    await client.messages.create({
-      from,
-      to: params.phoneE164,
-      body: `Bonjour ${params.firstName}, votre code Vodacom Privilege Golf : ${params.code} (valide 10 min).`,
-    });
-  } catch (e) {
-    const detail =
-      e && typeof e === "object" && "message" in e
-        ? String((e as { message: unknown }).message)
-        : "échec Twilio";
-    throw new Error(`SMS non envoyé : ${detail}`);
-  }
+  assertTwilioSmsConfigured();
+  await sendTwilioSmsMessage({
+    phoneE164: params.phoneE164,
+    body: `Bonjour ${params.firstName}, votre code Vodacom Privilege Golf : ${params.code} (valide 10 min).`,
+  });
 }
 
 export async function deliverOtpCode(params: {

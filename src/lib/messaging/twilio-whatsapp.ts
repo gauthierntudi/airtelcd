@@ -1,9 +1,13 @@
 import twilio from "twilio";
 import { assertChannelConfigured, getMessagingConfig } from "@/lib/messaging/config";
-import {
-  invitationWhatsAppText,
-  type InvitationContentParams,
-} from "@/lib/messaging/invitation-content";
+
+export type InvitationWhatsAppParams = {
+  phoneE164: string;
+  /** {{1}} — nom complet de l'invité */
+  displayName: string;
+  /** {{2}} — token invitation (URL : …/api/confirm/action={{2}}) */
+  invitationToken: string;
+};
 
 function toWhatsAppAddress(e164: string): string {
   const digits = e164.startsWith("+") ? e164 : `+${e164}`;
@@ -11,7 +15,7 @@ function toWhatsAppAddress(e164: string): string {
 }
 
 export async function sendInvitationWhatsApp(
-  params: InvitationContentParams & { phoneE164: string },
+  params: InvitationWhatsAppParams,
 ): Promise<void> {
   assertChannelConfigured("whatsapp");
   const { whatsapp: cfg } = getMessagingConfig().twilio;
@@ -24,6 +28,10 @@ export async function sendInvitationWhatsApp(
   await client.messages.create({
     from,
     to: toWhatsAppAddress(params.phoneE164),
-    body: invitationWhatsAppText(params),
+    contentSid: cfg.contentInviteSid!,
+    contentVariables: JSON.stringify({
+      "1": params.displayName,
+      "2": params.invitationToken,
+    }),
   });
 }

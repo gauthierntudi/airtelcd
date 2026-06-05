@@ -10,11 +10,46 @@ import { guestDisplayName } from "@/lib/event";
 import { invitationAbsoluteUrl } from "@/lib/invitation-url";
 import { prisma } from "@/lib/prisma";
 
+export type InvitationSentVia = ContactChannel | "both";
+
 export type SendInvitationResult = {
   guestId: string;
-  channel: ContactChannel;
+  channels: ContactChannel[];
+  /** Compat API — premier canal ou "both" si les deux ont été envoyés */
+  channel: InvitationSentVia;
   sentAt: string;
+  /** Présent si un ou plusieurs canaux ont échoué alors que d'autres ont réussi */
+  warnings?: string[];
 };
+
+function invitationSentViaValue(channels: ContactChannel[]): InvitationSentVia {
+  if (channels.length >= 2) return "both";
+  return channels[0]!;
+}
+
+async function sendOnChannel(
+  channel: ContactChannel,
+  guest: Guest,
+  content: {
+    firstName: string;
+    displayName: string;
+    invitationUrl: string;
+  },
+): Promise<void> {
+  if (channel === "email") {
+    await sendInvitationEmail({
+      ...content,
+      email: guest.email!.trim(),
+    });
+    return;
+  }
+
+  await sendInvitationWhatsApp({
+    phoneE164: guest.phone!,
+    displayName: content.displayName,
+    invitationToken: guest.token,
+  });
+}
 
 export async function sendInvitationToGuest(
   guest: Guest,
@@ -26,7 +61,7 @@ export async function sendInvitationToGuest(
     );
   }
 
-  const channel = assertCanSendInvitation(guest);
+  const channels = assertCanSendInvitation(guest);
   const invitationUrl = invitationAbsoluteUrl(guest.token, baseUrl);
   const displayName = guestDisplayName(guest.firstName, guest.lastName);
   const content = {
@@ -35,31 +70,46 @@ export async function sendInvitationToGuest(
     invitationUrl,
   };
 
-  if (channel === "email") {
-    await sendInvitationEmail({
-      ...content,
-      email: guest.email!.trim(),
-    });
-  } else {
-    await sendInvitationWhatsApp({
-      ...content,
-      phoneE164: guest.phone!,
-    });
+  const results = await Promise.allSettled(
+    channels.map((channel) => sendOnChannel(channel, guest, content)),
+  );
+
+  const succeeded = channels.filter((_, i) => results[i]?.status === "fulfilled");
+  const failed = channels
+    .map((channel, i) => {
+      const result = results[i];
+      if (result?.status === "rejected") {
+        const reason =
+          result.reason instanceof Error
+            ? result.reason.message
+            : "Erreur d'envoi";
+        return `${channel}: ${reason}`;
+      }
+      return null;
+    })
+    .filter((entry): entry is string => entry !== null);
+
+  if (succeeded.length === 0) {
+    throw new Error(failed.join(" · ") || "Erreur d'envoi");
   }
 
   const sentAt = new Date();
+  const sentVia = invitationSentViaValue(succeeded);
+
   await prisma.guest.update({
     where: { id: guest.id },
     data: {
       invitationSentAt: sentAt,
-      invitationSentVia: channel,
+      invitationSentVia: sentVia,
     },
   });
 
   return {
     guestId: guest.id,
-    channel,
+    channels: succeeded,
+    channel: sentVia,
     sentAt: sentAt.toISOString(),
+    warnings: failed.length > 0 ? failed : undefined,
   };
 }
 

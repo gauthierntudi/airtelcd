@@ -21,21 +21,3 @@ export function invitationEmailHtml(params: InvitationContentParams): string {
   return renderInvitationEmailFromTemplate(params);
 }
 
-export function invitationWhatsAppText({
-  firstName,
-  invitationUrl,
-}: InvitationContentParams): string {
-  return [
-    `Cher(e) ${firstName},`,
-    ``,
-    `Votre invitation exclusive vous attend pour *${EVENT.title}*.`,
-    ``,
-    `📅 ${EVENT.dateLabel} – ${EVENT.timeLabel}`,
-    `📍 ${EVENT.venue}`,
-    ``,
-    `Confirmez votre présence ici :`,
-    invitationUrl,
-    ``,
-    `— ${EVENT.organizer}`,
-  ].join("\n");
-}

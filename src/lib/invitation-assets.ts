@@ -10,6 +10,7 @@ export const PLATFORM_ORGANIZER_BG_URL =
 export const PLATFORM_MODULE_ICONS = {
   invitation: "/img/icons/invitation.svg",
   mpesa: "/img/icons/mpesa.svg",
+  market: "/img/icons/market.svg",
   forfait: "/img/icons/forfait.svg",
   games: "/img/icons/games.svg",
 } as const;

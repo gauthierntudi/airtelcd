@@ -127,8 +127,16 @@ export function GuestList({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur");
-      const via = data.channel === "email" ? "email" : "WhatsApp";
-      notify.success(via === "email" ? "Email envoyé" : "WhatsApp envoyé");
+      const label =
+        data.channel === "both"
+          ? "Email et WhatsApp envoyés"
+          : data.channel === "email"
+            ? "Email envoyé"
+            : "WhatsApp envoyé";
+      notify.success(label);
+      if (Array.isArray(data.warnings) && data.warnings.length > 0) {
+        notify.warning(data.warnings.join(" · "));
+      }
       onChanged();
     } catch (e) {
       notify.error("Échec envoi");
@@ -351,6 +359,7 @@ export function GuestList({
       {details && (
         <GuestDetailsModal
           guest={guests.find((g) => g.id === details.id) ?? details}
+          adminSecret={headers["x-admin-secret"]}
           messagingStatus={messagingStatus}
           copied={copiedId === details.id}
           sending={sendingId === details.id}

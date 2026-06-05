@@ -1,6 +1,18 @@
+import {
+  CARREFOUR_MARKET_NAME,
+  CARREFOUR_PRODUCTS,
+  getCarrefourProduct,
+  MPESA_VISA_WELCOME_BONUS_USD,
+} from "@/lib/mpesa-visa/constants";
+
 export type UssdScreenId =
   | "root"
   | "root_stub"
+  | "bonus_account"
+  | "carrefour_menu"
+  | "carrefour_confirm"
+  | "carrefour_success"
+  | "carrefour_insufficient"
   | "visa_no_card"
   | "visa_main"
   | "visa_create_confirm"
@@ -23,7 +35,15 @@ export type UssdScreenId =
 export type VisaSimulationState = {
   screen: UssdScreenId;
   hasCard: boolean;
+  visaCardEverIssued: boolean;
   cardBlocked: boolean;
+  bonusBalanceUsd: number;
+  cardMasked: string | null;
+  cardPan: string | null;
+  cardExpiry: string | null;
+  cardCvv: string | null;
+  purchaseHistory: string[];
+  carrefourProductId: string | null;
   historyCount: 5 | 10;
   assistanceTopic: string | null;
   stubLabel: string | null;
@@ -44,25 +64,49 @@ export type UssdScreenView = {
 export const INITIAL_VISA_SIM_STATE: VisaSimulationState = {
   screen: "root",
   hasCard: false,
+  visaCardEverIssued: false,
   cardBlocked: false,
+  bonusBalanceUsd: 0,
+  cardMasked: null,
+  cardPan: null,
+  cardExpiry: null,
+  cardCvv: null,
+  purchaseHistory: [],
+  carrefourProductId: null,
   historyCount: 5,
   assistanceTopic: null,
   stubLabel: null,
 };
 
-const DEMO_CARD = {
-  number: "4532 •••• •••• 8291",
-  expiry: "08/26",
-  cvv: "•••",
-};
+function cardNumber(state: VisaSimulationState): string {
+  return state.cardPan ?? state.cardMasked ?? "—";
+}
+
+function cardExpiry(state: VisaSimulationState): string {
+  return state.cardExpiry ?? "—";
+}
+
+function cardCvv(state: VisaSimulationState): string {
+  return state.cardCvv ?? "•••";
+}
 
 function statusLine(blocked: boolean): string {
   return blocked ? "Bloquée" : "Active";
 }
 
 export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
-  const { screen, hasCard, cardBlocked, historyCount, assistanceTopic, stubLabel } =
-    state;
+  const {
+    screen,
+    hasCard,
+    visaCardEverIssued,
+    cardBlocked,
+    bonusBalanceUsd,
+    historyCount,
+    assistanceTopic,
+    stubLabel,
+    carrefourProductId,
+    purchaseHistory,
+  } = state;
 
   switch (screen) {
     case "root":
@@ -82,20 +126,131 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         showInput: true,
       };
 
-    case "root_stub":
+    case "root_stub": {
+      const isCarrefourStub = stubLabel === CARREFOUR_MARKET_NAME;
       return {
         title: "M-PESA",
+        lines: isCarrefourStub
+          ? [
+              CARREFOUR_MARKET_NAME,
+              "",
+              "Ouvrez la carte Carrefour Market",
+              "sur la page d'accueil pour",
+              "consommer votre bonus.",
+            ]
+          : [
+              stubLabel ?? "Option",
+              "",
+              "Simulation — parcours non disponible dans cette démo.",
+              "Revenez au menu principal.",
+            ],
+        options: [{ key: "0", label: "Retour" }],
+        showInput: true,
+      };
+    }
+
+    case "bonus_account":
+      return {
+        title: "COMPTE BONUS",
+        lines: hasCard
+          ? [
+              `Solde Carrefour : ${bonusBalanceUsd.toFixed(2)} USD`,
+              `Bonus initial : ${MPESA_VISA_WELCOME_BONUS_USD} USD`,
+              "",
+              `Boutique ${CARREFOUR_MARKET_NAME}`,
+              "sur la page d'accueil (carte dédiée).",
+            ]
+          : [
+              "Aucune carte Visa active.",
+              "Créez votre carte (option 7)",
+              `pour recevoir ${MPESA_VISA_WELCOME_BONUS_USD} USD de bonus.`,
+            ],
+        options: [{ key: "0", label: "Retour" }],
+        showInput: true,
+      };
+
+    case "carrefour_menu":
+      return {
+        title: CARREFOUR_MARKET_NAME.toUpperCase(),
         lines: [
-          stubLabel ?? "Option",
+          `Solde disponible : ${bonusBalanceUsd.toFixed(2)} USD`,
           "",
-          "Simulation — parcours non disponible dans cette démo.",
-          "Revenez au menu principal.",
+          "Choisissez un produit :",
+        ],
+        options: [
+          ...CARREFOUR_PRODUCTS.map((p, i) => ({
+            key: String(i + 1),
+            label: `${p.name} — ${p.priceUsd} USD`,
+          })),
+          { key: "0", label: "Retour" },
+        ],
+        showInput: true,
+      };
+
+    case "carrefour_confirm": {
+      const product = carrefourProductId
+        ? getCarrefourProduct(carrefourProductId)
+        : null;
+      return {
+        title: CARREFOUR_MARKET_NAME.toUpperCase(),
+        lines: product
+          ? [
+              product.name,
+              `Prix : ${product.priceUsd} USD`,
+              `Solde après achat : ${(bonusBalanceUsd - product.priceUsd).toFixed(2)} USD`,
+            ]
+          : ["Produit invalide."],
+        options: [
+          { key: "1", label: "Confirmer l'achat" },
+          { key: "2", label: "Annuler" },
+        ],
+        showInput: true,
+      };
+    }
+
+    case "carrefour_success": {
+      const product = carrefourProductId
+        ? getCarrefourProduct(carrefourProductId)
+        : null;
+      return {
+        title: CARREFOUR_MARKET_NAME.toUpperCase(),
+        lines: [
+          "Achat enregistré.",
+          product?.name ?? "",
+          `Nouveau solde : ${bonusBalanceUsd.toFixed(2)} USD`,
+        ],
+        options: [
+          { key: "1", label: "Autre produit" },
+          { key: "0", label: "Retour" },
+        ],
+        showInput: true,
+      };
+    }
+
+    case "carrefour_insufficient":
+      return {
+        title: CARREFOUR_MARKET_NAME.toUpperCase(),
+        lines: [
+          "Solde insuffisant.",
+          `Disponible : ${bonusBalanceUsd.toFixed(2)} USD`,
         ],
         options: [{ key: "0", label: "Retour" }],
         showInput: true,
       };
 
     case "visa_no_card":
+      if (visaCardEverIssued) {
+        return {
+          title: "M-PESA CARTE VISA",
+          lines: [
+            "Une carte a déjà été créée",
+            "pour votre compte.",
+            "Création non disponible.",
+          ],
+          options: [{ key: "0", label: "Retour" }],
+          showInput: true,
+        };
+      }
       return {
         title: "M-PESA CARTE VISA",
         lines: [
@@ -109,19 +264,38 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         showInput: true,
       };
 
-    case "visa_main":
-      return {
-        title: "M-PESA CARTE VISA",
-        lines: [],
-        options: [
-          { key: "1", label: "Créer une carte Visa" },
+    case "visa_main": {
+      const options: { key: string; label: string }[] = [];
+      if (!hasCard && !visaCardEverIssued) {
+        options.push({ key: "1", label: "Créer une carte Visa" });
+      }
+      if (hasCard) {
+        options.push(
           { key: "2", label: "Ma carte Visa" },
           { key: "3", label: "Historique des transactions" },
           { key: "4", label: "Assistance" },
-          { key: "0", label: "Retour" },
-        ],
+        );
+      }
+      if (!hasCard && visaCardEverIssued) {
+        return {
+          title: "M-PESA CARTE VISA",
+          lines: [
+            "Une carte a déjà été créée",
+            "pour votre compte.",
+            "Création non disponible.",
+          ],
+          options: [{ key: "0", label: "Retour" }],
+          showInput: true,
+        };
+      }
+      options.push({ key: "0", label: "Retour" });
+      return {
+        title: "M-PESA CARTE VISA",
+        lines: [],
+        options,
         showInput: true,
       };
+    }
 
     case "visa_create_confirm":
       return {
@@ -129,6 +303,9 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         lines: [
           "Frais de création : 1 USD",
           "Validité : 6 mois",
+          "",
+          `Bonus ${CARREFOUR_MARKET_NAME} :`,
+          `${MPESA_VISA_WELCOME_BONUS_USD} USD offerts`,
         ],
         options: [
           { key: "1", label: "Confirmer" },
@@ -140,14 +317,8 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
     case "visa_create_success":
       return {
         title: "M-PESA CARTE VISA",
-        lines: [
-          "Votre Carte Visa M-Pesa",
-          "a été créée avec succès.",
-        ],
-        options: [
-          { key: "1", label: "Voir les détails" },
-          { key: "0", label: "Retour" },
-        ],
+        lines: ["Carte créée avec succès."],
+        options: [{ key: "0", label: "Retour" }],
         showInput: true,
       };
 
@@ -171,7 +342,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
     case "visa_card_number":
       return {
         title: "MA CARTE VISA",
-        lines: ["Numéro de carte :", DEMO_CARD.number],
+        lines: ["Numéro de carte :", cardNumber(state)],
         options: [{ key: "0", label: "Retour" }],
         showInput: true,
       };
@@ -179,7 +350,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
     case "visa_card_expiry":
       return {
         title: "MA CARTE VISA",
-        lines: ["Date d'expiration :", DEMO_CARD.expiry],
+        lines: ["Date d'expiration :", cardExpiry(state)],
         options: [{ key: "0", label: "Retour" }],
         showInput: true,
       };
@@ -187,7 +358,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
     case "visa_card_cvv":
       return {
         title: "MA CARTE VISA",
-        lines: ["CVV :", DEMO_CARD.cvv, "(Simulation — non réel)"],
+        lines: ["CVV :", cardCvv(state), "(Simulation — non réel)"],
         options: [{ key: "0", label: "Retour" }],
         showInput: true,
       };
@@ -198,7 +369,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         lines: [
           `Statut : ${statusLine(cardBlocked)}`,
           "Validité : 6 mois",
-          "Solde lié : M-Pesa FC",
+          `Bonus Carrefour : ${bonusBalanceUsd.toFixed(2)} USD`,
         ],
         options: [{ key: "0", label: "Retour" }],
         showInput: true,
@@ -263,17 +434,14 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
       };
 
     case "visa_history_list": {
-      const txs = [
+      const demoTxs = [
         "Achat POS — 12,50 USD",
         "Retrait ATM — 50,00 USD",
         "Paiement en ligne — 8,99 USD",
-        "Recharge — 100,00 USD",
-        "Frais mensuels — 1,00 USD",
-        "Achat POS — 22,00 USD",
-        "Paiement — 15,30 USD",
-        "Retrait — 30,00 USD",
-        "Achat — 5,50 USD",
-        "Crédit — 200,00 USD",
+      ];
+      const txs = [
+        ...purchaseHistory,
+        ...demoTxs,
       ].slice(0, historyCount);
       return {
         title: "HISTORIQUE",
@@ -366,14 +534,22 @@ function applyUssdChoiceInner(
         screen: state.hasCard ? "visa_main" : "visa_no_card",
       };
     }
+    if (key === "5") {
+      return {
+        ...state,
+        screen: "root_stub",
+        stubLabel: CARREFOUR_MARKET_NAME,
+      };
+    }
+    if (key === "8") {
+      return { ...state, screen: "bonus_account" };
+    }
     const labels: Record<string, string> = {
       "1": "M-Pesa USD",
       "2": "M-Pesa FC",
       "3": "Inviter un proche",
       "4": "Balance Rallonge",
-      "5": "Petit Commerce",
       "6": "Achat Produits",
-      "8": "Compte Bonus",
     };
     if (labels[key]) {
       return { ...state, screen: "root_stub", stubLabel: labels[key] };
@@ -381,19 +557,64 @@ function applyUssdChoiceInner(
     return state;
   }
 
+  if (screen === "bonus_account" && key === "0") {
+    return { ...state, screen: "root" };
+  }
+
+  if (screen === "carrefour_menu") {
+    if (key === "0") return { ...state, screen: "root" };
+    const index = Number(key) - 1;
+    const product = CARREFOUR_PRODUCTS[index];
+    if (!product) return state;
+    if (state.bonusBalanceUsd < product.priceUsd) {
+      return { ...state, screen: "carrefour_insufficient" };
+    }
+    return {
+      ...state,
+      carrefourProductId: product.id,
+      screen: "carrefour_confirm",
+    };
+  }
+
+  if (screen === "carrefour_confirm") {
+    if (key === "2") {
+      return { ...state, screen: "carrefour_menu", carrefourProductId: null };
+    }
+    if (key === "1") {
+      return { ...state, screen: "carrefour_success" };
+    }
+    return state;
+  }
+
+  if (screen === "carrefour_success") {
+    if (key === "1") {
+      return { ...state, screen: "carrefour_menu", carrefourProductId: null };
+    }
+    if (key === "0") return { ...state, screen: "root" };
+    return state;
+  }
+
+  if (screen === "carrefour_insufficient" && key === "0") {
+    return { ...state, screen: "carrefour_menu" };
+  }
+
   if (screen === "root_stub" && key === "0") {
     return { ...state, screen: "root", stubLabel: null };
   }
 
   if (screen === "visa_no_card") {
-    if (key === "1") return { ...state, screen: "visa_create_confirm" };
+    if (key === "1" && !state.visaCardEverIssued) {
+      return { ...state, screen: "visa_create_confirm" };
+    }
     if (key === "0") return { ...state, screen: "root" };
     return state;
   }
 
   if (screen === "visa_main") {
     if (key === "0") return { ...state, screen: "root" };
-    if (key === "1") return { ...state, screen: "visa_create_confirm" };
+    if (key === "1" && !state.hasCard && !state.visaCardEverIssued) {
+      return { ...state, screen: "visa_create_confirm" };
+    }
     if (key === "2" && state.hasCard) return { ...state, screen: "visa_my_card" };
     if (key === "3" && state.hasCard) return { ...state, screen: "visa_history" };
     if (key === "4" && state.hasCard) return { ...state, screen: "visa_assistance" };
@@ -402,9 +623,11 @@ function applyUssdChoiceInner(
 
   if (screen === "visa_create_confirm") {
     if (key === "1") {
+      if (state.visaCardEverIssued || state.hasCard) {
+        return state;
+      }
       return {
         ...state,
-        hasCard: true,
         cardBlocked: false,
         screen: "visa_create_success",
       };
@@ -418,10 +641,8 @@ function applyUssdChoiceInner(
     return state;
   }
 
-  if (screen === "visa_create_success") {
-    if (key === "1") return { ...state, screen: "visa_my_card" };
-    if (key === "0") return { ...state, screen: "visa_main" };
-    return state;
+  if (screen === "visa_create_success" && key === "0") {
+    return { ...state, screen: "visa_main" };
   }
 
   if (screen === "visa_my_card") {
@@ -434,7 +655,7 @@ function applyUssdChoiceInner(
       return { ...state, screen: "visa_block_confirm" };
     }
     if (key === "6" && state.cardBlocked) {
-      return { ...state, screen: "visa_unblock_done", cardBlocked: false };
+      return { ...state, screen: "visa_unblock_done" };
     }
     if (key === "7") return { ...state, screen: "visa_delete_confirm" };
     return state;
@@ -442,7 +663,7 @@ function applyUssdChoiceInner(
 
   if (screen === "visa_block_confirm") {
     if (key === "1") {
-      return { ...state, cardBlocked: true, screen: "visa_block_done" };
+      return { ...state, screen: "visa_block_done" };
     }
     if (key === "2") return { ...state, screen: "visa_my_card" };
     return state;
@@ -460,7 +681,6 @@ function applyUssdChoiceInner(
     if (key === "1") {
       return {
         ...state,
-        hasCard: false,
         cardBlocked: false,
         screen: "visa_delete_done",
       };

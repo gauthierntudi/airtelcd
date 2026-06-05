@@ -15,6 +15,7 @@ import {
   User,
 } from "lucide-react";
 import { AdminModal } from "@/components/admin/AdminModal";
+import { GuestMpesaSummary } from "@/components/admin/GuestMpesaSummary";
 import { ContactChannelBadges } from "@/components/admin/ContactChannelBadges";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import {
@@ -28,6 +29,7 @@ import { formatPhoneDisplay, whatsAppUrl } from "@/lib/phone";
 
 type Props = {
   guest: GuestRow;
+  adminSecret: string;
   messagingStatus: MessagingStatus;
   copied: boolean;
   sending: boolean;
@@ -39,6 +41,7 @@ type Props = {
 
 export function GuestDetailsModal({
   guest,
+  adminSecret,
   messagingStatus,
   copied,
   sending,
@@ -119,13 +122,13 @@ export function GuestDetailsModal({
               linkIcon={Phone}
             />
             <DetailItem
-              label="Canal d'envoi"
+              label="Canaux à l'envoi"
               value={
-                guest.messageChannel === "email"
-                  ? "Email (prioritaire)"
-                  : guest.messageChannel === "whatsapp"
-                    ? "WhatsApp (prioritaire)"
-                    : "—"
+                guest.sendChannels.length === 0
+                  ? "—"
+                  : guest.sendChannels
+                      .map((c) => (c === "email" ? "Email" : "WhatsApp"))
+                      .join(" + ")
               }
             />
           </DetailSection>
@@ -150,7 +153,13 @@ export function GuestDetailsModal({
             {guest.invitationSentVia && (
               <DetailItem
                 label="Canal utilisé"
-                value={guest.invitationSentVia === "email" ? "Email" : "WhatsApp"}
+                value={
+                  guest.invitationSentVia === "both"
+                    ? "Email + WhatsApp"
+                    : guest.invitationSentVia === "email"
+                      ? "Email"
+                      : "WhatsApp"
+                }
               />
             )}
             <DetailItem
@@ -166,6 +175,8 @@ export function GuestDetailsModal({
             />
           </DetailSection>
         </div>
+
+        <GuestMpesaSummary guestId={guest.id} adminSecret={adminSecret} />
 
         <div className="mt-4 rounded-xl border border-white/10 bg-[#121212] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">

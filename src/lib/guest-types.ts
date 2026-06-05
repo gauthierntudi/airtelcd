@@ -14,12 +14,14 @@ export type GuestRow = {
   rsvpStatus: RsvpStatus;
   confirmedAt: string | null;
   invitationSentAt: string | null;
-  invitationSentVia: ContactChannel | null;
+  invitationSentVia: ContactChannel | "both" | null;
   createdAt: string;
   updatedAt: string;
   displayName: string;
   invitationUrl: string;
   contactChannels: ContactChannel[];
+  /** Canaux réellement envoyables (contact + API configurée) */
+  sendChannels: ContactChannel[];
   messageChannel: ContactChannel | null;
   /** true seulement si contact + API Brevo/Twilio configurée pour ce canal */
   canSendInvitation: boolean;
