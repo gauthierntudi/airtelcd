@@ -5,7 +5,7 @@ export type InvitationWhatsAppParams = {
   phoneE164: string;
   /** {{1}} — nom complet de l'invité */
   displayName: string;
-  /** {{2}} — token invitation (URL : …/api/confirm/action={{2}}) */
+  /** {{2}} — token (URL Twilio : {URL_ORIGIN_CONFIRM}/api/confirm/action={{2}}) */
   invitationToken: string;
 };
 

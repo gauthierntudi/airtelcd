@@ -115,13 +115,15 @@
 
             <div class="qr-code-container">
                 <p>Scannez ce QR code pour confirmer votre présence :</p>
-                <img
-                    class="qr-code-image"
-                    src="{{qr_code_url}}"
-                    alt="QR Code — confirmer ma présence"
-                    width="200"
-                    height="200"
-                >
+                <a href="{{confirmation_url}}" style="text-decoration:none;display:inline-block;line-height:0;">
+                    <img
+                        class="qr-code-image"
+                        src="{{qr_code_url}}"
+                        alt="QR Code — confirmer ma présence"
+                        width="200"
+                        height="200"
+                    >
+                </a>
             </div>
 
             <div class="button-container">

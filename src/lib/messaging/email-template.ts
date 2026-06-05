@@ -1,18 +1,23 @@
 import fs from "fs";
 import path from "path";
-import { EVENT } from "@/lib/event";
 import { INVITATION_HERO_IMAGE_URL } from "@/lib/invitation-assets";
 import { invitationQrCodeImageUrl } from "@/lib/invitation-qr";
+import {
+  INVITATION_EXPERIENCE,
+  type InvitationEmailRenderParams,
+  type InvitationEmailVariant,
+} from "@/lib/messaging/invitation-email-vars";
 
 export const INVITATION_EMAIL_HERO_URL = INVITATION_HERO_IMAGE_URL;
 
-export type InvitationEmailTemplateParams = {
-  firstName: string;
-  displayName: string;
-  invitationUrl: string;
+const TEMPLATE_FILES: Record<InvitationEmailVariant, string> = {
+  simple: path.join("public", "tamplate-email", "email_template_simple.html"),
+  nominative: path.join(
+    "public",
+    "tamplate-email",
+    "email_template_nominative.html",
+  ),
 };
-
-const TEMPLATE_REL = path.join("public", "tamplate-email", "email_template.html");
 
 function escapeHtmlText(text: string): string {
   return text
@@ -22,27 +27,30 @@ function escapeHtmlText(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
-/** Attributs href/src — préserve les & des URLs. */
 function escapeHtmlAttr(text: string): string {
   return text.replace(/"/g, "&quot;");
 }
 
-function loadTemplate(): string {
-  const filePath = path.join(process.cwd(), TEMPLATE_REL);
+function loadTemplate(variant: InvitationEmailVariant): string {
+  const filePath = path.join(process.cwd(), TEMPLATE_FILES[variant]);
   return fs.readFileSync(filePath, "utf-8");
 }
 
-/**
- * Rendu du template `public/tamplate-email/email_template.html`.
- * - {{hero_image_url}} : bannière Cloudinary en tête
- * - {{qr_code_url}} : QR 200×200 dans .qr-code-container uniquement
- */
+export function invitationEmailSubject(params: InvitationEmailRenderParams): string {
+  if (params.variant === "nominative") {
+    return `${params.displayName}, votre invitation — ${INVITATION_EXPERIENCE.title}`;
+  }
+  return `Votre invitation — ${INVITATION_EXPERIENCE.title}`;
+}
+
 export function renderInvitationEmailFromTemplate(
-  params: InvitationEmailTemplateParams,
+  params: InvitationEmailRenderParams,
 ): string {
-  const subject = `${params.firstName}, votre invitation — ${EVENT.title}`;
-  const confirmationUrl = escapeHtmlAttr(params.invitationUrl);
-  const qrUrl = escapeHtmlAttr(invitationQrCodeImageUrl(params.invitationUrl));
+  const subject = invitationEmailSubject(params);
+  /** URL unique : bouton, lien sur le QR et données scannées */
+  const confirmationUrlRaw = params.invitationUrl;
+  const confirmationUrl = escapeHtmlAttr(confirmationUrlRaw);
+  const qrUrl = escapeHtmlAttr(invitationQrCodeImageUrl(confirmationUrlRaw));
   const heroUrl = escapeHtmlAttr(INVITATION_EMAIL_HERO_URL);
 
   const replacements: [string, string][] = [
@@ -50,13 +58,13 @@ export function renderInvitationEmailFromTemplate(
     ["{{qr_code_url}}", qrUrl],
     ["{{confirmation_url}}", confirmationUrl],
     ["{{subject}}", escapeHtmlText(subject)],
-    ["{{name_invite}}", escapeHtmlText(params.displayName)],
-    ["{{event_title}}", escapeHtmlText(EVENT.title)],
-    ["{{event_date}}", escapeHtmlText(`${EVENT.dateLabel} — ${EVENT.timeLabel}`)],
-    ["{{event_venue}}", escapeHtmlText(EVENT.venue)],
+    ["{{guest_name}}", escapeHtmlText(params.displayName)],
+    ["{{event_dates}}", escapeHtmlText(params.eventDates)],
+    ["{{event_time}}", escapeHtmlText(params.eventTime)],
+    ["{{event_venue}}", escapeHtmlText(params.venue)],
   ];
 
-  let html = loadTemplate();
+  let html = loadTemplate(params.variant);
   for (const [token, value] of replacements) {
     html = html.split(token).join(value);
   }

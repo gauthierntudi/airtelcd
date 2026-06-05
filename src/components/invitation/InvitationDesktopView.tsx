@@ -80,7 +80,7 @@ export function InvitationDesktopView({
                 {EVENT.title}
               </p>
               <h1 className="mt-3 font-vodafone-exb text-4xl font-normal leading-tight tracking-tight text-white">
-                Votre business digitalisé et connecté
+                Le privilège se vit aussi sur le green
               </h1>
               <p className="mt-2 font-vodafone-lt text-lg leading-relaxed text-white/90">
                 Cher(e) <span className="font-vodafone-rg-bd text-white">{displayName}</span>
@@ -124,7 +124,7 @@ export function InvitationDesktopView({
                     icon={Calendar}
                     label="Votre date"
                     value={formatInvitedDaysLong(guest.eventDays)}
-                    sub={EVENT.timeLabel}
+                    sub={guest.invitationTimeRange}
                   />
                   <InfoChip icon={MapPin} label="Lieu" value={EVENT.venue} />
                   <InfoChip icon={Shirt} label="Tenue" value={EVENT.dressCode} />

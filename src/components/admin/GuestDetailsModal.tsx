@@ -106,6 +106,10 @@ export function GuestDetailsModal({
               label="Jours d'invitation"
               value={formatInvitedDaysLong(guest.eventDays)}
             />
+            <DetailItem
+              label="Horaire"
+              value={guest.invitationTimeRange}
+            />
           </DetailSection>
 
           <DetailSection title="Contact" icon={Mail}>
@@ -233,7 +237,7 @@ export function GuestDetailsModal({
           </button>
           <button
             type="button"
-            disabled={!guest.canSendInvitation || sending}
+            disabled={sending}
             onClick={onSend}
             className="inline-flex items-center gap-2 rounded-xl bg-vodacom-red px-4 py-2 text-sm font-medium text-white transition hover:bg-vodacom-red-dark disabled:opacity-40"
           >

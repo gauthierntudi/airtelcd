@@ -1,13 +1,14 @@
 import type { Guest } from "@prisma/client";
 import type { ContactChannel } from "@/lib/guest-contact";
-import {
-  assertCanSendInvitation,
-  getMessagingStatus,
-} from "@/lib/messaging/config";
+import { getMessagingStatus } from "@/lib/messaging/config";
 import { sendInvitationEmail } from "@/lib/messaging/brevo";
+import { buildInvitationEmailParams } from "@/lib/messaging/invitation-email-vars";
+import {
+  assertSendOptions,
+  type SendInvitationOptions,
+} from "@/lib/messaging/send-options";
 import { sendInvitationWhatsApp } from "@/lib/messaging/twilio-whatsapp";
 import { guestDisplayName } from "@/lib/event";
-import { invitationAbsoluteUrl } from "@/lib/invitation-url";
 import { prisma } from "@/lib/prisma";
 
 export type InvitationSentVia = ContactChannel | "both";
@@ -15,10 +16,8 @@ export type InvitationSentVia = ContactChannel | "both";
 export type SendInvitationResult = {
   guestId: string;
   channels: ContactChannel[];
-  /** Compat API — premier canal ou "both" si les deux ont été envoyés */
   channel: InvitationSentVia;
   sentAt: string;
-  /** Présent si un ou plusieurs canaux ont échoué alors que d'autres ont réussi */
   warnings?: string[];
 };
 
@@ -30,15 +29,17 @@ function invitationSentViaValue(channels: ContactChannel[]): InvitationSentVia {
 async function sendOnChannel(
   channel: ContactChannel,
   guest: Guest,
-  content: {
-    firstName: string;
-    displayName: string;
-    invitationUrl: string;
-  },
+  baseUrl: string,
+  options: SendInvitationOptions,
 ): Promise<void> {
   if (channel === "email") {
+    const emailParams = buildInvitationEmailParams(
+      guest,
+      baseUrl,
+      options.emailTemplate,
+    );
     await sendInvitationEmail({
-      ...content,
+      ...emailParams,
       email: guest.email!.trim(),
     });
     return;
@@ -46,7 +47,7 @@ async function sendOnChannel(
 
   await sendInvitationWhatsApp({
     phoneE164: guest.phone!,
-    displayName: content.displayName,
+    displayName: guestDisplayName(guest.firstName, guest.lastName),
     invitationToken: guest.token,
   });
 }
@@ -54,6 +55,7 @@ async function sendOnChannel(
 export async function sendInvitationToGuest(
   guest: Guest,
   baseUrl: string,
+  options: SendInvitationOptions,
 ): Promise<SendInvitationResult> {
   if (!getMessagingStatus().canSendAny) {
     throw new Error(
@@ -61,17 +63,10 @@ export async function sendInvitationToGuest(
     );
   }
 
-  const channels = assertCanSendInvitation(guest);
-  const invitationUrl = invitationAbsoluteUrl(guest.token, baseUrl);
-  const displayName = guestDisplayName(guest.firstName, guest.lastName);
-  const content = {
-    firstName: guest.firstName,
-    displayName,
-    invitationUrl,
-  };
+  const channels = assertSendOptions(guest, options);
 
   const results = await Promise.allSettled(
-    channels.map((channel) => sendOnChannel(channel, guest, content)),
+    channels.map((channel) => sendOnChannel(channel, guest, baseUrl, options)),
   );
 
   const succeeded = channels.filter((_, i) => results[i]?.status === "fulfilled");
@@ -121,6 +116,7 @@ export type BulkSendResult = {
 export async function sendInvitationsBulk(
   guests: Guest[],
   baseUrl: string,
+  options: SendInvitationOptions,
 ): Promise<BulkSendResult> {
   const sent: SendInvitationResult[] = [];
   const failed: BulkSendResult["failed"] = [];
@@ -128,7 +124,7 @@ export async function sendInvitationsBulk(
   for (const guest of guests) {
     const displayName = guestDisplayName(guest.firstName, guest.lastName);
     try {
-      const result = await sendInvitationToGuest(guest, baseUrl);
+      const result = await sendInvitationToGuest(guest, baseUrl, options);
       sent.push(result);
     } catch (e) {
       failed.push({

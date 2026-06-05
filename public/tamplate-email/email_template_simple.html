@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{subject}}</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.65; color: #333333; }
+        .email-container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; }
+        .hero-banner { display: block; width: 100%; max-width: 600px; height: auto; border: 0; }
+        .content { padding: 30px; background-color: #ffffff; }
+        .message { margin-bottom: 24px; font-size: 16px; }
+        .meta { margin: 12px 0; }
+        .qr-code-container { text-align: center; margin: 28px 0; padding: 20px; background-color: #f5f5f5; border-radius: 8px; }
+        .qr-code-image { display: inline-block; width: 200px; height: 200px; border: 0; }
+        .button-container { text-align: center; margin: 28px 0; }
+        .button {
+            display: inline-block; padding: 15px 30px; background-color: #fa0002;
+            color: #ffffff !important; text-decoration: none; border-radius: 15px;
+            font-weight: bold; font-size: 16px;
+        }
+        .footer { text-align: center; padding: 20px; color: #666666; font-size: 14px; }
+        .social-links a { margin: 0 10px; color: #fa0002; text-decoration: none; }
+        @media only screen and (max-width: 600px) {
+            .email-container { padding: 10px; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <a href="{{confirmation_url}}" style="text-decoration:none;display:block;line-height:0;">
+            <img class="hero-banner" src="{{hero_image_url}}" alt="Kinshasa Open de Golf — invitation" width="600">
+        </a>
+        <div class="content">
+            <div class="message">
+                <p style="margin:0 0 16px;">Vodacom Privileges a le plaisir de vous convier à une expérience exclusive à <strong>Kinshasa Open de Golf</strong>. Dans un cadre raffiné, Green Bistro, profitez d'un moment privilégié alliant élégance, convivialité et art de vivre autour du golf.</p>
+                <p class="meta" style="margin:0 0 8px;">📅 Le(s) <strong>{{event_dates}}</strong> juin 2026</p>
+                <p class="meta" style="margin:0 0 8px;">🕗 De <strong>{{event_time}}</strong></p>
+                <p class="meta" style="margin:0 0 16px;">📍 <strong>{{event_venue}}</strong></p>
+                <p style="margin:0 0 8px;">Veuillez confirmer votre présence</p>
+                <p style="margin:0;">Au plaisir de vous accueillir.</p>
+            </div>
+
+            <div class="qr-code-container">
+                <p>Scannez ce QR code pour confirmer votre présence :</p>
+                <a href="{{confirmation_url}}" style="text-decoration:none;display:inline-block;line-height:0;">
+                    <img class="qr-code-image" src="{{qr_code_url}}" alt="QR Code — confirmer ma présence" width="200" height="200">
+                </a>
+            </div>
+
+            <div class="button-container">
+                <a href="{{confirmation_url}}" class="button" style="display:inline-block;padding:15px 30px;background-color:#fa0002;color:#ffffff !important;text-decoration:none;border-radius:15px;font-weight:bold;font-size:16px;">Confirmez</a>
+            </div>
+
+            <div class="footer">
+                <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+                <div class="social-links">
+                    <a href="https://web.facebook.com/VodacomRDC" target="_blank">Facebook</a> |
+                    <a href="https://x.com/Vodacomcongo" target="_blank">Twitter</a> |
+                    <a href="https://www.linkedin.com/company/vodacom-rdc/posts/?feedView=all" target="_blank">LinkedIn</a>
+                </div>
+                <p>&copy; 2026 Vodacom Congo. Tous droits réservés.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

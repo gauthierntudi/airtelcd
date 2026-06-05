@@ -2,11 +2,11 @@ import { assertChannelConfigured, getMessagingConfig } from "@/lib/messaging/con
 import {
   invitationEmailHtml,
   invitationEmailSubject,
-  type InvitationContentParams,
 } from "@/lib/messaging/invitation-content";
+import type { InvitationEmailRenderParams } from "@/lib/messaging/invitation-email-vars";
 
 export async function sendInvitationEmail(
-  params: InvitationContentParams & { email: string },
+  params: InvitationEmailRenderParams & { email: string },
 ): Promise<void> {
   assertChannelConfigured("email");
   const { brevo } = getMessagingConfig();
@@ -24,7 +24,7 @@ export async function sendInvitationEmail(
         email: brevo.senderEmail,
       },
       to: [{ email: params.email, name: params.displayName }],
-      subject: invitationEmailSubject(params.firstName),
+      subject: invitationEmailSubject(params),
       htmlContent: invitationEmailHtml(params),
     }),
   });

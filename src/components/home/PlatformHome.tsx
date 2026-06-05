@@ -54,7 +54,7 @@ export function PlatformHome() {
                 {EVENT.title}
               </p>
               <h1 className="mt-3 font-vodafone-exb text-[1.65rem] font-normal leading-[1.1] tracking-tight text-white sm:mt-4 sm:text-4xl md:text-[2.75rem]">
-                Votre business digitalisé et connecté
+                Le privilège se vit aussi sur le green
               </h1>
               <p className="mt-1.5 font-vodafone-rg-bd text-base text-vodacom-red sm:mt-2 sm:text-xl">
                 More Freedom. More Privileges.

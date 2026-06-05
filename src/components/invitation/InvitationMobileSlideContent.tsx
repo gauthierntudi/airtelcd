@@ -37,7 +37,12 @@ export function InvitationMobileSlideContent(props: SlideProps) {
     case "experience":
       return <ExperienceSlide />;
     case "datetime":
-      return <DateTimeSlide eventDays={props.guest.eventDays} />;
+      return (
+        <DateTimeSlide
+          eventDays={props.guest.eventDays}
+          timeRange={props.guest.invitationTimeRange}
+        />
+      );
     case "programme":
       return <ProgrammeSlide eventDays={props.guest.eventDays} />;
     case "rsvp":
@@ -62,7 +67,7 @@ function WelcomeSlide() {
           {EVENT.title}
         </p>
         <h2 className="font-vodafone-exb font-normal text-[2.65rem] leading-[1.05] tracking-tight text-white">
-          Votre business digitalisé et connecté
+          Le privilège se vit aussi sur le green
         </h2>
         <p className="font-vodafone-rg-bd font-normal text-2xl leading-snug text-vodacom-red">
           Kinshasa Open de Golf 2026
@@ -125,7 +130,13 @@ function ExperienceSlide() {
   );
 }
 
-function DateTimeSlide({ eventDays }: { eventDays: EventDayId[] }) {
+function DateTimeSlide({
+  eventDays,
+  timeRange,
+}: {
+  eventDays: EventDayId[];
+  timeRange: string;
+}) {
   return (
     <div className="flex flex-col gap-3 pb-0.5">
       <div className="space-y-2">
@@ -139,7 +150,7 @@ function DateTimeSlide({ eventDays }: { eventDays: EventDayId[] }) {
           {formatInvitedDaysLong(eventDays)}
         </p>
         <p className="font-vodafone-lt font-normal text-2xl leading-snug text-white/90">
-          {EVENT.timeLabel}
+          {timeRange}
         </p>
       </div>
     </div>

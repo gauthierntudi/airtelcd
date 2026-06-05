@@ -1,23 +1,14 @@
-import { EVENT } from "@/lib/event";
 import {
   INVITATION_EMAIL_HERO_URL,
+  invitationEmailSubject,
   renderInvitationEmailFromTemplate,
 } from "@/lib/messaging/email-template";
+import type { InvitationEmailRenderParams } from "@/lib/messaging/invitation-email-vars";
 
 export { INVITATION_EMAIL_HERO_URL };
 
-export type InvitationContentParams = {
-  firstName: string;
-  displayName: string;
-  invitationUrl: string;
-};
-
-export function invitationEmailSubject(firstName: string): string {
-  return `${firstName}, votre invitation — ${EVENT.title}`;
-}
-
-/** HTML invitation — template `public/tamplate-email/email_template.html` */
-export function invitationEmailHtml(params: InvitationContentParams): string {
+export function invitationEmailHtml(params: InvitationEmailRenderParams): string {
   return renderInvitationEmailFromTemplate(params);
 }
 
+export { invitationEmailSubject };

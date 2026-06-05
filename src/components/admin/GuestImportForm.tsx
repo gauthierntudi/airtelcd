@@ -20,6 +20,7 @@ import {
   type GuestImportRow,
 } from "@/lib/parse-guest-csv";
 import type { EventDayId } from "@/lib/event-days";
+import { DEFAULT_INVITATION_TIME_RANGE } from "@/lib/invitation-time-range";
 import { formatInvitedDaysShort } from "@/lib/event-days";
 import { notify } from "@/lib/toast";
 
@@ -40,6 +41,9 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
   const [fileName, setFileName] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [eventDays, setEventDays] = useState<EventDayId[]>([DEFAULT_EVENT_DAY_ID]);
+  const [invitationTimeRange, setInvitationTimeRange] = useState(
+    DEFAULT_INVITATION_TIME_RANGE,
+  );
 
   function downloadTemplate() {
     const blob = new Blob([GUEST_CSV_TEMPLATE], { type: "text/csv;charset=utf-8" });
@@ -95,6 +99,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
         headers,
         body: JSON.stringify({
           eventDays,
+          invitationTimeRange,
           guests: preview.map(({ firstName, lastName, email, phone }) => ({
             firstName,
             lastName,
@@ -129,6 +134,18 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
             <div className="mt-3">
               <EventDayMultiSelect value={eventDays} onChange={setEventDays} />
             </div>
+            <p className="mt-4 text-sm font-medium text-white">
+              Horaire pour cet import
+            </p>
+            <p className="mt-1 text-xs text-white/45">
+              Appliqué à tous les invités — variable horaire dans l&apos;email.
+            </p>
+            <input
+              value={invitationTimeRange}
+              onChange={(e) => setInvitationTimeRange(e.target.value)}
+              className="mt-2 w-full rounded-lg border border-white/15 bg-[#2a2a2a] px-3 py-2 text-sm text-white outline-none focus:border-vodacom-red/50"
+              placeholder={DEFAULT_INVITATION_TIME_RANGE}
+            />
           </div>
 
           <div className="flex flex-wrap gap-2">

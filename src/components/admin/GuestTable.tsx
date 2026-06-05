@@ -20,10 +20,16 @@ import {
   sortGuests,
 } from "@/lib/guest-table-utils";
 import type { MessagingStatus } from "@/lib/messaging/config";
+import {
+  canSendGuestWithOptions,
+  getGuestSendBlockReason,
+  type SendInvitationOptions,
+} from "@/lib/messaging/send-options";
 
 type Props = {
   rows: GuestRow[];
   messagingStatus: MessagingStatus;
+  sendOptions: SendInvitationOptions;
   copiedId: string | null;
   sendingId: string | null;
   bulkSending: boolean;
@@ -37,6 +43,7 @@ type Props = {
 export function GuestTable({
   rows,
   messagingStatus,
+  sendOptions,
   copiedId,
   sendingId,
   bulkSending,
@@ -152,6 +159,7 @@ export function GuestTable({
                   <GuestRowActions
                     guest={g}
                     messagingStatus={messagingStatus}
+                    sendOptions={sendOptions}
                     copied={copiedId === g.id}
                     sending={sendingId === g.id}
                     busy={bulkSending || (sendingId !== null && sendingId !== g.id)}

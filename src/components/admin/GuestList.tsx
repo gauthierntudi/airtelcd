@@ -24,6 +24,7 @@ import { GuestCreateForm } from "@/components/admin/GuestCreateForm";
 import { GuestImportForm } from "@/components/admin/GuestImportForm";
 import { GuestDetailsModal } from "@/components/admin/GuestDetailsModal";
 import { GuestTable } from "@/components/admin/GuestTable";
+import { InvitationSendOptions } from "@/components/admin/InvitationSendOptions";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import {
   type GuestRow,
@@ -32,6 +33,12 @@ import {
   guestsToCsv,
 } from "@/lib/guest-types";
 import type { MessagingStatus } from "@/lib/messaging/config";
+import {
+  canSendGuestWithOptions,
+  DEFAULT_SEND_OPTIONS,
+  getGuestSendBlockReason,
+  type SendInvitationOptions,
+} from "@/lib/messaging/send-options";
 import { PHONE_INPUT_HINT } from "@/lib/phone";
 import { notify } from "@/lib/toast";
 
@@ -68,6 +75,8 @@ export function GuestList({
   const [showCreate, setShowCreate] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [bulkSendConfirm, setBulkSendConfirm] = useState(false);
+  const [sendOptions, setSendOptions] =
+    useState<SendInvitationOptions>(DEFAULT_SEND_OPTIONS);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -94,9 +103,15 @@ export function GuestList({
   }, [guests]);
 
   const sendableFiltered = useMemo(
-    () => filtered.filter((g) => g.canSendInvitation),
-    [filtered],
+    () =>
+      filtered.filter((g) =>
+        canSendGuestWithOptions(g, sendOptions, messagingStatus),
+      ),
+    [filtered, sendOptions, messagingStatus],
   );
+
+  const canSendNow =
+    sendOptions.channels.email || sendOptions.channels.whatsapp;
 
   const notSentCount = useMemo(
     () => filtered.filter((g) => !g.invitationSentAt).length,
@@ -115,15 +130,23 @@ export function GuestList({
       notify.error("Envoi indisponible");
       return;
     }
-    if (!g.canSendInvitation) {
-      notify.error("Envoi impossible");
+    if (!canSendNow) {
+      notify.error("Sélectionnez au moins un canal");
+      return;
+    }
+    if (!canSendGuestWithOptions(g, sendOptions, messagingStatus)) {
+      notify.error(
+        getGuestSendBlockReason(g, sendOptions, messagingStatus) ??
+          "Envoi impossible pour cet invité avec ces canaux",
+      );
       return;
     }
     setSendingId(g.id);
     try {
       const res = await fetch(`/api/guests/${g.id}/send`, {
         method: "POST",
-        headers,
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(sendOptions),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur");
@@ -146,14 +169,17 @@ export function GuestList({
   }
 
   async function sendBulkInvitations() {
-    if (sendableFiltered.length === 0) return;
+    if (sendableFiltered.length === 0 || !canSendNow) return;
     setBulkSendConfirm(false);
     setBulkSending(true);
     try {
       const res = await fetch("/api/guests/send", {
         method: "POST",
-        headers,
-        body: JSON.stringify({ guestIds: sendableFiltered.map((g) => g.id) }),
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          guestIds: sendableFiltered.map((g) => g.id),
+          ...sendOptions,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur");
@@ -214,7 +240,12 @@ export function GuestList({
             <ToolbarBtn
               icon={bulkSending ? Loader2 : Send}
               onClick={() => setBulkSendConfirm(true)}
-              disabled={!messagingStatus.canSendAny || bulkSending || sendableFiltered.length === 0}
+              disabled={
+                !messagingStatus.canSendAny ||
+                !canSendNow ||
+                bulkSending ||
+                sendableFiltered.length === 0
+              }
               variant="primary"
               spin={bulkSending}
             >
@@ -226,7 +257,15 @@ export function GuestList({
           </div>
         </div>
 
-        <div className="mt-5 flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-[#121212] p-3 lg:flex-row lg:items-center">
+        <div className="mt-5">
+          <InvitationSendOptions
+            value={sendOptions}
+            onChange={setSendOptions}
+            messagingStatus={messagingStatus}
+          />
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-[#121212] p-3 lg:flex-row lg:items-center">
           <div className="relative flex-1 lg:max-w-md">
             <LucideIcon
               icon={Search}
@@ -298,6 +337,7 @@ export function GuestList({
           key={`${filter}-${search.trim()}`}
           rows={filtered}
           messagingStatus={messagingStatus}
+          sendOptions={sendOptions}
           copiedId={copiedId}
           sendingId={sendingId}
           bulkSending={bulkSending}
@@ -342,12 +382,20 @@ export function GuestList({
         <ConfirmDialog
           title="Envoyer les invitations"
           message={
-            <>
-              Envoyer l&apos;invitation à{" "}
-              <strong>{sendableFiltered.length}</strong> invité
-              {sendableFiltered.length !== 1 ? "s" : ""} affiché
-              {sendableFiltered.length !== 1 ? "s" : ""} ?
-            </>
+            <div className="space-y-4">
+              <p>
+                Envoyer l&apos;invitation à{" "}
+                <strong>{sendableFiltered.length}</strong> invité
+                {sendableFiltered.length !== 1 ? "s" : ""} affiché
+                {sendableFiltered.length !== 1 ? "s" : ""} ?
+              </p>
+              <InvitationSendOptions
+                compact
+                value={sendOptions}
+                onChange={setSendOptions}
+                messagingStatus={messagingStatus}
+              />
+            </div>
           }
           confirmLabel="Envoyer"
           loading={bulkSending}
@@ -462,6 +510,9 @@ function GuestEditModal({
   const [phone, setPhone] = useState(guest.phone ?? "");
   const [rsvpStatus, setRsvpStatus] = useState(guest.rsvpStatus);
   const [eventDays, setEventDays] = useState(guest.eventDays);
+  const [invitationTimeRange, setInvitationTimeRange] = useState(
+    guest.invitationTimeRange,
+  );
   const [saving, setSaving] = useState(false);
 
   async function handleSave(e: React.FormEvent) {
@@ -478,6 +529,7 @@ function GuestEditModal({
           phone: phone || null,
           rsvpStatus,
           eventDays,
+          invitationTimeRange,
         }),
       });
       const data = await res.json();
@@ -531,6 +583,17 @@ function GuestEditModal({
         </ModalField>
         <ModalField label="Jours d'invitation">
           <EventDayMultiSelect value={eventDays} onChange={setEventDays} />
+        </ModalField>
+        <ModalField label="Horaire d'invitation">
+          <input
+            value={invitationTimeRange}
+            onChange={(e) => setInvitationTimeRange(e.target.value)}
+            className={modalInputClass}
+            placeholder="08h00 – 17h00"
+          />
+          <p className="mt-1 text-xs text-white/45">
+            Utilisé dans l&apos;email (variables horaires) et la page invitation.
+          </p>
         </ModalField>
         <ModalField label="Statut RSVP">
           <select

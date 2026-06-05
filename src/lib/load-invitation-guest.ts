@@ -2,6 +2,7 @@ import { RsvpStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
 import type { EventDayId } from "@/lib/event-days";
 import { eventDaysFromDbDates } from "@/lib/parse-event-day";
+import { guestInvitationTimeRange } from "@/lib/invitation-time-range";
 import { prisma } from "@/lib/prisma";
 
 export type InvitationGuestView = {
@@ -9,6 +10,7 @@ export type InvitationGuestView = {
   lastName: string;
   token: string;
   eventDays: EventDayId[];
+  invitationTimeRange: string;
   rsvpStatus: RsvpStatus;
   confirmedAt: string | null;
 };
@@ -24,6 +26,7 @@ export async function loadInvitationGuestByToken(
     lastName: guest.lastName,
     token: guest.token,
     eventDays: eventDaysFromDbDates(guest.eventDays),
+    invitationTimeRange: guestInvitationTimeRange(guest),
     rsvpStatus: guest.rsvpStatus,
     confirmedAt: guest.confirmedAt?.toISOString() ?? null,
   };

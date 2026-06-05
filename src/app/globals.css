@@ -497,6 +497,14 @@ body {
   animation: checkin-orbit-ring-pulse 4s ease-in-out infinite;
 }
 
+/* Admin — toggle switches (options d'envoi) */
+@media (prefers-reduced-motion: reduce) {
+  .invite-toggle,
+  .invite-toggle-thumb {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .checkin-kiosk-fade-in,
   .checkin-qr-frame,

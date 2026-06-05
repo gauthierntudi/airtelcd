@@ -14,10 +14,16 @@ import type { LucideIcon as LucideIconType } from "lucide-react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import type { GuestRow } from "@/lib/guest-types";
 import type { MessagingStatus } from "@/lib/messaging/config";
+import {
+  canSendGuestWithOptions,
+  getGuestSendBlockReason,
+  type SendInvitationOptions,
+} from "@/lib/messaging/send-options";
 
 type Props = {
   guest: GuestRow;
   messagingStatus: MessagingStatus;
+  sendOptions: SendInvitationOptions;
   copied: boolean;
   sending: boolean;
   busy: boolean;
@@ -31,6 +37,7 @@ type Props = {
 export function GuestRowActions({
   guest,
   messagingStatus,
+  sendOptions,
   copied,
   sending,
   busy,
@@ -40,11 +47,22 @@ export function GuestRowActions({
   onEdit,
   onDelete,
 }: Props) {
+  const canSend = canSendGuestWithOptions(
+    guest,
+    sendOptions,
+    messagingStatus,
+  );
+  const blockReason = getGuestSendBlockReason(
+    guest,
+    sendOptions,
+    messagingStatus,
+  );
+
   const sendTitle = !messagingStatus.canSendAny
     ? "APIs non configurées"
-    : guest.canSendInvitation
+    : canSend
       ? "Envoyer l'invitation"
-      : "Contact ou API manquant";
+      : (blockReason ?? "Envoi impossible");
 
   return (
     <div className="flex flex-nowrap items-center justify-end gap-1">
@@ -60,7 +78,7 @@ export function GuestRowActions({
         icon={sending ? Loader2 : Send}
         spin={sending}
         title={sendTitle}
-        disabled={!guest.canSendInvitation || busy}
+        disabled={!canSend || busy}
         highlight
         onClick={onSend}
       />

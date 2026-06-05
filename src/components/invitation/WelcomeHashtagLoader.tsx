@@ -6,7 +6,11 @@ import { useRef } from "react";
 
 gsap.registerPlugin(useGSAP);
 
-const HASHTAGS = ["#Business", "#Digitalisé", "#Connecté"] as const;
+const LOADER_WORDS = [
+  "More Freedom",
+  "More Privileges",
+  "Vodacom Privilege",
+] as const;
 
 const LOADER_SCHEMES = [
   { bg: "#f70118", color: "#ffffff" },
@@ -48,9 +52,9 @@ export function WelcomeHashtagLoader({ onDone }: Props) {
         },
       });
 
-      HASHTAGS.forEach((tag) => {
+      LOADER_WORDS.forEach((word) => {
         tl.add(() => {
-          text.textContent = tag;
+          text.textContent = word;
         })
           .fromTo(
             text,
@@ -89,9 +93,9 @@ export function WelcomeHashtagLoader({ onDone }: Props) {
     >
       <p
         ref={textRef}
-        className="font-vodafone-exb px-6 text-center text-[2.75rem] font-normal leading-none tracking-tight opacity-0"
+        className="font-vodafone-exb px-6 text-center text-[2rem] font-normal leading-tight tracking-tight opacity-0 sm:text-[2.75rem]"
       >
-        {HASHTAGS[0]}
+        {LOADER_WORDS[0]}
       </p>
     </div>
   );

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthorized } from "@/lib/auth-admin";
 import { getMessagingStatus } from "@/lib/messaging/config";
 import { sendInvitationToGuest } from "@/lib/messaging/send-invitation";
+import { parseSendInvitationOptions } from "@/lib/messaging/send-options";
 import { prisma } from "@/lib/prisma";
 import { serializeGuest } from "@/lib/serialize-guest";
 
@@ -31,8 +32,16 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   const baseUrl = request.nextUrl.origin;
 
+  let body: Record<string, unknown> = {};
   try {
-    const result = await sendInvitationToGuest(guest, baseUrl);
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    /* options optionnelles */
+  }
+  const options = parseSendInvitationOptions(body);
+
+  try {
+    const result = await sendInvitationToGuest(guest, baseUrl, options);
     const updated = await prisma.guest.findUniqueOrThrow({ where: { id } });
     return NextResponse.json({
       ...result,

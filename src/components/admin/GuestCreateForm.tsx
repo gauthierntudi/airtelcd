@@ -9,6 +9,7 @@ import {
   EventDayMultiSelect,
 } from "@/components/admin/EventDayMultiSelect";
 import type { EventDayId } from "@/lib/event-days";
+import { DEFAULT_INVITATION_TIME_RANGE } from "@/lib/invitation-time-range";
 import { PHONE_INPUT_HINT } from "@/lib/phone";
 import { notify } from "@/lib/toast";
 
@@ -26,6 +27,9 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [eventDays, setEventDays] = useState<EventDayId[]>([DEFAULT_EVENT_DAY_ID]);
+  const [invitationTimeRange, setInvitationTimeRange] = useState(
+    DEFAULT_INVITATION_TIME_RANGE,
+  );
   const [creating, setCreating] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -41,6 +45,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
           email: email || undefined,
           phone: phone || undefined,
           eventDays,
+          invitationTimeRange,
         }),
       });
       const data = await res.json();
@@ -51,6 +56,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
       setEmail("");
       setPhone("");
       setEventDays([DEFAULT_EVENT_DAY_ID]);
+      setInvitationTimeRange(DEFAULT_INVITATION_TIME_RANGE);
       if (!embedded) {
         notify.success("Lien copié");
       }
@@ -113,6 +119,19 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
       </Field>
       <Field label="Jours d'invitation *" id="eventDays" hint="1 à 3 jours">
         <EventDayMultiSelect value={eventDays} onChange={setEventDays} />
+      </Field>
+      <Field
+        label="Horaire d'invitation"
+        id="invitationTimeRange"
+        hint="email & page invité"
+      >
+        <input
+          id="invitationTimeRange"
+          value={invitationTimeRange}
+          onChange={(e) => setInvitationTimeRange(e.target.value)}
+          className={embedded ? modalInputClass : inputClass}
+          placeholder={DEFAULT_INVITATION_TIME_RANGE}
+        />
       </Field>
       <div className={`flex gap-2 ${embedded ? "justify-end pt-2" : ""}`}>
         {embedded && onClose && (

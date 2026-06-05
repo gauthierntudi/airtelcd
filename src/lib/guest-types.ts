@@ -11,6 +11,7 @@ export type GuestRow = {
   phone: string | null;
   token: string;
   eventDays: EventDayId[];
+  invitationTimeRange: string;
   rsvpStatus: RsvpStatus;
   confirmedAt: string | null;
   invitationSentAt: string | null;

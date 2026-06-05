@@ -30,6 +30,8 @@ model Guest {
   token              String     @unique
   /// Jours d'invitation : 12, 13 et/ou 14 juin 2026 (1 à n)
   eventDays          DateTime[] @db.Date
+  /// Horaire affiché dans l'email et la page invitation — ex. « 08h00 – 17h00 »
+  invitationTimeRange String    @default("08h00 – 17h00")
   rsvpStatus         RsvpStatus @default(PENDING)
   confirmedAt        DateTime?
   invitationSentAt   DateTime?

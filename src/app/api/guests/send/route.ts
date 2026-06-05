@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthorized } from "@/lib/auth-admin";
 import { getMessagingStatus } from "@/lib/messaging/config";
 import { sendInvitationsBulk } from "@/lib/messaging/send-invitation";
+import { parseSendInvitationOptions } from "@/lib/messaging/send-options";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
@@ -10,13 +11,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  let body: { guestIds?: string[] };
+  let body: {
+    guestIds?: string[];
+    channels?: { email?: boolean; whatsapp?: boolean };
+    emailTemplate?: string;
+  };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
 
+  const options = parseSendInvitationOptions(body);
   const ids = body.guestIds?.filter(Boolean);
   if (!ids?.length) {
     return NextResponse.json(
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest) {
   const baseUrl = request.nextUrl.origin;
 
   try {
-    const result = await sendInvitationsBulk(guests, baseUrl);
+    const result = await sendInvitationsBulk(guests, baseUrl, options);
     return NextResponse.json(result);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Erreur d'envoi";

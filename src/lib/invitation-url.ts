@@ -13,16 +13,30 @@ export function parseTokenFromConfirmRef(ref: string): string | null {
   return token.length > 0 ? token : null;
 }
 
-export function getAppBaseUrl(baseUrl?: string): string {
+/** URL publique de l'app (check-in, OTP, etc.). */
+export function getAppBaseUrl(fallback?: string): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+
   return (
-    baseUrl ??
-    process.env.NEXT_PUBLIC_APP_URL ??
+    fallback ??
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000")
   ).replace(/\/$/, "");
 }
 
+/**
+ * Origine des liens de confirmation invité.
+ * Lien final : `{URL_ORIGIN_CONFIRM}/api/confirm/action={token}`
+ * (équivalent template WhatsApp : `…/action={{2}}`).
+ */
+export function getConfirmOrigin(fallback?: string): string {
+  const configured = process.env.URL_ORIGIN_CONFIRM?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+  return getAppBaseUrl(fallback);
+}
+
 export function invitationAbsoluteUrl(token: string, baseUrl?: string): string {
-  return `${getAppBaseUrl(baseUrl)}${invitationPath(token)}`;
+  return `${getConfirmOrigin(baseUrl)}${invitationPath(token)}`;
 }

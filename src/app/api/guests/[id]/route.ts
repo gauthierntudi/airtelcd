@@ -4,6 +4,7 @@ import { isAdminAuthorized } from "@/lib/auth-admin";
 import { prisma } from "@/lib/prisma";
 import { parseGuestPhoneField } from "@/lib/parse-guest-phone-field";
 import { parseEventDaysInput, eventDaysToDbDates } from "@/lib/parse-event-day";
+import { parseInvitationTimeRangeInput } from "@/lib/invitation-time-range";
 import { serializeGuest } from "@/lib/serialize-guest";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -23,6 +24,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     rsvpStatus?: RsvpStatus;
     eventDay?: string | string[];
     eventDays?: string | string[];
+    invitationTimeRange?: string;
   };
   try {
     body = await request.json();
@@ -67,6 +69,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     eventDaysData = { eventDays: eventDaysToDbDates(dayResult.eventDays) };
   }
 
+  let invitationTimeRangeData: { invitationTimeRange: string } | undefined;
+  if (body.invitationTimeRange !== undefined) {
+    const timeResult = parseInvitationTimeRangeInput(body.invitationTimeRange);
+    if ("error" in timeResult) {
+      return NextResponse.json({ error: timeResult.error }, { status: 400 });
+    }
+    invitationTimeRangeData = {
+      invitationTimeRange: timeResult.invitationTimeRange,
+    };
+  }
+
   const updated = await prisma.guest.update({
     where: { id },
     data: {
@@ -77,6 +90,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       }),
       ...phoneData,
       ...eventDaysData,
+      ...invitationTimeRangeData,
       ...(rsvpStatus !== undefined && {
         rsvpStatus,
         confirmedAt:

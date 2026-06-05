@@ -11,6 +11,7 @@ import {
 import type { ContactChannel } from "@/lib/guest-contact";
 import type { GuestRow } from "@/lib/guest-types";
 import type { InvitationSentVia } from "@/lib/messaging/send-invitation";
+import { guestInvitationTimeRange } from "@/lib/invitation-time-range";
 import { invitationAbsoluteUrl } from "@/lib/invitation-url";
 
 function asInvitationSentVia(v: string | null): InvitationSentVia | null {
@@ -27,6 +28,7 @@ export function serializeGuest(g: Guest, baseUrl: string): GuestRow {
     phone: g.phone,
     token: g.token,
     eventDays: eventDaysFromDbDates(g.eventDays),
+    invitationTimeRange: guestInvitationTimeRange(g),
     rsvpStatus: g.rsvpStatus,
     confirmedAt: g.confirmedAt?.toISOString() ?? null,
     invitationSentAt: g.invitationSentAt?.toISOString() ?? null,

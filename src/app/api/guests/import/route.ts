@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { parseGuestPhoneField } from "@/lib/parse-guest-phone-field";
 import { createUniqueGuestToken } from "@/lib/guest-token";
 import { parseEventDaysInput, eventDaysToDbDates } from "@/lib/parse-event-day";
+import { parseInvitationTimeRangeInput } from "@/lib/invitation-time-range";
 import { serializeGuest } from "@/lib/serialize-guest";
 
 export async function POST(request: NextRequest) {
@@ -13,7 +14,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  let body: { guests?: GuestImportRow[]; eventDays?: string | string[] };
+  let body: {
+    guests?: GuestImportRow[];
+    eventDays?: string | string[];
+    invitationTimeRange?: string;
+  };
   try {
     body = await request.json();
   } catch {
@@ -25,6 +30,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: dayResult.error }, { status: 400 });
   }
   const eventDaysDb = eventDaysToDbDates(dayResult.eventDays);
+
+  const timeResult = parseInvitationTimeRangeInput(body.invitationTimeRange);
+  if ("error" in timeResult) {
+    return NextResponse.json({ error: timeResult.error }, { status: 400 });
+  }
+  const invitationTimeRange = timeResult.invitationTimeRange;
 
   const guests = body.guests;
   if (!Array.isArray(guests) || guests.length === 0) {
@@ -69,6 +80,7 @@ export async function POST(request: NextRequest) {
           email: row.email?.trim() || null,
           phone: phoneResult.phone,
           eventDays: eventDaysDb,
+          invitationTimeRange,
           token,
         },
       });

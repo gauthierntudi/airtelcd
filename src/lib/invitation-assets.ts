@@ -1,6 +1,6 @@
-/** Bannière hero — email (Cloudinary) */
+/** Bannière hero — emails invitation (simple + nominatif) */
 export const INVITATION_HERO_IMAGE_URL =
-  "https://res.cloudinary.com/dfqlmkknv/image/upload/v1780534560/Capture_d_e%CC%81cran_2026-06-04_a%CC%80_01.54.08_hpvc8s.png";
+  "https://mypullzond243.b-cdn.net/golf2026/flyer-gen.jpg";
 
 /** Home — fond bandeau « Vodacom Golf 2026 » (Cloudinary) */
 export const PLATFORM_ORGANIZER_BG_URL =

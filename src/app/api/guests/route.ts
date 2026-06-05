@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { parseGuestPhoneField } from "@/lib/parse-guest-phone-field";
 import { createUniqueGuestToken } from "@/lib/guest-token";
 import { parseEventDaysInput, eventDaysToDbDates } from "@/lib/parse-event-day";
+import { parseInvitationTimeRangeInput } from "@/lib/invitation-time-range";
 import { serializeGuest } from "@/lib/serialize-guest";
 
 export async function GET(request: NextRequest) {
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
     phone?: string;
     eventDay?: string | string[];
     eventDays?: string | string[];
+    invitationTimeRange?: string;
   };
   try {
     body = await request.json();
@@ -80,6 +82,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: dayResult.error }, { status: 400 });
   }
 
+  const timeResult = parseInvitationTimeRangeInput(body.invitationTimeRange);
+  if ("error" in timeResult) {
+    return NextResponse.json({ error: timeResult.error }, { status: 400 });
+  }
+
   const token = await createUniqueGuestToken(prisma);
   const guest = await prisma.guest.create({
     data: {
@@ -88,6 +95,7 @@ export async function POST(request: NextRequest) {
       email: body.email?.trim() || null,
       phone: phoneResult.phone,
       eventDays: eventDaysToDbDates(dayResult.eventDays),
+      invitationTimeRange: timeResult.invitationTimeRange,
       token,
     },
   });
