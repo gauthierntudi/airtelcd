@@ -7,9 +7,10 @@ import { useRef } from "react";
 gsap.registerPlugin(useGSAP);
 
 const LOADER_WORDS = [
-  "More Freedom",
-  "More Privileges",
-  "Vodacom Privilege",
+  "#Privilèges",
+  "#Flexibilité",
+  "#Convertibilité",
+  "#Partage",
 ] as const;
 
 const LOADER_SCHEMES = [
@@ -93,7 +94,7 @@ export function WelcomeHashtagLoader({ onDone }: Props) {
     >
       <p
         ref={textRef}
-        className="font-vodafone-exb px-6 text-center text-[2rem] font-normal leading-tight tracking-tight opacity-0 sm:text-[2.75rem]"
+        className="font-vodafone-exb px-6 text-center text-[1.65rem] font-normal leading-tight tracking-tight opacity-0 sm:text-[2.5rem]"
       >
         {LOADER_WORDS[0]}
       </p>
