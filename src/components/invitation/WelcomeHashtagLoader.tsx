@@ -45,9 +45,9 @@ export function WelcomeHashtagLoader({ onDone }: Props) {
       const tl = gsap.timeline({
         onComplete: () => {
           gsap.to(root, {
-            opacity: 0,
-            duration: 0.35,
-            ease: "power2.inOut",
+            yPercent: -100,
+            duration: 0.7,
+            ease: "power3.inOut",
             onComplete: onDone,
           });
         },
@@ -87,7 +87,7 @@ export function WelcomeHashtagLoader({ onDone }: Props) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[60] flex items-center justify-center"
+      className="fixed inset-0 z-[60] flex items-center justify-center will-change-transform"
       aria-live="polite"
       aria-busy="true"
       style={{ backgroundColor: scheme.bg, color: scheme.color }}
