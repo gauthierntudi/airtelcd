@@ -16,7 +16,7 @@ import { AdminPanel, ProgressBar, StatTile } from "@/components/admin/AdminPanel
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import type { AdminMpesaCardRow } from "@/lib/mpesa-visa/service";
 import {
-  CARREFOUR_MARKET_NAME,
+  VODACOM_MARKET_NAME,
   CARREFOUR_PRODUCTS,
   MPESA_VISA_WELCOME_BONUS_USD,
 } from "@/lib/mpesa-visa/constants";
@@ -136,13 +136,13 @@ export function AdminMpesaPanel({
           icon={DollarSign}
           label="Total dépensé"
           value={`${metrics.totalSpent.toFixed(0)} $`}
-          sub="Achats Carrefour cumulés"
+          sub="Achats Vodacom Market cumulés"
         />
         <KpiCard
           icon={ShoppingBag}
           label="Transactions"
           value={metrics.totalPurchases}
-          sub={CARREFOUR_MARKET_NAME}
+          sub={VODACOM_MARKET_NAME}
         />
         <KpiCard
           icon={Ban}
@@ -263,8 +263,8 @@ export function AdminMpesaPanel({
           </AdminPanel>
 
           <AdminPanel
-            title="Catalogue Carrefour"
-            description="Catalogue boutique Carrefour Market (accueil)"
+            title="Catalogue Vodacom Market"
+            description="Catalogue boutique Vodacom Market (accueil)"
           >
             <ul className="space-y-2">
               {metrics.productCounts.map((p) => (
@@ -396,7 +396,7 @@ function CardTableGroup({
               <div className="rounded-xl border border-white/10 bg-[#1a1a1a] p-4">
                 <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/40">
                   <LucideIcon icon={ShoppingBag} size={12} />
-                  Historique {CARREFOUR_MARKET_NAME}
+                  Historique {VODACOM_MARKET_NAME}
                 </p>
                 {row.purchases.length === 0 ? (
                   <p className="mt-3 text-sm text-white/45">

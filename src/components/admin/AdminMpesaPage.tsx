@@ -16,8 +16,8 @@ export function AdminMpesaPage({ adminSecret }: Props) {
 
   return (
     <AdminLayout
-      title="Carte Visa M-Pesa & Carrefour"
-      subtitle="Suivi des cartes invités, bonus Carrefour Market et transactions USSD"
+      title="Carte Visa M-Pesa & Vodacom Market"
+      subtitle="Suivi des cartes invités, bonus Vodacom Market et transactions USSD"
       onRefresh={refresh}
       loading={loading}
     >

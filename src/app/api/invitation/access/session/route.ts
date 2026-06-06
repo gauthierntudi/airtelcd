@@ -11,7 +11,7 @@ export async function GET() {
   const result = await resolveInvitationSessionRedirect(session);
 
   if (!result) {
-    return NextResponse.json({ error: "Session absente" }, { status: 401 });
+    return NextResponse.json({ authenticated: false }, { status: 200 });
   }
 
   return NextResponse.json(result);

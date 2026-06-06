@@ -3,7 +3,7 @@
 import { CreditCard } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import { CARREFOUR_MARKET_NAME } from "@/lib/mpesa-visa/constants";
+import { VODACOM_MARKET_NAME } from "@/lib/mpesa-visa/constants";
 import type { AdminMpesaCardRow } from "@/lib/mpesa-visa/service";
 import { formatGuestDate } from "@/lib/guest-types";
 
@@ -82,7 +82,7 @@ export function GuestMpesaSummary({ guestId, adminSecret }: Props) {
       {row.purchases.length > 0 && (
         <>
           <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-white/40">
-            Achats {CARREFOUR_MARKET_NAME}
+            Achats {VODACOM_MARKET_NAME}
           </p>
           <ul className="mt-2 space-y-1.5">
             {row.purchases.map((p) => (

@@ -5,7 +5,11 @@ export async function fetchInvitationSessionRedirect(): Promise<string | null> {
       credentials: "include",
     });
     if (!res.ok) return null;
-    const data = (await res.json()) as { redirectPath?: string };
+    const data = (await res.json()) as {
+      redirectPath?: string;
+      authenticated?: boolean;
+    };
+    if (data.authenticated === false) return null;
     return typeof data.redirectPath === "string" ? data.redirectPath : null;
   } catch {
     return null;

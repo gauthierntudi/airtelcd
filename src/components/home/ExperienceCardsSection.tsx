@@ -11,10 +11,10 @@ import {
 import type { MpesaVisaExperienceState } from "@/lib/mpesa-visa/service";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { InvitationAccessModal } from "@/components/home/InvitationAccessModal";
-import { CarrefourMarketModal } from "@/components/carrefour/CarrefourMarketModal";
+import { VodacomMarketModal } from "@/components/vodacom-market/VodacomMarketModal";
 import { MpesaVisaUssdModal } from "@/components/home/MpesaVisaUssdModal";
 import { PLATFORM_MODULE_ICONS } from "@/lib/invitation-assets";
-import { CARREFOUR_MARKET_NAME, MPESA_VISA_WELCOME_BONUS_USD } from "@/lib/mpesa-visa/constants";
+import { MPESA_VISA_WELCOME_BONUS_USD, VODACOM_MARKET_NAME } from "@/lib/mpesa-visa/constants";
 
 type ModuleId = "invitation" | "mpesa" | "market" | "privilege" | "games";
 
@@ -57,9 +57,9 @@ const MODULES: {
   {
     id: "market",
     image: PLATFORM_MODULE_ICONS.market,
-    title: CARREFOUR_MARKET_NAME,
+    title: VODACOM_MARKET_NAME,
     status: "Disponible",
-    description: `Dépensez votre bonus ${MPESA_VISA_WELCOME_BONUS_USD} USD : cocktail, modem 5G ou téléphone Samsung.`,
+    description: `Dépensez votre bonus ${MPESA_VISA_WELCOME_BONUS_USD} USD : spiritueux, accessoires tech et plus.`,
     available: true,
     accessEnabled: true,
     accessLabel: "Accéder au marché",
@@ -182,7 +182,7 @@ export function ExperienceCardsSection() {
           setAccessOpen(true);
         }}
       />
-      <CarrefourMarketModal
+      <VodacomMarketModal
         open={marketOpen}
         onClose={() => setMarketOpen(false)}
         onAuthRequired={() => {

@@ -16,7 +16,12 @@ import {
   INVITATION_ACCESS_SMS_NOT_FOUND,
 } from "@/lib/invitation-access/types";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
+import { isTwilioVerifyConfigured } from "@/lib/messaging/config";
 import { canDeliverOtp, deliverOtpCode } from "@/lib/messaging/send-otp";
+import {
+  checkTwilioVerifySms,
+  TWILIO_VERIFY_OTP_MARKER,
+} from "@/lib/messaging/twilio-verify";
 import { invitationPath } from "@/lib/invitation-url";
 import { prisma } from "@/lib/prisma";
 
@@ -67,8 +72,12 @@ export async function requestInvitationAccessOtp(
     return { message: INVITATION_ACCESS_GENERIC_SENT };
   }
 
-  const code = generateOtpCode();
-  const codeHash = hashOtpCode(code, address, guest.id);
+  const useTwilioVerify =
+    input.channel === "sms" && isTwilioVerifyConfigured();
+  const code = useTwilioVerify ? null : generateOtpCode();
+  const codeHash = useTwilioVerify
+    ? TWILIO_VERIFY_OTP_MARKER
+    : hashOtpCode(code!, address, guest.id);
 
   await prisma.invitationAccessOtp.deleteMany({
     where: { guestId: guest.id },
@@ -87,7 +96,7 @@ export async function requestInvitationAccessOtp(
   const isDev = process.env.NODE_ENV === "development";
 
   if (!canDeliverOtp(input.channel)) {
-    if (isDev) {
+    if (isDev && code) {
       console.info(
         `[invitation-otp] ${input.channel} → ${address} : ${code}`,
       );
@@ -106,10 +115,10 @@ export async function requestInvitationAccessOtp(
       channel: input.channel,
       address,
       firstName: guest.firstName,
-      code,
+      code: code ?? "",
     });
   } catch (e) {
-    if (isDev) {
+    if (isDev && code) {
       console.info(
         `[invitation-otp] échec envoi, code dev : ${code}`,
         e,
@@ -164,12 +173,17 @@ export async function verifyInvitationAccessOtp(
     throw new Error("Trop de tentatives. Demandez un nouveau code.");
   }
 
-  const valid = verifyOtpCode(
-    input.code,
-    address,
-    record.guestId,
-    record.codeHash,
-  );
+  let valid = false;
+  if (record.codeHash === TWILIO_VERIFY_OTP_MARKER) {
+    valid = await checkTwilioVerifySms(address, input.code);
+  } else {
+    valid = verifyOtpCode(
+      input.code,
+      address,
+      record.guestId,
+      record.codeHash,
+    );
+  }
 
   if (!valid) {
     await prisma.invitationAccessOtp.update({

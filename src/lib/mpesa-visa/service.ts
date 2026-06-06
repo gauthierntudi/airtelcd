@@ -1,10 +1,14 @@
 import { Prisma } from "@prisma/client";
 import { guestDisplayName } from "@/lib/event";
 import {
-  CARREFOUR_MARKET_NAME,
   getCarrefourProduct,
   MPESA_VISA_WELCOME_BONUS_USD,
+  VODACOM_MARKET_NAME,
 } from "@/lib/mpesa-visa/constants";
+import {
+  assertVisaPayment,
+  type VisaPaymentInput,
+} from "@/lib/mpesa-visa/validate-payment";
 import { generateVisaCardDetails } from "@/lib/mpesa-visa/card-generator";
 import { isTwilioSmsConfigured } from "@/lib/messaging/config";
 import { sendMpesaCardCredentialsSms } from "@/lib/messaging/send-mpesa-card-sms";
@@ -211,6 +215,7 @@ export async function setMpesaVisaCardBlocked(
 export async function purchaseCarrefourProduct(
   guestId: string,
   productId: string,
+  payment?: VisaPaymentInput,
 ) {
   const product = getCarrefourProduct(productId);
   if (!product) throw new Error("Produit inconnu.");
@@ -223,6 +228,10 @@ export async function purchaseCarrefourProduct(
   }
   if (card.blocked) {
     throw new Error("Carte bloquée — achat impossible.");
+  }
+
+  if (payment) {
+    assertVisaPayment(guestId, payment);
   }
 
   const balance = decimalToNumber(card.bonusBalanceUsd);
@@ -313,4 +322,4 @@ export async function listAdminMpesaOverview(): Promise<AdminMpesaCardRow[]> {
   });
 }
 
-export { CARREFOUR_MARKET_NAME, MPESA_VISA_WELCOME_BONUS_USD };
+export { MPESA_VISA_WELCOME_BONUS_USD, VODACOM_MARKET_NAME };

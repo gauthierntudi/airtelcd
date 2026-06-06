@@ -1,5 +1,5 @@
 import {
-  CARREFOUR_MARKET_NAME,
+  VODACOM_MARKET_NAME,
   CARREFOUR_PRODUCTS,
   getCarrefourProduct,
   MPESA_VISA_WELCOME_BONUS_USD,
@@ -127,14 +127,14 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
       };
 
     case "root_stub": {
-      const isCarrefourStub = stubLabel === CARREFOUR_MARKET_NAME;
+      const isCarrefourStub = stubLabel === VODACOM_MARKET_NAME;
       return {
         title: "M-PESA",
         lines: isCarrefourStub
           ? [
-              CARREFOUR_MARKET_NAME,
+              VODACOM_MARKET_NAME,
               "",
-              "Ouvrez la carte Carrefour Market",
+              "Ouvrez Vodacom Market sur la plateforme",
               "sur la page d'accueil pour",
               "consommer votre bonus.",
             ]
@@ -154,10 +154,10 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         title: "COMPTE BONUS",
         lines: hasCard
           ? [
-              `Solde Carrefour : ${bonusBalanceUsd.toFixed(2)} USD`,
+              `Solde ${VODACOM_MARKET_NAME} : ${bonusBalanceUsd.toFixed(2)} USD`,
               `Bonus initial : ${MPESA_VISA_WELCOME_BONUS_USD} USD`,
               "",
-              `Boutique ${CARREFOUR_MARKET_NAME}`,
+              `Boutique ${VODACOM_MARKET_NAME}`,
               "sur la page d'accueil (carte dédiée).",
             ]
           : [
@@ -171,7 +171,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
 
     case "carrefour_menu":
       return {
-        title: CARREFOUR_MARKET_NAME.toUpperCase(),
+        title: VODACOM_MARKET_NAME.toUpperCase(),
         lines: [
           `Solde disponible : ${bonusBalanceUsd.toFixed(2)} USD`,
           "",
@@ -192,7 +192,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         ? getCarrefourProduct(carrefourProductId)
         : null;
       return {
-        title: CARREFOUR_MARKET_NAME.toUpperCase(),
+        title: VODACOM_MARKET_NAME.toUpperCase(),
         lines: product
           ? [
               product.name,
@@ -213,7 +213,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         ? getCarrefourProduct(carrefourProductId)
         : null;
       return {
-        title: CARREFOUR_MARKET_NAME.toUpperCase(),
+        title: VODACOM_MARKET_NAME.toUpperCase(),
         lines: [
           "Achat enregistré.",
           product?.name ?? "",
@@ -229,7 +229,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
 
     case "carrefour_insufficient":
       return {
-        title: CARREFOUR_MARKET_NAME.toUpperCase(),
+        title: VODACOM_MARKET_NAME.toUpperCase(),
         lines: [
           "Solde insuffisant.",
           `Disponible : ${bonusBalanceUsd.toFixed(2)} USD`,
@@ -304,7 +304,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
           "Frais de création : 1 USD",
           "Validité : 6 mois",
           "",
-          `Bonus ${CARREFOUR_MARKET_NAME} :`,
+          `Bonus ${VODACOM_MARKET_NAME} :`,
           `${MPESA_VISA_WELCOME_BONUS_USD} USD offerts`,
         ],
         options: [
@@ -369,7 +369,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
         lines: [
           `Statut : ${statusLine(cardBlocked)}`,
           "Validité : 6 mois",
-          `Bonus Carrefour : ${bonusBalanceUsd.toFixed(2)} USD`,
+          `Bonus ${VODACOM_MARKET_NAME} : ${bonusBalanceUsd.toFixed(2)} USD`,
         ],
         options: [{ key: "0", label: "Retour" }],
         showInput: true,
@@ -538,7 +538,7 @@ function applyUssdChoiceInner(
       return {
         ...state,
         screen: "root_stub",
-        stubLabel: CARREFOUR_MARKET_NAME,
+        stubLabel: VODACOM_MARKET_NAME,
       };
     }
     if (key === "8") {

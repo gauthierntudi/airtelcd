@@ -11,7 +11,7 @@ const NAV = [
   { href: "/admin", label: "Tableau de bord", icon: LayoutDashboard, exact: true },
   {
     href: "/admin/mpesa",
-    label: "M-Pesa & Carrefour",
+    label: "M-Pesa & Market",
     icon: CreditCard,
     exact: true,
   },

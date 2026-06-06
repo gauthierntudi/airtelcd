@@ -2,7 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 gsap.registerPlugin(useGSAP);
 
@@ -32,9 +32,11 @@ type Props = {
 export function WelcomeHashtagLoader({ onDone }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
-  const schemeRef = useRef<Scheme | null>(null);
-  if (!schemeRef.current) schemeRef.current = pickRandomScheme();
-  const scheme = schemeRef.current;
+  const [scheme, setScheme] = useState<Scheme>(LOADER_SCHEMES[0]);
+
+  useEffect(() => {
+    setScheme(pickRandomScheme());
+  }, []);
 
   useGSAP(
     () => {

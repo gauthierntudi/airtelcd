@@ -6,7 +6,16 @@ export type UssdPersistAction =
   | { type: "delete_card" }
   | { type: "block_card" }
   | { type: "unblock_card" }
-  | { type: "purchase"; productId: CarrefourProductId };
+  | {
+      type: "purchase";
+      productId: CarrefourProductId;
+      payment?: {
+        pan: string;
+        expiryMonth: number;
+        expiryYear: number;
+        cvv: string;
+      };
+    };
 
 export function getUssdPersistAction(
   prev: VisaSimulationState,

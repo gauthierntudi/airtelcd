@@ -83,12 +83,28 @@ export function AdminSystemStatus({ report }: Props) {
           }
         />
         <ProviderCard
-          title="SMS — Twilio (OTP)"
+          title={
+            report.twilioVerify.configured
+              ? "OTP SMS — Twilio Verify"
+              : "SMS — Twilio (OTP legacy)"
+          }
           icon={Smartphone}
-          configured={report.twilioSms.configured}
-          checks={report.twilioSms.checks}
+          configured={
+            report.twilioVerify.configured || report.twilioSms.configured
+          }
+          checks={
+            report.twilioVerify.configured
+              ? report.twilioVerify.checks
+              : report.twilioSms.checks
+          }
           extras={
-            report.twilioSms.configured && report.twilioSms.from ? (
+            report.twilioVerify.configured ? (
+              <ExtraRow
+                label="Service SID"
+                value={report.twilioVerify.serviceSid ?? "—"}
+                mono
+              />
+            ) : report.twilioSms.configured && report.twilioSms.from ? (
               <ExtraRow label="Numéro from" value={report.twilioSms.from} mono />
             ) : undefined
           }

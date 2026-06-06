@@ -1,5 +1,11 @@
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
-import { getMessagingConfig, isTwilioSmsConfigured } from "@/lib/messaging/config";
+import {
+  getMessagingConfig,
+  isOtpSmsChannelConfigured,
+  isTwilioSmsConfigured,
+  isTwilioVerifyConfigured,
+} from "@/lib/messaging/config";
+import { startTwilioVerifySms } from "@/lib/messaging/twilio-verify";
 import {
   assertTwilioSmsConfigured,
   sendTwilioSmsMessage,
@@ -15,7 +21,7 @@ export function isOtpEmailConfigured(): boolean {
 }
 
 export function isOtpSmsConfigured(): boolean {
-  return isTwilioSmsConfigured();
+  return isOtpSmsChannelConfigured();
 }
 
 function assertOtpEmailConfigured(): void {
@@ -76,6 +82,10 @@ export async function sendOtpSms(params: {
   firstName: string;
   code: string;
 }): Promise<void> {
+  if (isTwilioVerifyConfigured()) {
+    await startTwilioVerifySms(params.phoneE164);
+    return;
+  }
   assertTwilioSmsConfigured();
   await sendTwilioSmsMessage({
     phoneE164: params.phoneE164,

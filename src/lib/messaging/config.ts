@@ -32,6 +32,25 @@ function twilioSmsCredentials(): TwilioCredentials {
   };
 }
 
+function twilioVerifyServiceSid(): string | undefined {
+  return process.env.TWILIO_VERIFY_SERVICE_SID?.trim();
+}
+
+/** Compte Twilio hébergeant le Verify Service (souvent ≠ compte SMS). */
+function twilioVerifyCredentials(): TwilioCredentials {
+  return {
+    accountSid:
+      process.env.TWILIO_VERIFY_ACCOUNT_SID?.trim() ||
+      process.env.TWILIO_WHATSAPP_ACCOUNT_SID?.trim() ||
+      process.env.TWILIO_SMS_ACCOUNT_SID?.trim(),
+    authToken:
+      process.env.TWILIO_VERIFY_AUTH_TOKEN?.trim() ||
+      process.env.TWILIO_WHATSAPP_AUTH_TOKEN?.trim() ||
+      process.env.TWILIO_SMS_AUTH_TOKEN?.trim(),
+    from: undefined,
+  };
+}
+
 export function getMessagingConfig() {
   return {
     brevo: {
@@ -43,6 +62,8 @@ export function getMessagingConfig() {
     twilio: {
       whatsapp: twilioWhatsappCredentials(),
       sms: twilioSmsCredentials(),
+      verify: twilioVerifyCredentials(),
+      verifyServiceSid: twilioVerifyServiceSid(),
     },
     appUrl: process.env.NEXT_PUBLIC_APP_URL?.trim(),
   };
@@ -83,6 +104,19 @@ export function isTwilioSmsConfigured(): boolean {
   );
 }
 
+/** Twilio Verify — OTP SMS (recommandé, remplace l'envoi SMS manuel). */
+export function isTwilioVerifyConfigured(): boolean {
+  const { verify, verifyServiceSid } = getMessagingConfig().twilio;
+  return Boolean(
+    verify.accountSid && verify.authToken && verifyServiceSid,
+  );
+}
+
+/** OTP SMS disponible : Verify (prioritaire) ou SMS classique. */
+export function isOtpSmsChannelConfigured(): boolean {
+  return isTwilioVerifyConfigured() || isTwilioSmsConfigured();
+}
+
 export function isChannelConfigured(channel: ContactChannel): boolean {
   if (channel === "email") return isBrevoConfigured();
   if (channel === "whatsapp") return isTwilioWhatsappConfigured();
@@ -93,6 +127,7 @@ export type MessagingStatus = {
   brevo: boolean;
   twilioWhatsapp: boolean;
   twilioSms: boolean;
+  twilioVerify: boolean;
   /** Au moins un fournisseur prêt à envoyer des invitations */
   canSendAny: boolean;
 };
@@ -101,10 +136,12 @@ export function getMessagingStatus(): MessagingStatus {
   const brevo = isBrevoConfigured();
   const twilioWhatsapp = isTwilioWhatsappConfigured();
   const twilioSms = isTwilioSmsConfigured();
+  const twilioVerify = isTwilioVerifyConfigured();
   return {
     brevo,
     twilioWhatsapp,
     twilioSms,
+    twilioVerify,
     canSendAny: brevo || twilioWhatsapp,
   };
 }
@@ -133,6 +170,11 @@ export type SystemMessagingReport = {
     configured: boolean;
     checks: EnvVarCheck[];
     from: string | null;
+  };
+  twilioVerify: {
+    configured: boolean;
+    checks: EnvVarCheck[];
+    serviceSid: string | null;
   };
   appUrl: string | null;
   sendPriority: string;
@@ -181,18 +223,36 @@ export function getSystemMessagingReport(): SystemMessagingReport {
   const twilioSmsChecks: EnvVarCheck[] = [
     {
       name: "TWILIO_SMS_ACCOUNT_SID",
-      label: "Account SID (SMS)",
+      label: "Account SID (SMS / Verify)",
       configured: Boolean(cfg.twilio.sms.accountSid),
     },
     {
       name: "TWILIO_SMS_AUTH_TOKEN",
-      label: "Auth token (SMS)",
+      label: "Auth token (SMS / Verify)",
       configured: Boolean(cfg.twilio.sms.authToken),
     },
     {
       name: "TWILIO_SMS_FROM",
-      label: "Expéditeur SMS (E.164 ou Sender ID)",
+      label: "Expéditeur SMS legacy (si Verify absent)",
       configured: isValidTwilioSmsFrom(cfg.twilio.sms.from),
+    },
+  ];
+
+  const twilioVerifyChecks: EnvVarCheck[] = [
+    {
+      name: "TWILIO_VERIFY_SERVICE_SID",
+      label: "Verify Service SID (VA…)",
+      configured: Boolean(cfg.twilio.verifyServiceSid),
+    },
+    {
+      name: "TWILIO_VERIFY_ACCOUNT_SID",
+      label: "Account SID Verify (ou WhatsApp en repli)",
+      configured: Boolean(cfg.twilio.verify.accountSid),
+    },
+    {
+      name: "TWILIO_VERIFY_AUTH_TOKEN",
+      label: "Auth token Verify (ou WhatsApp en repli)",
+      configured: Boolean(cfg.twilio.verify.authToken),
     },
   ];
 
@@ -219,9 +279,14 @@ export function getSystemMessagingReport(): SystemMessagingReport {
       checks: twilioSmsChecks,
       from: cfg.twilio.sms.from ?? null,
     },
+    twilioVerify: {
+      configured: status.twilioVerify,
+      checks: twilioVerifyChecks,
+      serviceSid: cfg.twilio.verifyServiceSid ?? null,
+    },
     appUrl: cfg.appUrl ?? null,
     sendPriority:
-      "Email et WhatsApp envoyés si l'invité a les deux contacts et que Brevo + Twilio sont configurés. Les codes OTP utilisent Brevo + un compte Twilio SMS séparé.",
+      "Invitations : Brevo + Twilio WhatsApp. OTP : email via Brevo ; SMS via Twilio Verify (recommandé) ou SMS classique si TWILIO_VERIFY_SERVICE_SID absent.",
   };
 }
 

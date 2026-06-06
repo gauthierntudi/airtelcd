@@ -69,7 +69,11 @@ export async function POST(req: Request) {
         state = await setMpesaVisaCardBlocked(guest.id, false);
         break;
       case "purchase":
-        state = await purchaseCarrefourProduct(guest.id, body.productId);
+        state = await purchaseCarrefourProduct(
+          guest.id,
+          body.productId,
+          body.payment,
+        );
         break;
       default:
         return NextResponse.json({ error: "Action inconnue" }, { status: 400 });
