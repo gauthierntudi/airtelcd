@@ -20,7 +20,7 @@ import {
 import Image from "next/image";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { VodacomLogo } from "@/components/branding/VodacomLogo";
-import { guestSalutationPrefix } from "@/lib/event";
+import { invitationRsvpSlideHeadline } from "@/lib/invitation-pass-copy";
 import {
   INVITATION_RSVP_UI,
   type InvitationSharedProps,
@@ -278,7 +278,10 @@ function RsvpPanel({
           Your privileged access
         </h2>
         <p className="mt-1 font-vodafone-rg-bd text-base text-white/95">
-          {guestSalutationPrefix(guest.firstName)}confirmez votre présence
+          {invitationRsvpSlideHeadline(
+            guest.firstName,
+            isConfirmed ? RsvpStatus.CONFIRMED : RsvpStatus.PENDING,
+          )}
         </p>
       </div>
       <div className="p-5">

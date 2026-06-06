@@ -6,7 +6,12 @@ import { Plus } from "lucide-react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { InvitationRsvpActionsSheet } from "@/components/invitation/InvitationRsvpActionsSheet";
 import { InvitationEventDayCalendar } from "@/components/invitation/InvitationEventDayCalendar";
-import { EVENT, guestSalutationPrefix } from "@/lib/event";
+import { RsvpStatus } from "@prisma/client";
+import { EVENT } from "@/lib/event";
+import {
+  invitationRsvpSlideHeadline,
+  invitationRsvpSlideSubline,
+} from "@/lib/invitation-pass-copy";
 import { formatInvitedDaysLong } from "@/lib/event-days";
 import type { EventDayId } from "@/lib/event-days";
 import type { InvitationSlideId } from "@/lib/invitation-assets";
@@ -53,6 +58,7 @@ export function InvitationMobileSlideContent(props: SlideProps) {
           guest={props.guest}
           invitationUrl={props.invitationUrl}
           googleCalendarUrl={props.googleCalendarUrl}
+          isConfirmed={props.isConfirmed}
           onDownloadInvitation={props.onDownloadInvitation}
           downloadingInvitation={props.downloadingInvitation}
         />
@@ -194,6 +200,7 @@ type RsvpSlideProps = Pick<
   | "guest"
   | "invitationUrl"
   | "googleCalendarUrl"
+  | "isConfirmed"
   | "onDownloadInvitation"
   | "downloadingInvitation"
 >;
@@ -202,10 +209,12 @@ function RsvpSlide({
   guest,
   invitationUrl,
   googleCalendarUrl,
+  isConfirmed,
   onDownloadInvitation,
   downloadingInvitation,
 }: RsvpSlideProps) {
   const [actionsOpen, setActionsOpen] = useState(false);
+  const rsvpStatus = isConfirmed ? RsvpStatus.CONFIRMED : RsvpStatus.PENDING;
 
   return (
     <>
@@ -215,11 +224,10 @@ function RsvpSlide({
             Your privileged access
           </h2>
           <p className="font-vodafone-rg-bd text-2xl leading-snug text-vodacom-red">
-            {guestSalutationPrefix(guest.firstName)}confirmez votre présence
+            {invitationRsvpSlideHeadline(guest.firstName, rsvpStatus)}
           </p>
           <p className="font-vodafone-lt text-xl leading-snug text-white">
-            Utilisez le bouton ci-dessous pour répondre — puis présentez votre QR code à
-            l&apos;accueil.
+            {invitationRsvpSlideSubline(rsvpStatus)}
           </p>
         </div>
 
