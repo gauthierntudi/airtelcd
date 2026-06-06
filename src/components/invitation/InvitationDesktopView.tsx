@@ -84,8 +84,15 @@ export function InvitationDesktopView({
                 Le privilège se vit aussi sur le green
               </h1>
               <p className="mt-2 font-vodafone-lt text-lg leading-relaxed text-white/90">
-                Cher(e) <span className="font-vodafone-rg-bd text-white">{displayName}</span>
-                , votre invitation exclusive vous attend.
+                {displayName ? (
+                  <>
+                    Cher(e){" "}
+                    <span className="font-vodafone-rg-bd text-white">{displayName}</span>
+                    , votre invitation exclusive vous attend.
+                  </>
+                ) : (
+                  <>Votre invitation exclusive vous attend.</>
+                )}
               </p>
             </div>
           </div>

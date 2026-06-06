@@ -29,7 +29,7 @@ function invitationSlideOverlayClass(slideId: InvitationSlideId, index: number) 
 }
 
 type OnboardingSlideContentProps = {
-  displayName: string;
+  displayName: string | null;
   guest: InvitationSharedProps["guest"];
   confirmedAt: string | null;
   loading: boolean;

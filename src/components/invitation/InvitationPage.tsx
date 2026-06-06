@@ -12,7 +12,7 @@ import { WelcomeHashtagLoader } from "@/components/invitation/WelcomeHashtagLoad
 import type { InvitationSharedProps } from "@/components/invitation/invitation-shared";
 import { useIsLgViewport } from "@/hooks/use-is-lg-viewport";
 import {
-  guestDisplayName,
+  guestInvitationDisplayName,
   guestMissingNameFields,
   hasGuestFullName,
 } from "@/lib/event";
@@ -43,7 +43,7 @@ export function InvitationPage({
   icsDownloadUrl,
 }: Props) {
   const [guest, setGuest] = useState(initialGuest);
-  const displayName = guestDisplayName(guest.firstName, guest.lastName);
+  const displayName = guestInvitationDisplayName(guest.firstName, guest.lastName);
   const [status, setStatus] = useState(guest.rsvpStatus);
   const [confirmedAt, setConfirmedAt] = useState(guest.confirmedAt);
   const [loading, setLoading] = useState(false);

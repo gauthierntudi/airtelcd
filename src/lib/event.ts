@@ -39,12 +39,27 @@ export function hasGuestFullName(
   return hasGuestFirstName(firstName) && hasGuestLastName(lastName);
 }
 
+function guestFullName(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+): string {
+  return `${firstName?.trim() ?? ""} ${lastName?.trim() ?? ""}`.trim();
+}
+
 export function guestDisplayName(
   firstName: string | null | undefined,
   lastName: string | null | undefined,
 ): string {
-  const full = `${firstName?.trim() ?? ""} ${lastName?.trim() ?? ""}`.trim();
-  return full || GUEST_NAME_FALLBACK;
+  return guestFullName(firstName, lastName) || GUEST_NAME_FALLBACK;
+}
+
+/** Nom complet pour la page invitation — `null` si prénom et nom absents (pas de « Invité »). */
+export function guestInvitationDisplayName(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+): string | null {
+  const full = guestFullName(firstName, lastName);
+  return full || null;
 }
 
 /** Libellé court (prénom ou repli) — emails OTP, boutons invitation. */

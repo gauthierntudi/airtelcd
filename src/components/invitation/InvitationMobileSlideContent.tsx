@@ -15,7 +15,7 @@ import type { InvitationSharedProps } from "@/components/invitation/invitation-s
 
 type SlideProps = {
   slideId: InvitationSlideId;
-  displayName: string;
+  displayName: string | null;
   guest: InvitationSharedProps["guest"];
   confirmedAt: string | null;
   loading: boolean;
@@ -84,7 +84,7 @@ function InviteSlide({
   displayName,
   guest,
 }: {
-  displayName: string;
+  displayName: string | null;
   guest: InvitationSharedProps["guest"];
 }) {
   return (
@@ -100,8 +100,17 @@ function InviteSlide({
           Votre place VIP vous attend
         </p>
         <p className="font-vodafone-lt font-normal text-xl leading-snug text-white">
-          Cher(e) {displayName}, nous avons le plaisir de vous convier à une journée
-          exceptionnelle — sport, networking et expériences exclusives.
+          {displayName ? (
+            <>
+              Cher(e) {displayName}, nous avons le plaisir de vous convier à une journée
+              exceptionnelle — sport, networking et expériences exclusives.
+            </>
+          ) : (
+            <>
+              Nous avons le plaisir de vous convier à une journée exceptionnelle — sport,
+              networking et expériences exclusives.
+            </>
+          )}
         </p>
       </div>
     </div>

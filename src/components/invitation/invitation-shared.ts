@@ -24,7 +24,8 @@ export const INVITATION_RSVP_UI: Record<
 
 export type InvitationSharedProps = {
   guest: InvitationGuestView;
-  displayName: string;
+  /** Nom complet invité — `null` si non renseigné en base (textes génériques). */
+  displayName: string | null;
   status: RsvpStatus;
   confirmedAt: string | null;
   loading: boolean;
