@@ -2,7 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 gsap.registerPlugin(useGSAP);
 
@@ -13,18 +13,6 @@ const LOADER_WORDS = [
   "#Partage",
 ] as const;
 
-const LOADER_SCHEMES = [
-  { bg: "#f70118", color: "#ffffff" },
-  { bg: "#181818", color: "#ffffff" },
-  { bg: "#ffffff", color: "#f70118" },
-] as const;
-
-type Scheme = (typeof LOADER_SCHEMES)[number];
-
-function pickRandomScheme(): Scheme {
-  return LOADER_SCHEMES[Math.floor(Math.random() * LOADER_SCHEMES.length)];
-}
-
 type Props = {
   onDone: () => void;
 };
@@ -32,17 +20,26 @@ type Props = {
 export function WelcomeHashtagLoader({ onDone }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
-  const [scheme, setScheme] = useState<Scheme>(LOADER_SCHEMES[0]);
-
-  useEffect(() => {
-    setScheme(pickRandomScheme());
-  }, []);
 
   useGSAP(
     () => {
       const root = rootRef.current;
       const text = textRef.current;
       if (!root || !text) return;
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      gsap.set(root, { "--loader-angle": "180deg" });
+      if (!prefersReducedMotion) {
+        gsap.to(root, {
+          "--loader-angle": "340deg",
+          duration: 5,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+      }
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -89,10 +86,14 @@ export function WelcomeHashtagLoader({ onDone }: Props) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[60] flex items-center justify-center will-change-transform"
+      className="fixed inset-0 z-[60] flex items-center justify-center overflow-hidden will-change-transform text-white"
       aria-live="polite"
       aria-busy="true"
-      style={{ backgroundColor: scheme.bg, color: scheme.color }}
+      style={{
+        backgroundColor: "#810100",
+        backgroundImage:
+          "linear-gradient(var(--loader-angle, 180deg), #810100 0%, #e60000 100%)",
+      }}
     >
       <p
         ref={textRef}
