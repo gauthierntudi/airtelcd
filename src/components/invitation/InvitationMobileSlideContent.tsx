@@ -25,6 +25,8 @@ type SlideProps = {
   qrImageUrl: string;
   googleCalendarUrl: string;
   icsDownloadUrl: string;
+  onDownloadInvitation: () => void | Promise<void>;
+  downloadingInvitation: boolean;
   onConfirm: () => void;
 };
 
@@ -51,7 +53,8 @@ export function InvitationMobileSlideContent(props: SlideProps) {
           guest={props.guest}
           invitationUrl={props.invitationUrl}
           googleCalendarUrl={props.googleCalendarUrl}
-          icsDownloadUrl={props.icsDownloadUrl}
+          onDownloadInvitation={props.onDownloadInvitation}
+          downloadingInvitation={props.downloadingInvitation}
         />
       );
     default:
@@ -188,14 +191,19 @@ function ProgrammeSlide({ eventDays }: { eventDays: EventDayId[] }) {
 
 type RsvpSlideProps = Pick<
   SlideProps,
-  "guest" | "invitationUrl" | "googleCalendarUrl" | "icsDownloadUrl"
+  | "guest"
+  | "invitationUrl"
+  | "googleCalendarUrl"
+  | "onDownloadInvitation"
+  | "downloadingInvitation"
 >;
 
 function RsvpSlide({
   guest,
   invitationUrl,
   googleCalendarUrl,
-  icsDownloadUrl,
+  onDownloadInvitation,
+  downloadingInvitation,
 }: RsvpSlideProps) {
   const [actionsOpen, setActionsOpen] = useState(false);
 
@@ -247,8 +255,9 @@ function RsvpSlide({
         createPortal(
           <InvitationRsvpActionsSheet
             googleCalendarUrl={googleCalendarUrl}
-            icsDownloadUrl={icsDownloadUrl}
             mapsUrl={EVENT.mapsUrl}
+            onDownloadInvitation={onDownloadInvitation}
+            downloadingInvitation={downloadingInvitation}
             onClose={() => setActionsOpen(false)}
           />,
           document.body,

@@ -17,6 +17,7 @@ import {
   hasGuestFullName,
 } from "@/lib/event";
 import type { InvitationGuestView } from "@/lib/load-invitation-guest";
+import { useInvitationPassDownload } from "@/hooks/use-invitation-pass-download";
 import { notify } from "@/lib/toast";
 
 type Props = {
@@ -51,6 +52,12 @@ export function InvitationPage({
   const [welcomeLoaderDone, setWelcomeLoaderDone] = useState(false);
   const isLg = useIsLgViewport();
   const missingNames = guestMissingNameFields(guest);
+  const { downloadInvitation, downloadingInvitation, passCard } =
+    useInvitationPassDownload({
+      invitationUrl,
+      firstName: guest.firstName,
+      rsvpStatus: status,
+    });
 
   async function updateRsvp(next: RsvpStatus, names?: RsvpNamePayload) {
     setLoading(true);
@@ -113,6 +120,8 @@ export function InvitationPage({
     qrImageUrl,
     googleCalendarUrl,
     icsDownloadUrl,
+    onDownloadInvitation: downloadInvitation,
+    downloadingInvitation,
     onConfirm: handleConfirm,
     onDecline: () => updateRsvp(RsvpStatus.DECLINED),
   };
@@ -132,6 +141,7 @@ export function InvitationPage({
 
   return (
     <>
+      {passCard}
       {welcomeLoader}
       {isLg ? (
         <InvitationDesktopView {...shared} />

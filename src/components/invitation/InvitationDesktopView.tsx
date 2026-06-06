@@ -33,8 +33,6 @@ import { INVITATION_CLIENT_IMAGES } from "@/lib/invitation-assets";
 import { formatInvitationDateTime } from "@/lib/format-invitation-date";
 import type { InvitationGuestView } from "@/lib/load-invitation-guest";
 
-const ICS_FILENAME = "vodacom-privilege-golf-2026.ics";
-
 export function InvitationDesktopView({
   guest,
   displayName,
@@ -43,7 +41,8 @@ export function InvitationDesktopView({
   loading,
   invitationUrl,
   googleCalendarUrl,
-  icsDownloadUrl,
+  onDownloadInvitation,
+  downloadingInvitation,
   onConfirm,
   onDecline,
 }: InvitationSharedProps) {
@@ -195,11 +194,15 @@ export function InvitationDesktopView({
                   icon={Navigation}
                   label="Itinéraire"
                 />
-                <DesktopActionLink
-                  href={icsDownloadUrl}
-                  download={ICS_FILENAME}
+                <DesktopActionButton
                   icon={Download}
-                  label="Télécharger l'invitation"
+                  label={
+                    downloadingInvitation
+                      ? "Préparation…"
+                      : "Télécharger l'invitation"
+                  }
+                  disabled={downloadingInvitation}
+                  onClick={() => void onDownloadInvitation()}
                 />
               </ul>
             </section>
@@ -348,13 +351,11 @@ function DesktopActionLink({
   icon,
   label,
   external,
-  download,
 }: {
   href: string;
   icon: typeof CalendarPlus;
   label: string;
   external?: boolean;
-  download?: string;
 }) {
   return (
     <li>
@@ -362,9 +363,7 @@ function DesktopActionLink({
         href={href}
         {...(external
           ? { target: "_blank", rel: "noopener noreferrer" }
-          : download
-            ? { download }
-            : {})}
+          : {})}
         className="flex items-center gap-3 rounded-xl border border-vodacom-silver/30 bg-vodacom-cream/40 px-3 py-3 font-vodafone-rg-bd text-sm text-vodacom-black transition-colors hover:bg-vodacom-cream"
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-vodacom-red text-white">
@@ -372,6 +371,34 @@ function DesktopActionLink({
         </span>
         {label}
       </a>
+    </li>
+  );
+}
+
+function DesktopActionButton({
+  icon,
+  label,
+  onClick,
+  disabled,
+}: {
+  icon: typeof CalendarPlus;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        className="flex w-full items-center gap-3 rounded-xl border border-vodacom-silver/30 bg-vodacom-cream/40 px-3 py-3 text-left font-vodafone-rg-bd text-sm text-vodacom-black transition-colors hover:bg-vodacom-cream disabled:opacity-60"
+      >
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-vodacom-red text-white">
+          <LucideIcon icon={icon} size={18} />
+        </span>
+        {label}
+      </button>
     </li>
   );
 }

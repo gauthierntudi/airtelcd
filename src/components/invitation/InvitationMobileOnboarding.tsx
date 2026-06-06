@@ -39,6 +39,8 @@ type OnboardingSlideContentProps = {
   qrImageUrl: string;
   googleCalendarUrl: string;
   icsDownloadUrl: string;
+  onDownloadInvitation: () => void | Promise<void>;
+  downloadingInvitation: boolean;
   onConfirm: () => void;
 };
 
@@ -102,6 +104,8 @@ export function InvitationMobileOnboarding({
   qrImageUrl,
   googleCalendarUrl,
   icsDownloadUrl,
+  onDownloadInvitation,
+  downloadingInvitation,
   onConfirm,
   onDecline,
 }: InvitationSharedProps) {
@@ -173,6 +177,8 @@ export function InvitationMobileOnboarding({
               qrImageUrl,
               googleCalendarUrl,
               icsDownloadUrl,
+              onDownloadInvitation,
+              downloadingInvitation,
               onConfirm,
             }}
           />

@@ -33,6 +33,8 @@ export type InvitationSharedProps = {
   qrImageUrl: string;
   googleCalendarUrl: string;
   icsDownloadUrl: string;
+  onDownloadInvitation: () => void | Promise<void>;
+  downloadingInvitation: boolean;
   onConfirm: () => void;
   onDecline: () => void;
 };

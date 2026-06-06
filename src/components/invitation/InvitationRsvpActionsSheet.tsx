@@ -6,21 +6,21 @@ import { LucideIcon } from "@/components/ui/lucide-icon";
 
 type Props = {
   googleCalendarUrl: string;
-  icsDownloadUrl: string;
   mapsUrl: string;
+  onDownloadInvitation: () => void | Promise<void>;
+  downloadingInvitation: boolean;
   onClose: () => void;
 };
-
-const ICS_FILENAME = "vodacom-privilege-golf-2026.ics";
 
 /** Bottom sheet — calendrier, itinéraire, téléchargement (.ics) */
 export function InvitationRsvpActionsSheet({
   googleCalendarUrl,
-  icsDownloadUrl,
   mapsUrl,
+  onDownloadInvitation,
+  downloadingInvitation,
   onClose,
 }: Props) {
-  const actions = [
+  const linkActions = [
     {
       icon: CalendarPlus,
       label: "Ajouter au calendrier",
@@ -32,12 +32,6 @@ export function InvitationRsvpActionsSheet({
       label: "Itinéraire",
       href: mapsUrl,
       external: true,
-    },
-    {
-      icon: Download,
-      label: "Télécharger l'invitation",
-      href: icsDownloadUrl,
-      download: ICS_FILENAME,
     },
   ] as const;
 
@@ -65,15 +59,13 @@ export function InvitationRsvpActionsSheet({
       </header>
 
       <ul className="flex flex-col gap-2 px-5 pb-4">
-        {actions.map((action) => (
+        {linkActions.map((action) => (
           <li key={action.label}>
             <a
               href={action.href}
-              {...("external" in action && action.external
+              {...(action.external
                 ? { target: "_blank", rel: "noopener noreferrer" }
-                : "download" in action
-                  ? { download: action.download }
-                  : {})}
+                : {})}
               onClick={onClose}
               className="flex h-14 items-center gap-3 rounded-2xl bg-white/[0.08] px-4 font-vodafone-rg-bd text-base text-white ring-1 ring-white/10 active:bg-white/15"
             >
@@ -84,6 +76,21 @@ export function InvitationRsvpActionsSheet({
             </a>
           </li>
         ))}
+        <li>
+          <button
+            type="button"
+            disabled={downloadingInvitation}
+            onClick={() => {
+              void Promise.resolve(onDownloadInvitation()).then(onClose);
+            }}
+            className="flex h-14 w-full items-center gap-3 rounded-2xl bg-white/[0.08] px-4 font-vodafone-rg-bd text-base text-white ring-1 ring-white/10 active:bg-white/15 disabled:opacity-60"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-vodacom-red text-white">
+              <LucideIcon icon={Download} size={20} />
+            </span>
+            {downloadingInvitation ? "Préparation…" : "Télécharger l'invitation"}
+          </button>
+        </li>
       </ul>
 
       <div className="shrink-0 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))]">

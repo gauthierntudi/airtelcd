@@ -89,3 +89,7 @@ export const INVITATION_MOBILE_SLIDES: InvitationSlideConfig[] = [
     stepLabel: "RSVP",
   },
 ];
+
+/** Fond de la carte PNG « Télécharger l'invitation » (slide RSVP). */
+export const INVITATION_RSVP_PASS_IMAGE =
+  INVITATION_MOBILE_SLIDES.find((s) => s.id === "rsvp")!.image;
