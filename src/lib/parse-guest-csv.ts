@@ -2,7 +2,7 @@ import { normalizePhone } from "@/lib/phone";
 
 export type GuestImportRow = {
   firstName: string;
-  lastName: string;
+  lastName?: string;
   email?: string;
   phone?: string;
 };
@@ -71,8 +71,7 @@ function mapHeaders(headerCells: string[]): Map<number, keyof GuestImportRow> | 
     if (key) map.set(i, key);
   }
   const hasFirst = [...map.values()].includes("firstName");
-  const hasLast = [...map.values()].includes("lastName");
-  if (!hasFirst || !hasLast) return null;
+  if (!hasFirst) return null;
   return map;
 }
 
@@ -117,10 +116,10 @@ export function parseGuestCsv(text: string): ParseResult {
 
     const firstName = draft.firstName?.trim();
     const lastName = draft.lastName?.trim();
-    if (!firstName || !lastName) {
+    if (!firstName) {
       errors.push({
         line: lineNum,
-        message: "Prénom et nom requis",
+        message: "Prénom requis",
       });
       continue;
     }
@@ -138,7 +137,7 @@ export function parseGuestCsv(text: string): ParseResult {
     }
     rows.push({
       firstName,
-      lastName,
+      ...(lastName && { lastName }),
       ...(email && { email }),
       ...(phoneE164 && { phone: phoneE164 }),
     });

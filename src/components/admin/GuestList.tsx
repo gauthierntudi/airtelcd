@@ -505,7 +505,7 @@ function GuestEditModal({
   onSaved: () => void;
 }) {
   const [firstName, setFirstName] = useState(guest.firstName);
-  const [lastName, setLastName] = useState(guest.lastName);
+  const [lastName, setLastName] = useState(guest.lastName ?? "");
   const [email, setEmail] = useState(guest.email ?? "");
   const [phone, setPhone] = useState(guest.phone ?? "");
   const [rsvpStatus, setRsvpStatus] = useState(guest.rsvpStatus);
@@ -524,7 +524,7 @@ function GuestEditModal({
         headers,
         body: JSON.stringify({
           firstName,
-          lastName,
+          lastName: lastName.trim() || null,
           email: email || null,
           phone: phone || null,
           rsvpStatus,
@@ -554,9 +554,8 @@ function GuestEditModal({
               className={modalInputClass}
             />
           </ModalField>
-          <ModalField label="Nom">
+          <ModalField label="Nom" hint="Facultatif">
             <input
-              required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               className={modalInputClass}

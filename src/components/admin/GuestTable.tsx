@@ -12,6 +12,7 @@ import {
 import { useMemo, useState } from "react";
 import { GuestRowActions } from "@/components/admin/GuestRowActions";
 import { LucideIcon } from "@/components/ui/lucide-icon";
+import { guestInitials } from "@/lib/event";
 import { type GuestRow, RSVP_CONFIG } from "@/lib/guest-types";
 import {
   GUEST_PAGE_SIZES,
@@ -193,7 +194,7 @@ export function GuestTable({
 }
 
 function GuestIdentity({ guest }: { guest: GuestRow }) {
-  const initials = `${guest.firstName.charAt(0)}${guest.lastName.charAt(0)}`.toUpperCase();
+  const initials = guestInitials(guest.firstName, guest.lastName);
 
   return (
     <div className="flex items-center gap-3">

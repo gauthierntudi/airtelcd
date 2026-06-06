@@ -42,9 +42,6 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   if (body.firstName !== undefined && !firstName) {
     return NextResponse.json({ error: "Prénom requis" }, { status: 400 });
   }
-  if (body.lastName !== undefined && !lastName) {
-    return NextResponse.json({ error: "Nom requis" }, { status: 400 });
-  }
 
   const rsvpStatus = body.rsvpStatus;
   if (rsvpStatus && !Object.values(RsvpStatus).includes(rsvpStatus)) {
@@ -84,7 +81,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     where: { id },
     data: {
       ...(firstName !== undefined && { firstName }),
-      ...(lastName !== undefined && { lastName }),
+      ...(body.lastName !== undefined && {
+        lastName: lastName || null,
+      }),
       ...(body.email !== undefined && {
         email: body.email?.trim() || null,
       }),

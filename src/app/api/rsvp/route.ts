@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RsvpStatus } from "@prisma/client";
+import { guestDisplayName, hasGuestLastName } from "@/lib/event";
 import { prisma } from "@/lib/prisma";
 
 const ALLOWED: RsvpStatus[] = [
@@ -9,7 +10,7 @@ const ALLOWED: RsvpStatus[] = [
 ];
 
 export async function PATCH(request: NextRequest) {
-  let body: { token?: string; status?: RsvpStatus };
+  let body: { token?: string; status?: RsvpStatus; lastName?: string };
   try {
     body = await request.json();
   } catch {
@@ -31,9 +32,21 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Invitation introuvable" }, { status: 404 });
   }
 
+  const lastNameInput = body.lastName?.trim();
+  const needsLastName =
+    status === RsvpStatus.CONFIRMED && !hasGuestLastName(guest.lastName);
+
+  if (needsLastName && !lastNameInput) {
+    return NextResponse.json(
+      { error: "Nom requis pour confirmer votre présence" },
+      { status: 400 },
+    );
+  }
+
   const updated = await prisma.guest.update({
     where: { token },
     data: {
+      ...(needsLastName && lastNameInput ? { lastName: lastNameInput } : {}),
       rsvpStatus: status,
       confirmedAt: status === RsvpStatus.CONFIRMED ? new Date() : null,
     },
@@ -41,7 +54,8 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json({
     rsvpStatus: updated.rsvpStatus,
-    confirmedAt: updated.confirmedAt,
-    displayName: `${updated.firstName} ${updated.lastName}`.trim(),
+    confirmedAt: updated.confirmedAt?.toISOString() ?? null,
+    lastName: updated.lastName,
+    displayName: guestDisplayName(updated.firstName, updated.lastName),
   });
 }

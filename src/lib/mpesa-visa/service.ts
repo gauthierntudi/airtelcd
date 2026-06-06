@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { guestDisplayName } from "@/lib/event";
 import {
   CARREFOUR_MARKET_NAME,
   getCarrefourProduct,
@@ -109,7 +110,7 @@ export async function getMpesaVisaExperienceState(
   return {
     guest: {
       id: guest.id,
-      displayName: `${guest.firstName} ${guest.lastName}`.trim(),
+      displayName: guestDisplayName(guest.firstName, guest.lastName),
     },
     card,
     purchases,
@@ -297,7 +298,7 @@ export async function listAdminMpesaOverview(): Promise<AdminMpesaCardRow[]> {
     return {
       cardId: card.id,
       guestId: card.guestId,
-      guestName: `${card.guest.firstName} ${card.guest.lastName}`.trim(),
+      guestName: guestDisplayName(card.guest.firstName, card.guest.lastName),
       guestEmail: card.guest.email,
       guestPhone: card.guest.phone,
       cardMasked: card.cardMasked,

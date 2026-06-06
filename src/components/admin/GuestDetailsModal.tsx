@@ -23,6 +23,7 @@ import {
   RSVP_CONFIG,
   formatGuestDate,
 } from "@/lib/guest-types";
+import { guestInitials } from "@/lib/event";
 import { formatInvitedDaysLong } from "@/lib/event-days";
 import type { MessagingStatus } from "@/lib/messaging/config";
 import { formatPhoneDisplay, whatsAppUrl } from "@/lib/phone";
@@ -50,7 +51,7 @@ export function GuestDetailsModal({
   onCopy,
   onSend,
 }: Props) {
-  const initials = `${guest.firstName.charAt(0)}${guest.lastName.charAt(0)}`.toUpperCase();
+  const initials = guestInitials(guest.firstName, guest.lastName);
   const rsvp = RSVP_CONFIG[guest.rsvpStatus];
 
   return (
@@ -101,7 +102,7 @@ export function GuestDetailsModal({
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <DetailSection title="Identité" icon={User}>
             <DetailItem label="Prénom" value={guest.firstName} />
-            <DetailItem label="Nom" value={guest.lastName} />
+            <DetailItem label="Nom" value={guest.lastName ?? "—"} />
             <DetailItem
               label="Jours d'invitation"
               value={formatInvitedDaysLong(guest.eventDays)}

@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 
 export type InvitationGuestView = {
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   token: string;
   eventDays: EventDayId[];
   invitationTimeRange: string;

@@ -59,9 +59,9 @@ export async function POST(request: NextRequest) {
   for (let i = 0; i < guests.length; i++) {
     const row = guests[i];
     const firstName = row.firstName?.trim();
-    const lastName = row.lastName?.trim();
-    if (!firstName || !lastName) {
-      rowErrors.push({ index: i + 1, message: "Prénom et nom requis" });
+    const lastName = row.lastName?.trim() || null;
+    if (!firstName) {
+      rowErrors.push({ index: i + 1, message: "Prénom requis" });
       continue;
     }
 

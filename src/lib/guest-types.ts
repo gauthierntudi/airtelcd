@@ -6,7 +6,7 @@ import type { EventDayId } from "@/lib/event-days";
 export type GuestRow = {
   id: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   email: string | null;
   phone: string | null;
   token: string;

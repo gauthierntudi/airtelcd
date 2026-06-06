@@ -64,12 +64,9 @@ export async function POST(request: NextRequest) {
   }
 
   const firstName = body.firstName?.trim();
-  const lastName = body.lastName?.trim();
-  if (!firstName || !lastName) {
-    return NextResponse.json(
-      { error: "Prénom et nom requis" },
-      { status: 400 },
-    );
+  const lastName = body.lastName?.trim() || null;
+  if (!firstName) {
+    return NextResponse.json({ error: "Prénom requis" }, { status: 400 });
   }
 
   const phoneResult = parseGuestPhoneField(body.phone);

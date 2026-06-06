@@ -10,6 +10,7 @@ import {
   verifyInvitationAccessOtp,
 } from "@/lib/invitation-access/service";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
+import { guestDisplayName } from "@/lib/event";
 import { prisma } from "@/lib/prisma";
 
 export type CheckinKioskView = {
@@ -36,10 +37,6 @@ export type CheckinGuestView = {
 
 function newKioskToken(): string {
   return randomBytes(18).toString("base64url");
-}
-
-function guestDisplayName(firstName: string, lastName: string): string {
-  return `${firstName} ${lastName}`.trim();
 }
 
 function countdownRemaining(successEndsAt: Date | null): number | null {
@@ -236,7 +233,7 @@ async function getActiveKioskSession() {
 
 async function markCheckinSuccess(
   sessionId: string,
-  guest: { id: string; firstName: string; lastName: string },
+  guest: { id: string; firstName: string; lastName: string | null },
   confirmRsvp: boolean,
 ) {
   const successEndsAt = new Date(

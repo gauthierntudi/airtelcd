@@ -11,6 +11,7 @@ import {
 import type { ContactChannel } from "@/lib/guest-contact";
 import type { GuestRow } from "@/lib/guest-types";
 import type { InvitationSentVia } from "@/lib/messaging/send-invitation";
+import { guestDisplayName } from "@/lib/event";
 import { guestInvitationTimeRange } from "@/lib/invitation-time-range";
 import { invitationAbsoluteUrl } from "@/lib/invitation-url";
 
@@ -35,7 +36,7 @@ export function serializeGuest(g: Guest, baseUrl: string): GuestRow {
     invitationSentVia: asInvitationSentVia(g.invitationSentVia),
     createdAt: g.createdAt.toISOString(),
     updatedAt: g.updatedAt.toISOString(),
-    displayName: `${g.firstName} ${g.lastName}`.trim(),
+    displayName: guestDisplayName(g.firstName, g.lastName),
     invitationUrl: invitationAbsoluteUrl(g.token, baseUrl),
     contactChannels: getGuestContactChannels(g),
     sendChannels: getSendableMessageChannels(g),

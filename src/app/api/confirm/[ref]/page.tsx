@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { InvitationPage } from "@/components/invitation/InvitationPage";
-import { EVENT } from "@/lib/event";
+import { EVENT, guestDisplayName } from "@/lib/event";
 import {
   buildGoogleCalendarUrl,
   buildIcsDownloadUrl,
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
   if (!guest) return { title: "Invitation" };
   return {
-    title: `${guest.firstName} ${guest.lastName} — ${EVENT.title}`,
+    title: `${guestDisplayName(guest.firstName, guest.lastName)} — ${EVENT.title}`,
     description: `Confirmez votre présence à ${EVENT.title}.`,
   };
 }

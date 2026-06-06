@@ -41,7 +41,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
         headers,
         body: JSON.stringify({
           firstName,
-          lastName,
+          ...(lastName.trim() && { lastName: lastName.trim() }),
           email: email || undefined,
           phone: phone || undefined,
           eventDays,
@@ -82,10 +82,9 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
             autoComplete="given-name"
           />
         </Field>
-        <Field label="Nom *" id="lastName">
+        <Field label="Nom" id="lastName" hint="Facultatif">
           <input
             id="lastName"
-            required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
               className={embedded ? modalInputClass : inputClass}

@@ -19,6 +19,23 @@ export const AGENDA = [
   { time: "16h00 – 17h00", label: "Remise des prix & clôture" },
 ] as const;
 
-export function guestDisplayName(firstName: string, lastName: string): string {
-  return `${firstName} ${lastName}`.trim();
+export function hasGuestLastName(lastName: string | null | undefined): boolean {
+  return Boolean(lastName?.trim());
+}
+
+export function guestDisplayName(
+  firstName: string,
+  lastName: string | null | undefined,
+): string {
+  return `${firstName} ${lastName?.trim() ?? ""}`.trim();
+}
+
+export function guestInitials(
+  firstName: string,
+  lastName: string | null | undefined,
+): string {
+  const first = firstName.trim().charAt(0);
+  const last = lastName?.trim().charAt(0) ?? "";
+  const initials = `${first}${last}`.toUpperCase();
+  return initials || "?";
 }
