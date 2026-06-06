@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, X } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { useState } from "react";
 import { InvitationBottomSheet } from "@/components/invitation/InvitationBottomSheet";
 import { LucideIcon } from "@/components/ui/lucide-icon";
@@ -13,15 +13,32 @@ export type RsvpNamePayload = {
 type Props = {
   needsFirstName: boolean;
   needsLastName: boolean;
+  existingFirstName?: string | null;
+  existingLastName?: string | null;
   loading: boolean;
   onClose: () => void;
   onSubmit: (names: RsvpNamePayload) => void;
 };
 
+function buildIntroMessage(
+  needsFirstName: boolean,
+  needsLastName: boolean,
+): string {
+  if (needsFirstName && needsLastName) {
+    return "Indiquez votre prénom et nom pour confirmer votre présence.";
+  }
+  if (needsFirstName) {
+    return "Votre nom est déjà enregistré. Complétez avec votre prénom pour confirmer.";
+  }
+  return "Votre prénom est déjà enregistré. Complétez avec votre nom pour confirmer.";
+}
+
 /** Bottom sheet — nom complet requis avant confirmation si absent en base */
 export function InvitationRsvpNameSheet({
   needsFirstName,
   needsLastName,
+  existingFirstName,
+  existingLastName,
   loading,
   onClose,
   onSubmit,
@@ -70,8 +87,16 @@ export function InvitationRsvpNameSheet({
 
         <div className="px-5 pb-4">
           <p className="font-vodafone-lt text-sm leading-relaxed text-white/70">
-            Indiquez votre prénom et nom pour confirmer votre présence.
+            {buildIntroMessage(needsFirstName, needsLastName)}
           </p>
+
+          {!needsFirstName && existingFirstName?.trim() ? (
+            <ProvidedNameField label="Prénom" value={existingFirstName.trim()} />
+          ) : null}
+
+          {!needsLastName && existingLastName?.trim() ? (
+            <ProvidedNameField label="Nom" value={existingLastName.trim()} />
+          ) : null}
 
           {needsFirstName ? (
             <label htmlFor="rsvp-first-name" className="mt-4 block">
@@ -120,5 +145,26 @@ export function InvitationRsvpNameSheet({
         </div>
       </form>
     </InvitationBottomSheet>
+  );
+}
+
+function ProvidedNameField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="mt-4 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3">
+      <div className="flex items-start gap-3">
+        <span
+          className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/25 text-emerald-300"
+          aria-hidden
+        >
+          <LucideIcon icon={Check} size={14} />
+        </span>
+        <div className="min-w-0">
+          <p className="font-vodafone-rg-bd text-xs uppercase tracking-wide text-emerald-300/90">
+            {label} déjà enregistré
+          </p>
+          <p className="mt-0.5 font-vodafone-rg-bd text-base text-white">{value}</p>
+        </div>
+      </div>
+    </div>
   );
 }

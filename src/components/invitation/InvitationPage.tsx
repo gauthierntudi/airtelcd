@@ -142,6 +142,8 @@ export function InvitationPage({
         <InvitationRsvpNameSheet
           needsFirstName={missingNames.firstName}
           needsLastName={missingNames.lastName}
+          existingFirstName={guest.firstName}
+          existingLastName={guest.lastName}
           loading={loading}
           onClose={() => setNameSheetOpen(false)}
           onSubmit={(names) => updateRsvp(RsvpStatus.CONFIRMED, names)}
