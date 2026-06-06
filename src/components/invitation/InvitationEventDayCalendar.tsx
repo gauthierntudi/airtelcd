@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { AgendaList } from "@/components/invitation/AgendaList";
 import { InvitationEventMonthCalendar } from "@/components/invitation/InvitationEventMonthCalendar";
 import { InvitationProgrammeDayModal } from "@/components/invitation/InvitationProgrammeDayModal";
-import {
-  formatInvitedDayLong,
-  getAgendaForDay,
-  type EventDayId,
-} from "@/lib/event-days";
+import { ProgrammeDayContent } from "@/components/invitation/ProgrammeDayContent";
+import { getProgrammeForDay } from "@/lib/event-programmes";
+import { formatInvitedDayLong, type EventDayId } from "@/lib/event-days";
 import { sortEventDayIds } from "@/lib/parse-event-day";
 
 type Props = {
@@ -41,7 +38,7 @@ export function InvitationEventDayCalendar({
 
   const multiDay = invited.length > 1;
   const showInlineAgenda = showAgenda && !useSheet;
-  const agenda = showInlineAgenda ? getAgendaForDay(selectedDayId) : null;
+  const programme = showInlineAgenda ? getProgrammeForDay(selectedDayId) : null;
 
   function handleDayClick(dayId: EventDayId) {
     if (useSheet) {
@@ -100,19 +97,8 @@ export function InvitationEventDayCalendar({
           )}
         </p>
 
-        {agenda && (
-          <div className="space-y-2">
-            <p
-              className={
-                isMobile
-                  ? "font-vodafone-rg-bd text-xs uppercase tracking-wide text-white/45"
-                  : "font-vodafone-rg-bd text-xs uppercase tracking-wide text-vodacom-black/45"
-              }
-            >
-              {agenda.length} étape{agenda.length > 1 ? "s" : ""}
-            </p>
-            <AgendaList variant={variant} items={agenda} />
-          </div>
+        {programme && (
+          <ProgrammeDayContent programme={programme} variant={variant} />
         )}
       </div>
 

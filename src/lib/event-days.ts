@@ -1,5 +1,3 @@
-import { AGENDA } from "@/lib/event";
-
 /** Jours de l'événement — 12, 13 et 14 juin 2026 */
 export const EVENT_DAYS = [
   {
@@ -77,21 +75,8 @@ export function buildEventMonthCalendarCells(): CalendarMonthCell[] {
   return cells;
 }
 
-export type AgendaItem = { time: string; label: string };
-
-/** Programme par jour — même grille pour chaque jour (personnalisable) */
-export const EVENT_AGENDA_BY_DAY: Record<EventDayId, readonly AgendaItem[]> = {
-  "2026-06-12": AGENDA,
-  "2026-06-13": AGENDA,
-  "2026-06-14": AGENDA,
-};
-
 export function getEventDayById(id: EventDayId) {
   return EVENT_DAYS.find((d) => d.id === id)!;
-}
-
-export function getAgendaForDay(dayId: EventDayId): readonly AgendaItem[] {
-  return EVENT_AGENDA_BY_DAY[dayId] ?? AGENDA;
 }
 
 export function formatInvitedDayLong(dayId: EventDayId): string {

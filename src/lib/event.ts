@@ -11,14 +11,6 @@ export const EVENT = {
     "https://www.google.com/maps/search/?api=1&query=Golf+Club+de+Kinshasa+Gombe",
 } as const;
 
-export const AGENDA = [
-  { time: "08h00 – 09h00", label: "Accueil & remise du kit participant" },
-  { time: "09h00 – 12h00", label: "Début des parties – Round 1" },
-  { time: "12h00 – 13h30", label: "Déjeuner et networking" },
-  { time: "13h30 – 16h00", label: "Round 2 & concours de précision" },
-  { time: "16h00 – 17h00", label: "Remise des prix & clôture" },
-] as const;
-
 export const GUEST_NAME_FALLBACK = "Invité";
 
 export function hasGuestFirstName(

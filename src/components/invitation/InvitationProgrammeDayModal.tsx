@@ -1,10 +1,11 @@
 "use client";
 
 import { X } from "lucide-react";
-import { AgendaList } from "@/components/invitation/AgendaList";
+import { ProgrammeDayContent } from "@/components/invitation/ProgrammeDayContent";
 import { InvitationBottomSheet } from "@/components/invitation/InvitationBottomSheet";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import { getAgendaForDay, getEventDayById, type EventDayId } from "@/lib/event-days";
+import { getProgrammeForDay } from "@/lib/event-programmes";
+import { getEventDayById, type EventDayId } from "@/lib/event-days";
 
 type Props = {
   dayId: EventDayId;
@@ -14,7 +15,7 @@ type Props = {
 /** Bottom sheet — programme du jour (slide Programme mobile) */
 export function InvitationProgrammeDayModal({ dayId, onClose }: Props) {
   const day = getEventDayById(dayId);
-  const agenda = getAgendaForDay(dayId);
+  const programme = getProgrammeForDay(dayId);
 
   return (
     <InvitationBottomSheet
@@ -38,14 +39,17 @@ export function InvitationProgrammeDayModal({ dayId, onClose }: Props) {
 
           <div className="min-w-0 flex-1 pt-0.5">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-vodacom-red">
-              Programme
+              Jour {day.day} · {day.label}
             </p>
             <h2
               id="programme-day-title"
-              className="font-vodafone-exb text-[1.65rem] leading-tight tracking-tight text-white"
+              className="font-vodafone-exb text-[1.35rem] leading-tight tracking-tight text-white"
             >
-              {day.weekday}
+              {programme.title}
             </h2>
+            <p className="mt-1 font-vodafone-rg-bd text-sm text-vodacom-red/90">
+              {programme.subtitle}
+            </p>
           </div>
 
           <button
@@ -60,10 +64,7 @@ export function InvitationProgrammeDayModal({ dayId, onClose }: Props) {
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5">
-        <p className="mb-3 font-vodafone-rg-bd text-xs uppercase tracking-wide text-white/45">
-          {agenda.length} étape{agenda.length > 1 ? "s" : ""}
-        </p>
-        <AgendaList variant="sheet" items={agenda} />
+        <ProgrammeDayContent programme={programme} variant="sheet" />
       </div>
 
       <div className="shrink-0 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))]">
