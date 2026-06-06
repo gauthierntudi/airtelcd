@@ -39,7 +39,7 @@ import {
   getGuestSendBlockReason,
   type SendInvitationOptions,
 } from "@/lib/messaging/send-options";
-import { PHONE_INPUT_HINT } from "@/lib/phone";
+import { AdminPhoneInput } from "@/components/admin/AdminPhoneInput";
 import { notify } from "@/lib/toast";
 
 const FILTERS: { id: RsvpFilter; label: string }[] = [
@@ -504,7 +504,7 @@ function GuestEditModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [firstName, setFirstName] = useState(guest.firstName);
+  const [firstName, setFirstName] = useState(guest.firstName ?? "");
   const [lastName, setLastName] = useState(guest.lastName ?? "");
   const [email, setEmail] = useState(guest.email ?? "");
   const [phone, setPhone] = useState(guest.phone ?? "");
@@ -523,7 +523,7 @@ function GuestEditModal({
         method: "PATCH",
         headers,
         body: JSON.stringify({
-          firstName,
+          firstName: firstName.trim() || null,
           lastName: lastName.trim() || null,
           email: email || null,
           phone: phone || null,
@@ -546,9 +546,8 @@ function GuestEditModal({
     <AdminModal title={`Modifier — ${guest.displayName}`} onClose={onClose}>
       <form onSubmit={handleSave} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
-          <ModalField label="Prénom">
+          <ModalField label="Prénom" hint="Facultatif">
             <input
-              required
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className={modalInputClass}
@@ -571,14 +570,12 @@ function GuestEditModal({
           />
         </ModalField>
         <ModalField label="Téléphone">
-          <input
-            type="tel"
+          <AdminPhoneInput
+            id="edit-guest-phone"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className={modalInputClass}
-            placeholder="+243 810 000 000"
+            onChange={setPhone}
+            inputClass={modalInputClass}
           />
-          <p className="mt-1 text-xs text-white/45">{PHONE_INPUT_HINT}</p>
         </ModalField>
         <ModalField label="Jours d'invitation">
           <EventDayMultiSelect value={eventDays} onChange={setEventDays} />

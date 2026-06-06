@@ -23,7 +23,7 @@ enum CheckinKioskStatus {
 
 model Guest {
   id                 String     @id @default(cuid())
-  firstName          String
+  firstName          String?
   lastName           String?
   email              String?
   phone              String?

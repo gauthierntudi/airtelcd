@@ -86,7 +86,7 @@ export function normalizePhone(
     return {
       ok: false,
       error:
-        "Numéro invalide. Utilisez par ex. 082 426 9291, 824 269 291 ou 243 824 269 291.",
+        "Numéro invalide. Utilisez par ex. 0815191631, 815191631 ou +243 815 191 631.",
     };
   }
 
@@ -128,4 +128,4 @@ export function whatsAppUrl(e164: string): string {
 }
 
 export const PHONE_INPUT_HINT =
-  "Format international (E.164). Ex. +243 810 000 000 — utilisé pour WhatsApp si pas d’email.";
+  "RDC : 0815191631, 815191631 ou +243… — enregistré automatiquement en +243… pour WhatsApp.";

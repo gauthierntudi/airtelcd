@@ -101,10 +101,10 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
           eventDays,
           invitationTimeRange,
           guests: preview.map(({ firstName, lastName, email, phone }) => ({
-            firstName,
-            lastName,
-            email,
-            phone,
+            firstName: firstName?.trim() || null,
+            lastName: lastName?.trim() || null,
+            email: email?.trim() || null,
+            phone: phone?.trim() || null,
           })),
         }),
       });
@@ -271,7 +271,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
     return (
       <>
         <p className="mb-4 text-sm text-white/55">
-          Choisissez les jours d&apos;invitation, puis importez un CSV (prénom, nom, email,
+          Choisissez les jours d&apos;invitation, puis importez un CSV (prénom/nom facultatifs, email,
           téléphone). Les dates ne sont pas dans le fichier.
         </p>
         {importBody}

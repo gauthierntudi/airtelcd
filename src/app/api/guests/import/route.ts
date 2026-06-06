@@ -58,12 +58,8 @@ export async function POST(request: NextRequest) {
 
   for (let i = 0; i < guests.length; i++) {
     const row = guests[i];
-    const firstName = row.firstName?.trim();
+    const firstName = row.firstName?.trim() || null;
     const lastName = row.lastName?.trim() || null;
-    if (!firstName) {
-      rowErrors.push({ index: i + 1, message: "Prénom requis" });
-      continue;
-    }
 
     const phoneResult = parseGuestPhoneField(row.phone);
     if ("error" in phoneResult) {

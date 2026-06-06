@@ -4,11 +4,18 @@ import { RsvpStatus } from "@prisma/client";
 import { useState } from "react";
 import { InvitationDesktopView } from "@/components/invitation/InvitationDesktopView";
 import { InvitationMobileOnboarding } from "@/components/invitation/InvitationMobileOnboarding";
-import { InvitationRsvpNameSheet } from "@/components/invitation/InvitationRsvpNameSheet";
+import {
+  InvitationRsvpNameSheet,
+  type RsvpNamePayload,
+} from "@/components/invitation/InvitationRsvpNameSheet";
 import { WelcomeHashtagLoader } from "@/components/invitation/WelcomeHashtagLoader";
 import type { InvitationSharedProps } from "@/components/invitation/invitation-shared";
 import { useIsLgViewport } from "@/hooks/use-is-lg-viewport";
-import { guestDisplayName, hasGuestLastName } from "@/lib/event";
+import {
+  guestDisplayName,
+  guestMissingNameFields,
+  hasGuestFullName,
+} from "@/lib/event";
 import type { InvitationGuestView } from "@/lib/load-invitation-guest";
 import { notify } from "@/lib/toast";
 
@@ -23,6 +30,7 @@ type Props = {
 type RsvpResponse = {
   rsvpStatus: RsvpStatus;
   confirmedAt: string | null;
+  firstName: string | null;
   lastName: string | null;
   displayName: string;
 };
@@ -42,8 +50,9 @@ export function InvitationPage({
   const [nameSheetOpen, setNameSheetOpen] = useState(false);
   const [welcomeLoaderDone, setWelcomeLoaderDone] = useState(false);
   const isLg = useIsLgViewport();
+  const missingNames = guestMissingNameFields(guest);
 
-  async function updateRsvp(next: RsvpStatus, lastName?: string) {
+  async function updateRsvp(next: RsvpStatus, names?: RsvpNamePayload) {
     setLoading(true);
     const successMessage =
       next === RsvpStatus.CONFIRMED ? "Présence confirmée" : "Réponse enregistrée";
@@ -56,7 +65,8 @@ export function InvitationPage({
           body: JSON.stringify({
             token: guest.token,
             status: next,
-            ...(lastName ? { lastName } : {}),
+            ...(names?.firstName ? { firstName: names.firstName } : {}),
+            ...(names?.lastName ? { lastName: names.lastName } : {}),
           }),
         }).then(async (res) => {
           const json = await res.json();
@@ -72,7 +82,11 @@ export function InvitationPage({
       );
       setStatus(data.rsvpStatus);
       setConfirmedAt(data.confirmedAt);
-      setGuest((prev) => ({ ...prev, lastName: data.lastName }));
+      setGuest((prev) => ({
+        ...prev,
+        firstName: data.firstName,
+        lastName: data.lastName,
+      }));
       setNameSheetOpen(false);
     } catch {
       /* toast erreur déjà affiché */
@@ -82,7 +96,7 @@ export function InvitationPage({
   }
 
   function handleConfirm() {
-    if (!hasGuestLastName(guest.lastName)) {
+    if (!hasGuestFullName(guest.firstName, guest.lastName)) {
       setNameSheetOpen(true);
       return;
     }
@@ -126,10 +140,11 @@ export function InvitationPage({
       )}
       {nameSheetOpen && (
         <InvitationRsvpNameSheet
-          firstName={guest.firstName}
+          needsFirstName={missingNames.firstName}
+          needsLastName={missingNames.lastName}
           loading={loading}
           onClose={() => setNameSheetOpen(false)}
-          onSubmit={(lastName) => updateRsvp(RsvpStatus.CONFIRMED, lastName)}
+          onSubmit={(names) => updateRsvp(RsvpStatus.CONFIRMED, names)}
         />
       )}
     </>

@@ -10,7 +10,7 @@ import {
 } from "@/components/admin/EventDayMultiSelect";
 import type { EventDayId } from "@/lib/event-days";
 import { DEFAULT_INVITATION_TIME_RANGE } from "@/lib/invitation-time-range";
-import { PHONE_INPUT_HINT } from "@/lib/phone";
+import { AdminPhoneInput } from "@/components/admin/AdminPhoneInput";
 import { notify } from "@/lib/toast";
 
 type Props = {
@@ -40,29 +40,37 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
         method: "POST",
         headers,
         body: JSON.stringify({
-          firstName,
-          ...(lastName.trim() && { lastName: lastName.trim() }),
-          email: email || undefined,
-          phone: phone || undefined,
+          firstName: firstName.trim() || null,
+          lastName: lastName.trim() || null,
+          email: email.trim() || undefined,
+          phone: phone.trim() || undefined,
           eventDays,
           invitationTimeRange,
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erreur");
-      await navigator.clipboard.writeText(data.invitationUrl);
+      if (!res.ok) {
+        throw new Error(data.error ?? "Impossible de créer l'invité");
+      }
+
+      try {
+        await navigator.clipboard.writeText(data.invitationUrl);
+        if (!embedded) notify.success("Invité créé — lien copié");
+      } catch {
+        if (!embedded) {
+          notify.success("Invité créé (copie du lien indisponible sur ce navigateur)");
+        }
+      }
+
       setFirstName("");
       setLastName("");
       setEmail("");
       setPhone("");
       setEventDays([DEFAULT_EVENT_DAY_ID]);
       setInvitationTimeRange(DEFAULT_INVITATION_TIME_RANGE);
-      if (!embedded) {
-        notify.success("Lien copié");
-      }
       onCreated();
     } catch (err) {
-      notify.error("Erreur");
+      notify.error(err instanceof Error ? err.message : "Erreur");
     } finally {
       setCreating(false);
     }
@@ -71,25 +79,25 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
   const form = (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Prénom *" id="firstName">
+        <Field label="Prénom" id="firstName" hint="facultatif">
           <input
             id="firstName"
-            required
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-              className={embedded ? modalInputClass : inputClass}
-            placeholder="Jean"
-            autoComplete="given-name"
+            className={embedded ? modalInputClass : inputClass}
+            placeholder="Jean (optionnel)"
+            autoComplete="off"
           />
         </Field>
-        <Field label="Nom" id="lastName" hint="Facultatif">
+        <Field label="Nom" id="lastName" hint="facultatif">
           <input
             id="lastName"
+            name="guest-last-name-optional"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-              className={embedded ? modalInputClass : inputClass}
-            placeholder="Dupont"
-            autoComplete="family-name"
+            className={embedded ? modalInputClass : inputClass}
+            placeholder="Dupont (optionnel)"
+            autoComplete="off"
           />
         </Field>
       </div>
@@ -105,16 +113,12 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
         />
       </Field>
       <Field label="Téléphone" id="phone" hint="WhatsApp si pas d’email">
-        <input
+        <AdminPhoneInput
           id="phone"
-          type="tel"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-              className={embedded ? modalInputClass : inputClass}
-          placeholder="+243 810 000 000"
-          autoComplete="tel"
+          onChange={setPhone}
+          inputClass={embedded ? modalInputClass : inputClass}
         />
-          <p className="mt-1 text-xs text-white/45">{PHONE_INPUT_HINT}</p>
       </Field>
       <Field label="Jours d'invitation *" id="eventDays" hint="1 à 3 jours">
         <EventDayMultiSelect value={eventDays} onChange={setEventDays} />
@@ -158,7 +162,8 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
     return (
       <>
         <p className="mb-4 text-sm text-white/55">
-          Le lien d&apos;invitation unique est généré et copié automatiquement.
+          Prénom et nom sont facultatifs — l&apos;invité les saisira à la
+          confirmation si besoin. Le lien unique est généré à la création.
         </p>
         {form}
       </>
@@ -169,7 +174,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
     <section className="rounded-2xl border border-vodacom-silver/30 bg-white p-6 shadow-sm">
       <h2 className="text-lg font-bold text-vodacom-black">Nouvel invité</h2>
       <p className="mt-1 text-sm text-vodacom-black/60">
-        Le lien d&apos;invitation unique est généré et copié automatiquement.
+        Prénom et nom facultatifs — demandés à la confirmation si absents.
       </p>
       <div className="mt-5">{form}</div>
     </section>

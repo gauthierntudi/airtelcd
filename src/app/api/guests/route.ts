@@ -63,11 +63,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
 
-  const firstName = body.firstName?.trim();
+  const firstName = body.firstName?.trim() || null;
   const lastName = body.lastName?.trim() || null;
-  if (!firstName) {
-    return NextResponse.json({ error: "Prénom requis" }, { status: 400 });
-  }
 
   const phoneResult = parseGuestPhoneField(body.phone);
   if ("error" in phoneResult) {

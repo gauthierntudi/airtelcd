@@ -210,7 +210,11 @@ export function InvitationMobileOnboarding({
               className="flex h-[3.75rem] w-full items-center justify-center gap-2 rounded-2xl bg-vodacom-red text-lg font-bold text-white shadow-lg shadow-vodacom-red/25 active:scale-[0.98] disabled:opacity-50"
             >
               {loading && <LucideIcon icon={Loader2} size={22} className="animate-spin" />}
-              {loading ? "Enregistrement…" : `Je confirme, ${guest.firstName} !`}
+              {loading
+                ? "Enregistrement…"
+                : guest.firstName?.trim()
+                  ? `Je confirme, ${guest.firstName.trim()} !`
+                  : "Je confirme !"}
             </button>
             <button
               type="button"

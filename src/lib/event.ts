@@ -19,23 +19,77 @@ export const AGENDA = [
   { time: "16h00 – 17h00", label: "Remise des prix & clôture" },
 ] as const;
 
+export const GUEST_NAME_FALLBACK = "Invité";
+
+export function hasGuestFirstName(
+  firstName: string | null | undefined,
+): boolean {
+  return Boolean(firstName?.trim());
+}
+
 export function hasGuestLastName(lastName: string | null | undefined): boolean {
   return Boolean(lastName?.trim());
 }
 
+/** Prénom et nom renseignés — requis pour confirmer la présence si absent en base. */
+export function hasGuestFullName(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+): boolean {
+  return hasGuestFirstName(firstName) && hasGuestLastName(lastName);
+}
+
 export function guestDisplayName(
-  firstName: string,
+  firstName: string | null | undefined,
   lastName: string | null | undefined,
 ): string {
-  return `${firstName} ${lastName?.trim() ?? ""}`.trim();
+  const full = `${firstName?.trim() ?? ""} ${lastName?.trim() ?? ""}`.trim();
+  return full || GUEST_NAME_FALLBACK;
+}
+
+/** Libellé court (prénom ou repli) — emails OTP, boutons invitation. */
+export function guestFirstNameLabel(
+  firstName: string | null | undefined,
+): string {
+  return firstName?.trim() || GUEST_NAME_FALLBACK;
+}
+
+/** « Jean, » ou chaîne vide si pas de prénom — textes page invitation. */
+export function guestSalutationPrefix(
+  firstName: string | null | undefined,
+): string {
+  const first = firstName?.trim();
+  return first ? `${first}, ` : "";
+}
+
+/** Affichage admin : nom complet, sinon email/téléphone. */
+export function guestAdminDisplayName(guest: {
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  phone: string | null;
+}): string {
+  const full = guestDisplayName(guest.firstName, guest.lastName);
+  if (full !== GUEST_NAME_FALLBACK) return full;
+  return guest.email?.trim() || guest.phone?.trim() || GUEST_NAME_FALLBACK;
 }
 
 export function guestInitials(
-  firstName: string,
+  firstName: string | null | undefined,
   lastName: string | null | undefined,
 ): string {
-  const first = firstName.trim().charAt(0);
+  const first = firstName?.trim().charAt(0) ?? "";
   const last = lastName?.trim().charAt(0) ?? "";
   const initials = `${first}${last}`.toUpperCase();
   return initials || "?";
+}
+
+export function guestMissingNameFields(guest: {
+  firstName: string | null;
+  lastName: string | null;
+}): { firstName: boolean; lastName: boolean } {
+  return {
+    firstName: !hasGuestFirstName(guest.firstName),
+    lastName: !hasGuestLastName(guest.lastName),
+  };
 }

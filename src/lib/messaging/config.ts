@@ -8,10 +8,14 @@ export type TwilioCredentials = {
 };
 
 export type TwilioWhatsappCredentials = TwilioCredentials & {
+  /** @deprecated Préférer contentInviteNominativeSid */
   contentInviteSid: string | undefined;
+  contentInviteNominativeSid: string | undefined;
+  contentInviteSimpleSid: string | undefined;
 };
 
 function twilioWhatsappCredentials(): TwilioWhatsappCredentials {
+  const legacyInviteSid = process.env.TWILIO_WHATSAPP_CONTENT_INVITE_SID?.trim();
   return {
     accountSid:
       process.env.TWILIO_WHATSAPP_ACCOUNT_SID?.trim() ||
@@ -20,7 +24,12 @@ function twilioWhatsappCredentials(): TwilioWhatsappCredentials {
       process.env.TWILIO_WHATSAPP_AUTH_TOKEN?.trim() ||
       process.env.TWILIO_AUTH_TOKEN?.trim(),
     from: process.env.TWILIO_WHATSAPP_FROM?.trim(),
-    contentInviteSid: process.env.TWILIO_WHATSAPP_CONTENT_INVITE_SID?.trim(),
+    contentInviteSid: legacyInviteSid,
+    contentInviteNominativeSid:
+      process.env.TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID?.trim() ||
+      legacyInviteSid,
+    contentInviteSimpleSid:
+      process.env.TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID?.trim(),
   };
 }
 
@@ -80,7 +89,8 @@ export function isTwilioWhatsappConfigured(): boolean {
     whatsapp.accountSid &&
       whatsapp.authToken &&
       whatsapp.from &&
-      whatsapp.contentInviteSid,
+      whatsapp.contentInviteNominativeSid &&
+      whatsapp.contentInviteSimpleSid,
   );
 }
 
@@ -214,9 +224,14 @@ export function getSystemMessagingReport(): SystemMessagingReport {
       configured: Boolean(cfg.twilio.whatsapp.from),
     },
     {
-      name: "TWILIO_WHATSAPP_CONTENT_INVITE_SID",
-      label: "Template invitation (Content SID)",
-      configured: Boolean(cfg.twilio.whatsapp.contentInviteSid),
+      name: "TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID",
+      label: "Template WhatsApp nominatif (Content SID)",
+      configured: Boolean(cfg.twilio.whatsapp.contentInviteNominativeSid),
+    },
+    {
+      name: "TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID",
+      label: "Template WhatsApp simple (Content SID)",
+      configured: Boolean(cfg.twilio.whatsapp.contentInviteSimpleSid),
     },
   ];
 
@@ -321,7 +336,7 @@ export function assertChannelConfigured(channel: ContactChannel): void {
   }
   if (channel === "whatsapp" && !isTwilioWhatsappConfigured()) {
     throw new Error(
-      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN, TWILIO_WHATSAPP_FROM et TWILIO_WHATSAPP_CONTENT_INVITE_SID requis.",
+      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID et TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID requis.",
     );
   }
 }

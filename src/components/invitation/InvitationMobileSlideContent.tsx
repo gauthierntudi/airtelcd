@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { InvitationRsvpActionsSheet } from "@/components/invitation/InvitationRsvpActionsSheet";
 import { InvitationEventDayCalendar } from "@/components/invitation/InvitationEventDayCalendar";
-import { EVENT } from "@/lib/event";
+import { EVENT, guestSalutationPrefix } from "@/lib/event";
 import { formatInvitedDaysLong } from "@/lib/event-days";
 import type { EventDayId } from "@/lib/event-days";
 import type { InvitationSlideId } from "@/lib/invitation-assets";
@@ -94,7 +94,7 @@ function InviteSlide({
           Invitation exclusive
         </p>
         <h2 className="font-vodafone-exb font-normal text-[2.65rem] leading-[1.05] tracking-tight text-white">
-          Bonjour {guest.firstName}
+          Bonjour{guest.firstName?.trim() ? ` ${guest.firstName.trim()}` : ""}
         </h2>
         <p className="font-vodafone-rg-bd font-normal text-2xl leading-snug text-vodacom-red">
           Votre place VIP vous attend
@@ -198,7 +198,7 @@ function RsvpSlide({
             Your privileged access
           </h2>
           <p className="font-vodafone-rg-bd text-2xl leading-snug text-vodacom-red">
-            {guest.firstName}, confirmez votre présence
+            {guestSalutationPrefix(guest.firstName)}confirmez votre présence
           </p>
           <p className="font-vodafone-lt text-xl leading-snug text-white">
             Utilisez le bouton ci-dessous pour répondre — puis présentez votre QR code à

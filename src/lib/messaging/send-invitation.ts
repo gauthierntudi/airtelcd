@@ -7,9 +7,21 @@ import {
   assertSendOptions,
   type SendInvitationOptions,
 } from "@/lib/messaging/send-options";
+import { buildInvitationWhatsAppVariables } from "@/lib/messaging/invitation-whatsapp-vars";
 import { sendInvitationWhatsApp } from "@/lib/messaging/twilio-whatsapp";
-import { guestDisplayName } from "@/lib/event";
+import { guestDisplayName, hasGuestFullName } from "@/lib/event";
+import type { InvitationEmailVariant } from "@/lib/messaging/invitation-email-vars";
 import { prisma } from "@/lib/prisma";
+
+/** Nominatif uniquement si prénom + nom connus — sinon template simple. */
+function resolveInvitationTemplate(
+  guest: Guest,
+  preferred: InvitationEmailVariant,
+): InvitationEmailVariant {
+  if (preferred === "simple") return "simple";
+  if (!hasGuestFullName(guest.firstName, guest.lastName)) return "simple";
+  return "nominative";
+}
 
 export type InvitationSentVia = ContactChannel | "both";
 
@@ -32,12 +44,10 @@ async function sendOnChannel(
   baseUrl: string,
   options: SendInvitationOptions,
 ): Promise<void> {
+  const template = resolveInvitationTemplate(guest, options.emailTemplate);
+
   if (channel === "email") {
-    const emailParams = buildInvitationEmailParams(
-      guest,
-      baseUrl,
-      options.emailTemplate,
-    );
+    const emailParams = buildInvitationEmailParams(guest, baseUrl, template);
     await sendInvitationEmail({
       ...emailParams,
       email: guest.email!.trim(),
@@ -47,8 +57,8 @@ async function sendOnChannel(
 
   await sendInvitationWhatsApp({
     phoneE164: guest.phone!,
-    displayName: guestDisplayName(guest.firstName, guest.lastName),
-    invitationToken: guest.token,
+    variant: template,
+    contentVariables: buildInvitationWhatsAppVariables(guest, template),
   });
 }
 

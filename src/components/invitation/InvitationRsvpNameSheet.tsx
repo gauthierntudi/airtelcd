@@ -5,28 +5,43 @@ import { useState } from "react";
 import { InvitationBottomSheet } from "@/components/invitation/InvitationBottomSheet";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 
-type Props = {
-  firstName: string;
-  loading: boolean;
-  onClose: () => void;
-  onSubmit: (lastName: string) => void;
+export type RsvpNamePayload = {
+  firstName?: string;
+  lastName?: string;
 };
 
-/** Bottom sheet — nom requis avant confirmation RSVP si absent en base */
+type Props = {
+  needsFirstName: boolean;
+  needsLastName: boolean;
+  loading: boolean;
+  onClose: () => void;
+  onSubmit: (names: RsvpNamePayload) => void;
+};
+
+/** Bottom sheet — nom complet requis avant confirmation si absent en base */
 export function InvitationRsvpNameSheet({
-  firstName,
+  needsFirstName,
+  needsLastName,
   loading,
   onClose,
   onSubmit,
 }: Props) {
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const trimmed = lastName.trim();
-  const canSubmit = trimmed.length > 0 && !loading;
+
+  const trimmedFirst = firstName.trim();
+  const trimmedLast = lastName.trim();
+  const firstOk = !needsFirstName || trimmedFirst.length > 0;
+  const lastOk = !needsLastName || trimmedLast.length > 0;
+  const canSubmit = firstOk && lastOk && !loading;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
-    onSubmit(trimmed);
+    onSubmit({
+      ...(needsFirstName && { firstName: trimmedFirst }),
+      ...(needsLastName && { lastName: trimmedLast }),
+    });
   }
 
   return (
@@ -41,7 +56,7 @@ export function InvitationRsvpNameSheet({
             id="rsvp-name-title"
             className="font-vodafone-exb text-xl leading-tight text-white"
           >
-            Votre nom
+            Votre identité
           </h2>
           <button
             type="button"
@@ -55,21 +70,40 @@ export function InvitationRsvpNameSheet({
 
         <div className="px-5 pb-4">
           <p className="font-vodafone-lt text-sm leading-relaxed text-white/70">
-            {firstName}, indiquez votre nom de famille pour confirmer votre
-            présence.
+            Indiquez votre prénom et nom pour confirmer votre présence.
           </p>
-          <label htmlFor="rsvp-last-name" className="mt-4 block">
-            <span className="font-vodafone-rg-bd text-sm text-white">Nom *</span>
-            <input
-              id="rsvp-last-name"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              autoComplete="family-name"
-              placeholder="Dupont"
-              className="mt-2 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 font-vodafone-lt text-base text-white outline-none placeholder:text-white/35 focus:border-vodacom-red/60 focus:ring-2 focus:ring-vodacom-red/25"
-            />
-          </label>
+
+          {needsFirstName ? (
+            <label htmlFor="rsvp-first-name" className="mt-4 block">
+              <span className="font-vodafone-rg-bd text-sm text-white">
+                Prénom *
+              </span>
+              <input
+                id="rsvp-first-name"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                autoComplete="given-name"
+                placeholder="Jean"
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 font-vodafone-lt text-base text-white outline-none placeholder:text-white/35 focus:border-vodacom-red/60 focus:ring-2 focus:ring-vodacom-red/25"
+              />
+            </label>
+          ) : null}
+
+          {needsLastName ? (
+            <label htmlFor="rsvp-last-name" className="mt-4 block">
+              <span className="font-vodafone-rg-bd text-sm text-white">Nom *</span>
+              <input
+                id="rsvp-last-name"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                autoComplete="family-name"
+                placeholder="Dupont"
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 font-vodafone-lt text-base text-white outline-none placeholder:text-white/35 focus:border-vodacom-red/60 focus:ring-2 focus:ring-vodacom-red/25"
+              />
+            </label>
+          ) : null}
         </div>
 
         <div className="shrink-0 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))]">

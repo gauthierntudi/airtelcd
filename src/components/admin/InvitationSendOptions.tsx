@@ -13,13 +13,13 @@ type Props = {
   compact?: boolean;
 };
 
-const EMAIL_TEMPLATES: {
+const INVITATION_TEMPLATES: {
   id: InvitationEmailVariant;
   label: string;
   hint: string;
 }[] = [
-  { id: "nominative", label: "Nominatif", hint: "Cher/Chère + nom" },
-  { id: "simple", label: "Simple", hint: "Sans nom" },
+  { id: "nominative", label: "Nominatif", hint: "Cher/Chère + nom (email & WhatsApp)" },
+  { id: "simple", label: "Simple", hint: "Sans nom (email & WhatsApp)" },
 ];
 
 export function InvitationSendOptions({
@@ -39,9 +39,12 @@ export function InvitationSendOptions({
     });
   }
 
-  function setEmailTemplate(template: InvitationEmailVariant) {
+  function setInvitationTemplate(template: InvitationEmailVariant) {
     onChange({ ...value, emailTemplate: template });
   }
+
+  const showTemplatePicker =
+    value.channels.email || value.channels.whatsapp;
 
   return (
     <div
@@ -80,21 +83,21 @@ export function InvitationSendOptions({
           </div>
         </section>
 
-        {value.channels.email ? (
+        {showTemplatePicker ? (
           <section
             className="shrink-0 space-y-2"
             role="radiogroup"
-            aria-label="Template email"
+            aria-label="Template invitation"
           >
-            <p className="text-xs font-semibold text-white/60">Template email</p>
+            <p className="text-xs font-semibold text-white/60">Template invitation</p>
             <div className="flex flex-wrap gap-2">
-              {EMAIL_TEMPLATES.map((tpl) => (
+              {INVITATION_TEMPLATES.map((tpl) => (
                 <TemplateSwitchRow
                   key={tpl.id}
                   label={tpl.label}
                   hint={tpl.hint}
                   selected={value.emailTemplate === tpl.id}
-                  onSelect={() => setEmailTemplate(tpl.id)}
+                  onSelect={() => setInvitationTemplate(tpl.id)}
                 />
               ))}
             </div>

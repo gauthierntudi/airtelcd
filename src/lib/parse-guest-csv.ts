@@ -1,7 +1,7 @@
 import { normalizePhone } from "@/lib/phone";
 
 export type GuestImportRow = {
-  firstName: string;
+  firstName?: string;
   lastName?: string;
   email?: string;
   phone?: string;
@@ -116,13 +116,6 @@ export function parseGuestCsv(text: string): ParseResult {
 
     const firstName = draft.firstName?.trim();
     const lastName = draft.lastName?.trim();
-    if (!firstName) {
-      errors.push({
-        line: lineNum,
-        message: "Prénom requis",
-      });
-      continue;
-    }
 
     const email = draft.email?.trim();
     const phoneRaw = draft.phone?.trim();
@@ -136,7 +129,7 @@ export function parseGuestCsv(text: string): ParseResult {
       if (normalized.e164) phoneE164 = normalized.e164;
     }
     rows.push({
-      firstName,
+      ...(firstName && { firstName }),
       ...(lastName && { lastName }),
       ...(email && { email }),
       ...(phoneE164 && { phone: phoneE164 }),

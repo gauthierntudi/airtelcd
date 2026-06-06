@@ -20,6 +20,7 @@ import {
 import Image from "next/image";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { VodacomLogo } from "@/components/branding/VodacomLogo";
+import { guestSalutationPrefix } from "@/lib/event";
 import {
   INVITATION_RSVP_UI,
   type InvitationSharedProps,
@@ -267,7 +268,7 @@ function RsvpPanel({
           Your privileged access
         </h2>
         <p className="mt-1 font-vodafone-rg-bd text-base text-white/95">
-          {guest.firstName}, confirmez votre présence
+          {guestSalutationPrefix(guest.firstName)}confirmez votre présence
         </p>
       </div>
       <div className="p-5">
@@ -275,7 +276,8 @@ function RsvpPanel({
           <div className="space-y-3 text-center">
             <LucideIcon icon={CheckCircle2} size={40} className="mx-auto text-emerald-600" />
             <p className="font-vodafone-rg-bd text-emerald-800">
-              À bientôt sur le green, {guest.firstName} !
+              À bientôt sur le green
+              {guest.firstName?.trim() ? `, ${guest.firstName.trim()}` : ""} !
             </p>
             {confirmedAt && (
               <p
@@ -313,7 +315,11 @@ function RsvpPanel({
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-vodacom-red py-4 font-vodafone-rg-bd text-base font-normal text-white shadow-md shadow-vodacom-red/20 active:scale-[0.98] disabled:opacity-50"
             >
               {loading && <LucideIcon icon={Loader2} size={20} className="animate-spin" />}
-              {loading ? "En cours…" : `Je confirme, ${guest.firstName} !`}
+              {loading
+                ? "En cours…"
+                : guest.firstName?.trim()
+                  ? `Je confirme, ${guest.firstName.trim()} !`
+                  : "Je confirme !"}
             </button>
             <button
               type="button"

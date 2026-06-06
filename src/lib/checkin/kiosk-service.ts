@@ -233,7 +233,7 @@ async function getActiveKioskSession() {
 
 async function markCheckinSuccess(
   sessionId: string,
-  guest: { id: string; firstName: string; lastName: string | null },
+  guest: { id: string; firstName: string | null; lastName: string | null },
   confirmRsvp: boolean,
 ) {
   const successEndsAt = new Date(

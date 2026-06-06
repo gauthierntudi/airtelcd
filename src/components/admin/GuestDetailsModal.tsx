@@ -101,7 +101,7 @@ export function GuestDetailsModal({
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <DetailSection title="Identité" icon={User}>
-            <DetailItem label="Prénom" value={guest.firstName} />
+            <DetailItem label="Prénom" value={guest.firstName ?? "—"} />
             <DetailItem label="Nom" value={guest.lastName ?? "—"} />
             <DetailItem
               label="Jours d'invitation"

@@ -16,6 +16,7 @@ import {
   INVITATION_ACCESS_SMS_NOT_FOUND,
 } from "@/lib/invitation-access/types";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
+import { guestFirstNameLabel } from "@/lib/event";
 import { isTwilioVerifyConfigured } from "@/lib/messaging/config";
 import { canDeliverOtp, deliverOtpCode } from "@/lib/messaging/send-otp";
 import {
@@ -114,7 +115,7 @@ export async function requestInvitationAccessOtp(
     await deliverOtpCode({
       channel: input.channel,
       address,
-      firstName: guest.firstName,
+      firstName: guestFirstNameLabel(guest.firstName),
       code: code ?? "",
     });
   } catch (e) {

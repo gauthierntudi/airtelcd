@@ -5,7 +5,7 @@ import type { EventDayId } from "@/lib/event-days";
 /** Ordre aligné sur le modèle Guest / export CSV / tableau admin */
 export type GuestRow = {
   id: string;
-  firstName: string;
+  firstName: string | null;
   lastName: string | null;
   email: string | null;
   phone: string | null;

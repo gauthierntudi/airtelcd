@@ -39,9 +39,6 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
   const firstName = body.firstName?.trim();
   const lastName = body.lastName?.trim();
-  if (body.firstName !== undefined && !firstName) {
-    return NextResponse.json({ error: "Prénom requis" }, { status: 400 });
-  }
 
   const rsvpStatus = body.rsvpStatus;
   if (rsvpStatus && !Object.values(RsvpStatus).includes(rsvpStatus)) {
@@ -80,7 +77,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const updated = await prisma.guest.update({
     where: { id },
     data: {
-      ...(firstName !== undefined && { firstName }),
+      ...(body.firstName !== undefined && { firstName: firstName || null }),
       ...(body.lastName !== undefined && {
         lastName: lastName || null,
       }),

@@ -37,7 +37,9 @@ export function AdminDashboard({ adminSecret, messagingStatus }: Props) {
       if (!res.ok) throw new Error(data.error ?? "Erreur");
       setGuests(data);
     } catch (e) {
-      notify.error("Erreur");
+      notify.error(
+        e instanceof Error ? e.message : "Impossible de charger les invités",
+      );
     } finally {
       setLoading(false);
     }
