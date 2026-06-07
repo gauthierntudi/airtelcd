@@ -111,13 +111,13 @@ export function InvitationDesktopView({
                 <div className="absolute inset-0 bg-gradient-to-r from-vodacom-black/75 via-vodacom-black/30 to-transparent" />
                 <div className="absolute bottom-4 left-5 right-4">
                   <p className="inline-flex rounded-full bg-vodacom-red px-3 py-1 text-[11px] font-bold text-white">
-                    Expérience VIP
+                    Expérience Privilège
                   </p>
                   <p className="mt-2 font-vodafone-exb text-2xl leading-tight text-white">
                     Le green bistro club
                   </p>
                   <p className="font-vodafone-rg-bd text-lg text-vodacom-red">
-                    More Freedom. More Privileges.
+                    Plus de flexibilité, plus de privilèges
                   </p>
                 </div>
               </div>
@@ -275,7 +275,7 @@ function RsvpPanel({
     >
       <div className="bg-vodacom-red px-5 py-4">
         <h2 className="font-vodafone-exb text-2xl font-normal leading-tight text-white">
-          Your privileged access
+          Votre accès Privilège
         </h2>
         <p className="mt-1 font-vodafone-rg-bd text-base text-white/95">
           {invitationRsvpSlideHeadline(

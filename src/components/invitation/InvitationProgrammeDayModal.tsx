@@ -39,7 +39,7 @@ export function InvitationProgrammeDayModal({ dayId, onClose }: Props) {
 
           <div className="min-w-0 flex-1 pt-0.5">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-vodacom-red">
-              Jour {day.day} · {day.label}
+              {day.weekday} · {day.label}
             </p>
             <h2
               id="programme-day-title"

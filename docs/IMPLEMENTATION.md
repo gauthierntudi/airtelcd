@@ -1,4 +1,4 @@
-# Vodacom Privilege Golf 2026 — Suivi d'implémentation
+# Vodacom Privilège Golf 2026 — Suivi d'implémentation
 
 Plateforme événementielle : invitation, expériences produit Vodacom RDC, jeux enfants.
 

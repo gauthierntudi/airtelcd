@@ -129,7 +129,7 @@ export function CheckinDisplayScreen() {
         <div className="flex items-center gap-4 sm:gap-6">
           <Image
             src={BRAND.logoWhite}
-            alt="Vodacom Privilege"
+            alt="Vodacom Privilège"
             width={200}
             height={52}
             className="h-9 w-auto object-contain sm:h-11"

@@ -1,11 +1,11 @@
-Invitation numérique – Vodacom Privilege Golf
+Invitation numérique – Vodacom Privilège Golf
 
 1️⃣ En-tête / Accroche
 
-Logo Vodacom Privilege en haut
+Logo Vodacom Privilège en haut
 Titre de l’événement :
 
-> Vodacom Privilege Golf 2026
+> Vodacom Privilège Golf 2026
 * Accroche personnalisée :
 
   > Cher/Chère {{Nom de l’invité}}, votre invitation exclusive vous attend !
@@ -15,7 +15,7 @@ Titre de l’événement :
 
 * Introduction :
 
-  > Nous avons le plaisir de vous convier à notre prestigieux événement Vodacom Privilege Golf, une journée exceptionnelle dédiée au sport, au networking et aux expériences exclusives.
+  > Nous avons le plaisir de vous convier à notre prestigieux événement Vodacom Privilège Golf, une journée exceptionnelle dédiée au sport, au networking et aux expériences exclusives.
 
 * Détails principaux :
 
@@ -51,7 +51,7 @@ Titre de l’événement :
 
 * Texte intégré dans le visuel :
 
-> « {{Nom de l’invité}}, votre place VIP vous attend au Vodacom Privilege Golf ! »
+> « {{Nom de l’invité}}, votre place VIP vous attend au Vodacom Privilège Golf ! »
 
 * Option : ajouter animation légère du logo Vodacom pour dynamiser la page.
 
@@ -64,6 +64,6 @@ Titre de l’événement :
 
 7️⃣ Pied de page / Mentions légales
 
-* Organisateur : Vodacom Privilege
+* Organisateur : Vodacom Privilège
 * Sponsors / partenaires
 * Mentions légales pour l’utilisation de données personnelles (RGPD)

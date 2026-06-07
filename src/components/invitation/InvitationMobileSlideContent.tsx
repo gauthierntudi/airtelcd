@@ -131,13 +131,13 @@ function ExperienceSlide() {
     <div className="flex flex-col gap-3 pb-0.5">
       <div className="space-y-2">
         <p className="inline-flex max-w-full rounded-full bg-vodacom-red px-3 py-1.5 text-[11px] font-bold leading-tight text-white">
-          Expérience VIP
+          Expérience Privilège
         </p>
         <h2 className="font-vodafone-exb font-normal text-[2.65rem] leading-[1.05] tracking-tight text-white">
           Le green bistro club
         </h2>
         <p className="font-vodafone-rg-bd font-normal text-2xl leading-snug text-vodacom-red">
-          More Freedom. More Privileges.
+          Plus de flexibilité, plus de privilèges
         </p>
         <p className="font-vodafone-lt font-normal text-xl leading-snug text-white">
           Participez à des parties de golf, rencontrez d&apos;autres membres privilèges et
@@ -221,7 +221,7 @@ function RsvpSlide({
       <div className="flex min-h-0 flex-1 flex-col justify-end">
         <div className="mb-4 shrink-0 space-y-2">
           <h2 className="font-vodafone-exb text-[2.35rem] font-normal leading-[1.05] tracking-tight text-white">
-            Your privileged access
+            Votre accès Privilège
           </h2>
           <p className="font-vodafone-rg-bd text-2xl leading-snug text-vodacom-red">
             {invitationRsvpSlideHeadline(guest.firstName, rsvpStatus)}

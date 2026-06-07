@@ -4,7 +4,7 @@ import { BRAND } from "@/lib/branding";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vodacom Privilege Golf 2026",
+  title: "Vodacom Privilège Golf 2026",
   description:
     "Plateforme événementielle — invitation, expériences et activités enfants.",
   icons: {

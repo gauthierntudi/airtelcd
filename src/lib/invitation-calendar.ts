@@ -29,7 +29,7 @@ export function buildGoogleCalendarUrl(
     action: "TEMPLATE",
     text: EVENT.title,
     dates: `${start}/${end}`,
-    details: `Invitation Vodacom Privilege Golf.\nConfirmer : ${invitationUrl}`,
+    details: `Invitation Vodacom Privilège Golf.\nConfirmer : ${invitationUrl}`,
     location: EVENT.venue,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -42,7 +42,7 @@ export function buildIcsDownloadUrl(
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Vodacom Privilege//Golf 2026//FR",
+    "PRODID:-//Vodacom Privilège//Golf 2026//FR",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
   ];

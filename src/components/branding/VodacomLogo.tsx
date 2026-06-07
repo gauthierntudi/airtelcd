@@ -24,7 +24,7 @@ export function VodacomLogo({
   const image = (
     <Image
       src={src}
-      alt="Vodacom Privilege"
+      alt="Vodacom Privilège"
       width={width}
       height={height}
       className={`h-auto w-auto object-contain object-left ${className}`}

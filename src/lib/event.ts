@@ -1,12 +1,12 @@
 export const EVENT = {
-  title: "Vodacom Privilege Golf 2026",
+  title: "Vodacom Privilège Golf 2026",
   dateLabel: "Du 12 au 14 juin 2026",
   timeLabel: "08h00 à 17h00",
   venue: "Golf Club de Kinshasa, Gombe",
   dressCode: "Casual golf / Polo",
   contactEmail: "contact@vodacomprivilege.com",
   contactPhone: "+243 81 000 0000",
-  organizer: "Vodacom Privilege",
+  organizer: "Vodacom Privilège",
   mapsUrl:
     "https://www.google.com/maps/search/?api=1&query=Golf+Club+de+Kinshasa+Gombe",
 } as const;

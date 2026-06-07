@@ -89,7 +89,7 @@ export async function sendOtpSms(params: {
   assertTwilioSmsConfigured();
   await sendTwilioSmsMessage({
     phoneE164: params.phoneE164,
-    body: `Bonjour ${params.firstName}, votre code Vodacom Privilege Golf : ${params.code} (valide 10 min).`,
+    body: `Bonjour ${params.firstName}, votre code Vodacom Privilège Golf : ${params.code} (valide 10 min).`,
   });
 }
 

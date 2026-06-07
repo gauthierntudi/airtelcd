@@ -3,7 +3,7 @@ import {
   parsePhoneNumberFromString,
 } from "libphonenumber-js";
 
-/** Pays par défaut : RDC (invités Vodacom Privilege Golf) */
+/** Pays par défaut : RDC (invités Vodacom Privilège Golf) */
 export const DEFAULT_PHONE_COUNTRY: CountryCode = "CD";
 
 export type PhoneNormalizeResult =

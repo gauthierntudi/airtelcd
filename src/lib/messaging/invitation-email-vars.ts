@@ -8,7 +8,7 @@ import { guestInvitationTimeRange } from "@/lib/invitation-time-range";
 export const INVITATION_EXPERIENCE = {
   title: "Kinshasa Open de Golf",
   venue: "Green Bistro/Cercle de Kinshasa",
-  organizer: "Vodacom Privileges",
+  organizer: "Vodacom Privilège",
 } as const;
 
 export type InvitationEmailVariant = "simple" | "nominative";

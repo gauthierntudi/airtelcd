@@ -1,4 +1,4 @@
-# Vodacom Privilege Golf 2026
+# Vodacom Privilège Golf 2026
 
 Plateforme Next.js pour l'événement : invitations, expériences Vodacom RDC, jeux enfants.
 

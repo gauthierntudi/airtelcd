@@ -223,7 +223,7 @@ export function CheckinGuestFlow({ token }: Props) {
       <div className="min-h-[100dvh] bg-vodacom-cream px-5 py-8">
         <Image
           src={BRAND.logoBlack}
-          alt="Vodacom Privilege"
+          alt="Vodacom Privilège"
           width={140}
           height={40}
           className="mb-8 h-9 w-auto object-contain"
@@ -339,7 +339,7 @@ export function CheckinGuestFlow({ token }: Props) {
               Confirmer ma présence
             </h2>
             <p className="mt-2 font-vodafone-lt text-sm text-white/70">
-              Validez votre participation au Vodacom Privilege Golf 2026 pour
+              Validez votre participation au Vodacom Privilège Golf 2026 pour
               finaliser le check-in.
             </p>
             <button

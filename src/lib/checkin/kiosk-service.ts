@@ -68,7 +68,7 @@ function kioskHeadlines(
     case CheckinKioskStatus.SUCCESS:
       return {
         headline: displayName ? `Bienvenue, ${displayName} !` : "Check-in réussi",
-        subline: "Profitez de l'événement Vodacom Privilege Golf",
+        subline: "Profitez de l'événement Vodacom Privilège Golf",
       };
     default:
       return { headline: "Check-in", subline: null };

@@ -5,7 +5,7 @@ type Props = {
 };
 
 export const metadata = {
-  title: "Check-in invitation — Vodacom Privilege Golf",
+  title: "Check-in invitation — Vodacom Privilège Golf",
 };
 
 export default async function CheckinScanPage({ params }: Props) {

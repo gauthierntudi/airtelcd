@@ -57,7 +57,7 @@ export function PlatformHome() {
                 Le privilège se vit aussi sur le green
               </h1>
               <p className="mt-1.5 font-vodafone-rg-bd text-base text-vodacom-red sm:mt-2 sm:text-xl">
-                More Freedom. More Privileges.
+                Plus de flexibilité, plus de privilèges
               </p>
               <p className="mt-3 font-vodafone-lt text-sm leading-relaxed text-white/80 sm:mt-4 sm:text-lg sm:text-white/85">
                 Invitations VIP, expériences produit et activités enfants pour

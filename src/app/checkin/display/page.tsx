@@ -1,7 +1,7 @@
 import { CheckinDisplayScreen } from "@/components/checkin/CheckinDisplayScreen";
 
 export const metadata = {
-  title: "Check-in — Vodacom Privilege Golf",
+  title: "Check-in — Vodacom Privilège Golf",
   description: "Borne d'accueil — scannez le QR code pour vérifier votre invitation",
 };
 

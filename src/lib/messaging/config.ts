@@ -66,7 +66,7 @@ export function getMessagingConfig() {
       apiKey: process.env.BREVO_API_KEY?.trim(),
       senderEmail: process.env.BREVO_SENDER_EMAIL?.trim(),
       senderName:
-        process.env.BREVO_SENDER_NAME?.trim() ?? "Vodacom Privilege Golf",
+        process.env.BREVO_SENDER_NAME?.trim() ?? "Vodacom Privilège Golf",
     },
     twilio: {
       whatsapp: twilioWhatsappCredentials(),

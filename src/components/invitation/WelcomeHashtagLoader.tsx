@@ -7,10 +7,12 @@ import { useRef } from "react";
 gsap.registerPlugin(useGSAP);
 
 const LOADER_WORDS = [
-  "#Privilèges",
-  "#Flexibilité",
-  "#Convertibilité",
-  "#Partage",
+  "Privilèges",
+  "Flexibilité",
+  "Convertibilité",
+  "Partage",
+  "Transacter sans cash",
+  "Transformer son business",
 ] as const;
 
 type Props = {

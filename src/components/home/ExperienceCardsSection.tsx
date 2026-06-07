@@ -71,9 +71,9 @@ const MODULES: {
   {
     id: "privilege",
     image: PLATFORM_MODULE_ICONS.forfait,
-    title: "Vodacom Privilege",
+    title: "Vodacom Privilège",
     status: "À venir",
-    description: "Parcours et privilèges réservés aux membres Vodacom Privilege.",
+    description: "Parcours et privilèges réservés aux membres Vodacom Privilège.",
     available: false,
     accessEnabled: false,
     accessLabel: "",

@@ -40,10 +40,12 @@ export function ProgrammeDayContent({ programme, variant }: Props) {
 
   return (
     <div className={isSheet ? "space-y-4 pb-2" : "space-y-3"}>
-      <div className="space-y-1">
-        <h3 className={titleClass}>{programme.title}</h3>
-        <p className={subtitleClass}>{programme.subtitle}</p>
-      </div>
+      {!isSheet && (
+        <div className="space-y-1">
+          <h3 className={titleClass}>{programme.title}</h3>
+          <p className={subtitleClass}>{programme.subtitle}</p>
+        </div>
+      )}
 
       <p className={bodyClass}>{programme.description}</p>
 

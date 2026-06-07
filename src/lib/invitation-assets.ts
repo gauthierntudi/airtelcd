@@ -22,11 +22,12 @@ export const INVITATION_EXPERIENCE_VIDEO_URL =
 /** Poster slide Expérience (avant lecture vidéo + slide hors vue) */
 export const INVITATION_EXPERIENCE_POSTER = "/img/poster3.jpg";
 
-const IMG = (n: number) => `/img/img0${n}.jpg`;
+const IMG = (n: number) =>
+  n === 1 ? "/img/background01.jpg" : `/img/img0${n}.jpg`;
 
 /** Visuels desktop — `public/img/` */
 export const INVITATION_CLIENT_IMAGES = {
-  hero: { src: IMG(1), alt: "Vodacom Privilege Golf 2026" },
+  hero: { src: IMG(1), alt: "Vodacom Privilège Golf 2026" },
   experience: { src: IMG(2), alt: "Expérience golf premium" },
   programme: { src: IMG(3), alt: "Programme et networking" },
 } as const;
@@ -54,7 +55,7 @@ export const INVITATION_MOBILE_SLIDES: InvitationSlideConfig[] = [
   {
     id: "welcome",
     image: IMG(1),
-    imageAlt: "Bienvenue au Vodacom Privilege Golf",
+    imageAlt: "Bienvenue au Vodacom Privilège Golf",
     stepLabel: "Bienvenue",
   },
   {
@@ -84,7 +85,7 @@ export const INVITATION_MOBILE_SLIDES: InvitationSlideConfig[] = [
   },
   {
     id: "rsvp",
-    image: IMG(7),
+    image: IMG(8),
     imageAlt: "Confirmer votre présence",
     stepLabel: "RSVP",
   },

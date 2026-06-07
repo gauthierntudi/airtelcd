@@ -35,7 +35,7 @@ export const InvitationDownloadPassCard = forwardRef<HTMLDivElement, Props>(
         <div className="relative flex h-full flex-col px-8 pb-10 pt-[5.5rem]">
           <div className="shrink-0 space-y-2">
             <h2 className="font-vodafone-exb text-[2.35rem] font-normal leading-[1.05] tracking-tight text-white">
-              Your privileged access
+              Votre accès Privilège
             </h2>
             <p className="font-vodafone-rg-bd text-2xl leading-snug text-vodacom-red">
               {invitationPassHeadline(firstName, rsvpStatus)}
