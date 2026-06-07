@@ -8,18 +8,52 @@ import {
   OtpSixDigitInput,
   type OtpSixDigitInputHandle,
 } from "@/components/ui/OtpSixDigitInput";
-import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
+import type {
+  InvitationAccessChannel,
+  InvitationAccessPostAuth,
+} from "@/lib/invitation-access/types";
+import { VODACOM_MARKET_NAME } from "@/lib/mpesa-visa/constants";
 import { formatPhoneDisplay } from "@/lib/phone";
 import { notify } from "@/lib/toast";
 
 type Step = "contact" | "otp";
 
+const POST_AUTH_COPY: Record<
+  InvitationAccessPostAuth,
+  { badge: string; title: string; submit: string }
+> = {
+  invitation: {
+    badge: "Invitation",
+    title: "Accéder à mon invitation",
+    submit: "Voir mon invitation",
+  },
+  market: {
+    badge: VODACOM_MARKET_NAME,
+    title: `Accéder au ${VODACOM_MARKET_NAME}`,
+    submit: "Accéder au marché",
+  },
+  mpesa: {
+    badge: "Carte Visa M-Pesa",
+    title: "Accéder à Carte Visa M-Pesa",
+    submit: "Ouvrir l'expérience",
+  },
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
+  /** Après OTP : invitation → redirection ; market/mpesa → callback. */
+  postAuth?: InvitationAccessPostAuth;
+  onAuthenticated?: (intent: Exclude<InvitationAccessPostAuth, "invitation">) => void;
 };
 
-export function InvitationAccessModal({ open, onClose }: Props) {
+export function InvitationAccessModal({
+  open,
+  onClose,
+  postAuth = "invitation",
+  onAuthenticated,
+}: Props) {
+  const copy = POST_AUTH_COPY[postAuth];
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<Step>("contact");
   const [channel, setChannel] = useState<InvitationAccessChannel>("email");
@@ -137,7 +171,11 @@ export function InvitationAccessModal({ open, onClose }: Props) {
       if (!res.ok) throw new Error(data.error ?? "Erreur");
 
       onClose();
-      window.location.href = data.redirectPath as string;
+      if (postAuth === "invitation") {
+        window.location.href = data.redirectPath as string;
+        return;
+      }
+      onAuthenticated?.(postAuth);
     } catch (err) {
       notify.error(err instanceof Error ? err.message : "Erreur");
     } finally {
@@ -190,13 +228,13 @@ export function InvitationAccessModal({ open, onClose }: Props) {
         <header className="flex items-start justify-between gap-3 border-b border-vodacom-silver/25 px-5 py-4">
           <div>
             <p className="font-vodafone-rg-bd text-[10px] uppercase tracking-[0.2em] text-vodacom-red">
-              Invitation
+              {copy.badge}
             </p>
             <h2
               id="invitation-access-title"
               className="font-vodafone-exb text-xl font-normal text-vodacom-black"
             >
-              Accéder à mon invitation
+              {copy.title}
             </h2>
             <p className="mt-1 font-vodafone-lt text-sm text-vodacom-black/60">
               {step === "contact"
@@ -306,7 +344,7 @@ export function InvitationAccessModal({ open, onClose }: Props) {
                 {loading && (
                   <LucideIcon icon={Loader2} size={20} className="animate-spin" />
                 )}
-                {loading ? "Vérification…" : "Voir mon invitation"}
+                {loading ? "Vérification…" : copy.submit}
               </button>
 
               <button
