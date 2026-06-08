@@ -1,11 +1,12 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Clock, X } from "lucide-react";
 import { ProgrammeDayContent } from "@/components/invitation/ProgrammeDayContent";
 import { InvitationBottomSheet } from "@/components/invitation/InvitationBottomSheet";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { getProgrammeForDay } from "@/lib/event-programmes";
 import { getEventDayById, type EventDayId } from "@/lib/event-days";
+import { getEventDayInvitationTimeRange } from "@/lib/invitation-time-range";
 
 type Props = {
   dayId: EventDayId;
@@ -49,6 +50,10 @@ export function InvitationProgrammeDayModal({ dayId, onClose }: Props) {
             </h2>
             <p className="mt-1 font-vodafone-rg-bd text-sm text-vodacom-red/90">
               {programme.subtitle}
+            </p>
+            <p className="mt-2 inline-flex items-center gap-1.5 font-vodafone-lt text-sm text-white/85">
+              <LucideIcon icon={Clock} size={15} className="shrink-0" aria-hidden />
+              <span>{getEventDayInvitationTimeRange(dayId)}</span>
             </p>
           </div>
 

@@ -12,6 +12,11 @@ export const EVENT_DAY_INVITATION_TIME_RANGES: Record<EventDayId, string> = {
   "2026-06-14": "12h00 – 18h00",
 };
 
+/** Horaire d'un jour invité (slide Date, bottom sheet Programme). */
+export function getEventDayInvitationTimeRange(dayId: EventDayId): string {
+  return EVENT_DAY_INVITATION_TIME_RANGES[dayId];
+}
+
 /** Horaire par défaut (12 juin) — emails et WhatsApp 1 jour */
 export const DEFAULT_INVITATION_TIME_RANGE =
   EVENT_DAY_INVITATION_TIME_RANGES[DEFAULT_EVENT_DAY_ID];

@@ -12,7 +12,7 @@ import {
   invitationRsvpSlideHeadline,
   invitationRsvpSlideSubline,
 } from "@/lib/invitation-pass-copy";
-import { formatInvitedDaysLong } from "@/lib/event-days";
+import { InvitationDayScheduleList } from "@/components/invitation/InvitationDayScheduleList";
 import type { EventDayId } from "@/lib/event-days";
 import type { InvitationSlideId } from "@/lib/invitation-assets";
 import { InvitationQrCode } from "@/components/invitation/InvitationQrCode";
@@ -44,12 +44,7 @@ export function InvitationMobileSlideContent(props: SlideProps) {
     case "experience":
       return <ExperienceSlide />;
     case "datetime":
-      return (
-        <DateTimeSlide
-          eventDays={props.guest.eventDays}
-          timeRange={props.guest.invitationTimeRange}
-        />
-      );
+      return <DateTimeSlide eventDays={props.guest.eventDays} />;
     case "programme":
       return <ProgrammeSlide eventDays={props.guest.eventDays} />;
     case "rsvp":
@@ -148,28 +143,17 @@ function ExperienceSlide() {
   );
 }
 
-function DateTimeSlide({
-  eventDays,
-  timeRange,
-}: {
-  eventDays: EventDayId[];
-  timeRange: string;
-}) {
+function DateTimeSlide({ eventDays }: { eventDays: EventDayId[] }) {
   return (
     <div className="flex flex-col gap-3 pb-0.5">
-      <div className="space-y-2">
+      <div className="space-y-3">
         <p className="inline-flex max-w-full rounded-full bg-white px-3 py-1.5 text-[11px] font-bold leading-tight text-vodacom-red">
           Date &amp; horaires
         </p>
-        <h2 className="font-vodafone-exb font-normal text-[2.65rem] leading-[1.05] tracking-tight text-white">
+        <h2 className="font-vodafone-exb font-normal text-[2.35rem] leading-[1.05] tracking-tight text-white">
           Votre rendez-vous
         </h2>
-        <p className="font-vodafone-rg-bd font-normal text-2xl leading-snug text-white">
-          {formatInvitedDaysLong(eventDays)}
-        </p>
-        <p className="font-vodafone-lt font-normal text-2xl leading-snug text-white/90">
-          {timeRange}
-        </p>
+        <InvitationDayScheduleList dayIds={eventDays} />
       </div>
     </div>
   );
