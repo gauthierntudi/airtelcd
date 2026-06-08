@@ -117,12 +117,28 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur");
 
-      const summary =
-        data.failed > 0
-          ? `${data.created} importés · ${data.failed} échecs`
-          : `${data.created} importés`;
+      const parts = [`${data.created} importés`];
+      if (data.skipped > 0) {
+        parts.push(`${data.skipped} ignorés (numéro déjà connu)`);
+      }
+      if (data.failed > 0) {
+        parts.push(`${data.failed} échecs`);
+      }
+      if (data.skipped > 0 && Array.isArray(data.skippedRows)) {
+        const lines = data.skippedRows
+          .slice(0, 5)
+          .map((r: { index: number }) => r.index)
+          .join(", ");
+        const suffix =
+          data.skippedRows.length > 5
+            ? `… (+${data.skippedRows.length - 5})`
+            : "";
+        notify.warning(
+          `${data.skipped} ligne(s) ignorée(s) — numéro déjà en base ou doublon CSV (l. ${lines}${suffix ? ` ${suffix}` : ""})`,
+        );
+      }
       reset();
-      onImported(summary);
+      onImported(parts.join(" · "));
     } catch (err) {
       notify.error("Erreur");
     } finally {
@@ -181,6 +197,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
             Colonnes CSV : <code className="text-[11px]">nom_complet</code>,{" "}
             <code className="text-[11px]">email</code>,{" "}
             <code className="text-[11px]">telephone</code>. Virgule ou point-virgule.
+            Les numéros déjà en base sont ignorés.
           </p>
 
           {fileName && preview.length > 0 && (

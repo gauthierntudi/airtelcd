@@ -6,7 +6,22 @@ import { parseGuestPhoneField } from "@/lib/parse-guest-phone-field";
 import { createUniqueGuestToken } from "@/lib/guest-token";
 import { parseEventDaysInput, eventDaysToDbDates } from "@/lib/parse-event-day";
 import { parseInvitationTimeRangeInput } from "@/lib/invitation-time-range";
+import { normalizePhone } from "@/lib/phone";
 import { serializeGuest } from "@/lib/serialize-guest";
+
+async function loadExistingPhoneE164Set(): Promise<Set<string>> {
+  const rows = await prisma.guest.findMany({
+    where: { phone: { not: null } },
+    select: { phone: true },
+  });
+  const set = new Set<string>();
+  for (const { phone } of rows) {
+    if (!phone) continue;
+    const norm = normalizePhone(phone);
+    if (norm.ok && norm.e164) set.add(norm.e164);
+  }
+  return set;
+}
 
 export async function POST(request: NextRequest) {
   const secret = request.headers.get("x-admin-secret");
@@ -57,7 +72,10 @@ export async function POST(request: NextRequest) {
 
   const baseUrl = request.nextUrl.origin;
   const rowErrors: { index: number; message: string }[] = [];
+  const skippedRows: { index: number; message: string }[] = [];
   const created: ReturnType<typeof serializeGuest>[] = [];
+  const knownPhones = await loadExistingPhoneE164Set();
+  const batchPhones = new Set<string>();
 
   for (let i = 0; i < guests.length; i++) {
     const row = guests[i];
@@ -69,18 +87,40 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
+    const phoneE164 = phoneResult.phone;
+    if (phoneE164) {
+      if (knownPhones.has(phoneE164)) {
+        skippedRows.push({
+          index: i + 1,
+          message: "Numéro déjà enregistré — ignoré",
+        });
+        continue;
+      }
+      if (batchPhones.has(phoneE164)) {
+        skippedRows.push({
+          index: i + 1,
+          message: "Numéro en double dans le fichier — ignoré",
+        });
+        continue;
+      }
+    }
+
     try {
       const token = await createUniqueGuestToken(prisma);
       const guest = await prisma.guest.create({
         data: {
           fullName,
           email: row.email?.trim() || null,
-          phone: phoneResult.phone,
+          phone: phoneE164,
           eventDays: eventDaysDb,
           invitationTimeRange,
           token,
         },
       });
+      if (phoneE164) {
+        knownPhones.add(phoneE164);
+        batchPhones.add(phoneE164);
+      }
       created.push(serializeGuest(guest, baseUrl));
     } catch {
       rowErrors.push({ index: i + 1, message: "Impossible de créer cet invité" });
@@ -89,8 +129,10 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     created: created.length,
+    skipped: skippedRows.length,
     failed: rowErrors.length,
     guests: created,
     errors: rowErrors,
+    skippedRows,
   });
 }
