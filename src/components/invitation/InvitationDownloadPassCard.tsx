@@ -28,6 +28,8 @@ export const InvitationDownloadPassCard = forwardRef<HTMLDivElement, Props>(
           data-pass-bg
           src={INVITATION_RSVP_PASS_IMAGE}
           alt=""
+          decoding="sync"
+          crossOrigin="anonymous"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="invitation-slide-overlay absolute inset-0" aria-hidden />

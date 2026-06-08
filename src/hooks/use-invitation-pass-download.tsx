@@ -43,7 +43,8 @@ export function useInvitationPassDownload({
   const passCard = (
     <div
       aria-hidden
-      className="pointer-events-none fixed left-[-10000px] top-0 -z-50 overflow-hidden"
+      className="pointer-events-none fixed left-0 top-0 -z-50 overflow-hidden opacity-0"
+      style={{ width: 390, height: 780 }}
     >
       <InvitationDownloadPassCard
         ref={cardRef}
