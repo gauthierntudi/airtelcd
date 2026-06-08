@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { formatExpiryDisplay } from "@/lib/mpesa-visa/expiry-utils";
 
 function digitsFromHash(hash: string, count: number, offset: number): string {
   let out = "";
@@ -18,7 +19,7 @@ export function generateVisaCardDetails(guestId: string) {
   const panFormatted = `${pan16.slice(0, 4)} ${pan16.slice(4, 8)} ${pan16.slice(8, 12)} ${pan16.slice(12, 16)}`;
   const masked = `${bin} •••• •••• ${lastFour}`;
   const month = 6 + (parseInt(hash.slice(4, 6), 16) % 6);
-  const year = 26;
+  const year = 2026;
   const cvv = digitsFromHash(hash, 3, 28);
   return {
     cardLastFour: lastFour,
@@ -27,7 +28,7 @@ export function generateVisaCardDetails(guestId: string) {
     panFormatted,
     expiryMonth: month,
     expiryYear: year,
-    expiryDisplay: `${String(month).padStart(2, "0")}/${year}`,
+    expiryDisplay: formatExpiryDisplay(month, year),
     cvv,
     cvvDisplay: cvv,
   };

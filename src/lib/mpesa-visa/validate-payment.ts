@@ -1,4 +1,5 @@
 import { generateVisaCardDetails } from "@/lib/mpesa-visa/card-generator";
+import { normalizeExpiryYear } from "@/lib/mpesa-visa/expiry-utils";
 
 export type VisaPaymentInput = {
   pan: string;
@@ -7,25 +8,13 @@ export type VisaPaymentInput = {
   cvv: string;
 };
 
-export function parseExpiryInput(raw: string): {
-  expiryMonth: number;
-  expiryYear: number;
-} | null {
-  const cleaned = raw.replace(/\D/g, "");
-  if (cleaned.length === 4) {
-    const expiryMonth = Number(cleaned.slice(0, 2));
-    const yy = Number(cleaned.slice(2, 4));
-    if (expiryMonth < 1 || expiryMonth > 12) return null;
-    return { expiryMonth, expiryYear: 2000 + yy };
-  }
-  const match = raw.trim().match(/^(\d{1,2})\s*\/\s*(\d{2,4})$/);
-  if (!match) return null;
-  const expiryMonth = Number(match[1]);
-  let expiryYear = Number(match[2]);
-  if (expiryMonth < 1 || expiryMonth > 12) return null;
-  if (expiryYear < 100) expiryYear += 2000;
-  return { expiryMonth, expiryYear };
-}
+export {
+  formatExpiryDisplay,
+  formatExpiryInput,
+  formatExpiryYearTwoDigits,
+  normalizeExpiryYear,
+  parseExpiryInput,
+} from "@/lib/mpesa-visa/expiry-utils";
 
 /** Vérifie PAN, expiration et CVV contre la carte Visa M-Pesa de l'invité (BD + dérivé guestId). */
 export function assertVisaPayment(
@@ -44,7 +33,8 @@ export function assertVisaPayment(
 
   if (
     payment.expiryMonth !== expected.expiryMonth ||
-    payment.expiryYear !== expected.expiryYear
+    normalizeExpiryYear(payment.expiryYear) !==
+      normalizeExpiryYear(expected.expiryYear)
   ) {
     throw new Error("Date d'expiration incorrecte.");
   }

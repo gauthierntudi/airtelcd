@@ -5,6 +5,7 @@ import {
   MPESA_VISA_WELCOME_BONUS_USD,
   VODACOM_MARKET_NAME,
 } from "@/lib/mpesa-visa/constants";
+import { formatExpiryDisplay } from "@/lib/mpesa-visa/expiry-utils";
 import {
   assertVisaPayment,
   type VisaPaymentInput,
@@ -310,7 +311,7 @@ export async function listAdminMpesaOverview(): Promise<AdminMpesaCardRow[]> {
       guestPhone: card.guest.phone,
       cardMasked: card.cardMasked,
       cardLastFour: card.cardLastFour,
-      expiryDisplay: `${String(card.expiryMonth).padStart(2, "0")}/${card.expiryYear}`,
+      expiryDisplay: formatExpiryDisplay(card.expiryMonth, card.expiryYear),
       bonusBalanceUsd: decimalToNumber(card.bonusBalanceUsd),
       blocked: card.blocked,
       cardCreatedAt: card.createdAt.toISOString(),

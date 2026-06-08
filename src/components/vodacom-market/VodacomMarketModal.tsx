@@ -32,7 +32,10 @@ import {
   runMpesaVisaAction,
 } from "@/lib/mpesa-visa/client";
 import type { MpesaVisaExperienceState } from "@/lib/mpesa-visa/service";
-import { parseExpiryInput } from "@/lib/mpesa-visa/validate-payment";
+import {
+  formatExpiryInput,
+  parseExpiryInput,
+} from "@/lib/mpesa-visa/validate-payment";
 import { notify } from "@/lib/toast";
 
 type Props = {
@@ -492,7 +495,9 @@ export function VodacomMarketModal({
                           inputMode="numeric"
                           autoComplete="cc-exp"
                           value={expiry}
-                          onChange={(e) => setExpiry(e.target.value)}
+                          onChange={(e) =>
+                            setExpiry(formatExpiryInput(e.target.value))
+                          }
                           placeholder="MM/AA"
                           maxLength={5}
                           className="mt-1 w-full rounded border border-[#888C8C] px-3 py-2.5 font-mono text-base text-[#0F1111] outline-none focus:border-[#E77600] focus:ring-1 focus:ring-[#E77600]"
