@@ -8,9 +8,9 @@ function waitForImage(img: HTMLImageElement): Promise<void> {
   });
 }
 
-export function invitationPassFilename(firstName: string | null | undefined): string {
+export function invitationPassFilename(fullName: string | null | undefined): string {
   const slug =
-    firstName
+    fullName
       ?.trim()
       .toLowerCase()
       .normalize("NFD")

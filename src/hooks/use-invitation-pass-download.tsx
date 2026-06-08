@@ -10,13 +10,13 @@ import {
 
 type Params = {
   invitationUrl: string;
-  firstName: string | null;
+  fullName: string | null;
   rsvpStatus: RsvpStatus;
 };
 
 export function useInvitationPassDownload({
   invitationUrl,
-  firstName,
+  fullName,
   rsvpStatus,
 }: Params) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -30,15 +30,15 @@ export function useInvitationPassDownload({
     try {
       await downloadInvitationPassPng(
         cardRef.current,
-        invitationPassFilename(firstName),
+        invitationPassFilename(fullName),
       );
     } catch {
-      /* erreur silencieuse — le toast peut être ajouté si besoin */
+      /* erreur silencieuse */
     } finally {
       busyRef.current = false;
       setDownloading(false);
     }
-  }, [firstName]);
+  }, [fullName]);
 
   const passCard = (
     <div
@@ -48,7 +48,7 @@ export function useInvitationPassDownload({
       <InvitationDownloadPassCard
         ref={cardRef}
         invitationUrl={invitationUrl}
-        firstName={firstName}
+        fullName={fullName}
         rsvpStatus={rsvpStatus}
       />
     </div>

@@ -19,7 +19,7 @@ function resolveInvitationTemplate(
   preferred: InvitationEmailVariant,
 ): InvitationEmailVariant {
   if (preferred === "simple") return "simple";
-  if (!hasGuestFullName(guest.firstName, guest.lastName)) return "simple";
+  if (!hasGuestFullName(guest.fullName)) return "simple";
   return "nominative";
 }
 
@@ -132,7 +132,7 @@ export async function sendInvitationsBulk(
   const failed: BulkSendResult["failed"] = [];
 
   for (const guest of guests) {
-    const displayName = guestDisplayName(guest.firstName, guest.lastName);
+    const displayName = guestDisplayName(guest.fullName);
     try {
       const result = await sendInvitationToGuest(guest, baseUrl, options);
       sent.push(result);

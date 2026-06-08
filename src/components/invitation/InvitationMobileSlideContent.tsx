@@ -7,7 +7,7 @@ import { LucideIcon } from "@/components/ui/lucide-icon";
 import { InvitationRsvpActionsSheet } from "@/components/invitation/InvitationRsvpActionsSheet";
 import { InvitationEventDayCalendar } from "@/components/invitation/InvitationEventDayCalendar";
 import { RsvpStatus } from "@prisma/client";
-import { EVENT } from "@/lib/event";
+import { EVENT, guestFirstWord } from "@/lib/event";
 import {
   invitationRsvpSlideHeadline,
   invitationRsvpSlideSubline,
@@ -103,7 +103,7 @@ function InviteSlide({
           Invitation exclusive
         </p>
         <h2 className="font-vodafone-exb font-normal text-[2.65rem] leading-[1.05] tracking-tight text-white">
-          Bonjour{guest.firstName?.trim() ? ` ${guest.firstName.trim()}` : ""}
+          Bonjour{guestFirstWord(guest.fullName) ? ` ${guestFirstWord(guest.fullName)}` : ""}
         </h2>
         <p className="font-vodafone-rg-bd font-normal text-2xl leading-snug text-vodacom-red">
           Votre place VIP vous attend
@@ -224,7 +224,7 @@ function RsvpSlide({
             Votre accès Privilège
           </h2>
           <p className="font-vodafone-rg-bd text-2xl leading-snug text-vodacom-red">
-            {invitationRsvpSlideHeadline(guest.firstName, rsvpStatus)}
+            {invitationRsvpSlideHeadline(guest.fullName, rsvpStatus)}
           </p>
           <p className="font-vodafone-lt text-xl leading-snug text-white">
             {invitationRsvpSlideSubline(rsvpStatus)}

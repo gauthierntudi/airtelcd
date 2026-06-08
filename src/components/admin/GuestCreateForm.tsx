@@ -22,8 +22,7 @@ type Props = {
 };
 
 export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [eventDays, setEventDays] = useState<EventDayId[]>([DEFAULT_EVENT_DAY_ID]);
@@ -40,8 +39,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
         method: "POST",
         headers,
         body: JSON.stringify({
-          firstName: firstName.trim() || null,
-          lastName: lastName.trim() || null,
+          fullName: fullName.trim() || null,
           email: email.trim() || undefined,
           phone: phone.trim() || undefined,
           eventDays,
@@ -62,8 +60,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
         }
       }
 
-      setFirstName("");
-      setLastName("");
+      setFullName("");
       setEmail("");
       setPhone("");
       setEventDays([DEFAULT_EVENT_DAY_ID]);
@@ -78,29 +75,16 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
 
   const form = (
     <form onSubmit={handleSubmit} className="grid gap-4">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Prénom" id="firstName" hint="facultatif">
-          <input
-            id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className={embedded ? modalInputClass : inputClass}
-            placeholder="Jean (optionnel)"
-            autoComplete="off"
-          />
-        </Field>
-        <Field label="Nom" id="lastName" hint="facultatif">
-          <input
-            id="lastName"
-            name="guest-last-name-optional"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className={embedded ? modalInputClass : inputClass}
-            placeholder="Dupont (optionnel)"
-            autoComplete="off"
-          />
-        </Field>
-      </div>
+      <Field label="Nom complet" id="fullName" hint="facultatif">
+        <input
+          id="fullName"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          className={embedded ? modalInputClass : inputClass}
+          placeholder="Jean Dupont (optionnel)"
+          autoComplete="name"
+        />
+      </Field>
       <Field label="Email" id="email" hint="Optionnel">
         <input
           id="email"
@@ -162,7 +146,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
     return (
       <>
         <p className="mb-4 text-sm text-white/55">
-          Prénom et nom sont facultatifs — l&apos;invité les saisira à la
+          Le nom complet est facultatif — l&apos;invité le saisira à la
           confirmation si besoin. Le lien unique est généré à la création.
         </p>
         {form}
@@ -174,7 +158,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
     <section className="rounded-2xl border border-vodacom-silver/30 bg-white p-6 shadow-sm">
       <h2 className="text-lg font-bold text-vodacom-black">Nouvel invité</h2>
       <p className="mt-1 text-sm text-vodacom-black/60">
-        Prénom et nom facultatifs — demandés à la confirmation si absents.
+        Nom complet facultatif — demandé à la confirmation si absent.
       </p>
       <div className="mt-5">{form}</div>
     </section>

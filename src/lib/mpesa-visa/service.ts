@@ -85,8 +85,7 @@ export async function getMpesaVisaExperienceState(
       where: { id: guestId },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        fullName: true,
         mpesaVisaCardIssuedAt: true,
         mpesaVisaCard: {
           include: {
@@ -114,7 +113,7 @@ export async function getMpesaVisaExperienceState(
   return {
     guest: {
       id: guest.id,
-      displayName: guestDisplayName(guest.firstName, guest.lastName),
+      displayName: guestDisplayName(guest.fullName),
     },
     card,
     purchases,
@@ -130,7 +129,7 @@ export async function createMpesaVisaCard(guestId: string) {
     where: { id: guestId },
     select: {
       id: true,
-      firstName: true,
+      fullName: true,
       phone: true,
       mpesaVisaCardIssuedAt: true,
       mpesaVisaCard: { select: { id: true } },
@@ -284,8 +283,7 @@ export async function listAdminMpesaOverview(): Promise<AdminMpesaCardRow[]> {
       guest: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          fullName: true,
           email: true,
           phone: true,
         },
@@ -307,7 +305,7 @@ export async function listAdminMpesaOverview(): Promise<AdminMpesaCardRow[]> {
     return {
       cardId: card.id,
       guestId: card.guestId,
-      guestName: guestDisplayName(card.guest.firstName, card.guest.lastName),
+      guestName: guestDisplayName(card.guest.fullName),
       guestEmail: card.guest.email,
       guestPhone: card.guest.phone,
       cardMasked: card.cardMasked,

@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RsvpStatus } from "@prisma/client";
-import {
-  guestDisplayName,
-  hasGuestFirstName,
-  hasGuestFullName,
-  hasGuestLastName,
-} from "@/lib/event";
+import { guestDisplayName, hasGuestFullName } from "@/lib/event";
 import { prisma } from "@/lib/prisma";
 
 const ALLOWED: RsvpStatus[] = [
@@ -18,8 +13,7 @@ export async function PATCH(request: NextRequest) {
   let body: {
     token?: string;
     status?: RsvpStatus;
-    firstName?: string;
-    lastName?: string;
+    fullName?: string;
   };
   try {
     body = await request.json();
@@ -42,18 +36,15 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Invitation introuvable" }, { status: 404 });
   }
 
-  const firstNameInput = body.firstName?.trim();
-  const lastNameInput = body.lastName?.trim();
+  const fullNameInput = body.fullName?.trim();
   const needsFullName =
-    status === RsvpStatus.CONFIRMED &&
-    !hasGuestFullName(guest.firstName, guest.lastName);
+    status === RsvpStatus.CONFIRMED && !hasGuestFullName(guest.fullName);
 
-  const finalFirst = firstNameInput || guest.firstName?.trim() || null;
-  const finalLast = lastNameInput || guest.lastName?.trim() || null;
+  const finalFullName = fullNameInput || guest.fullName?.trim() || null;
 
-  if (needsFullName && (!finalFirst || !finalLast)) {
+  if (needsFullName && !finalFullName) {
     return NextResponse.json(
-      { error: "Prénom et nom requis pour confirmer votre présence" },
+      { error: "Nom complet requis pour confirmer votre présence" },
       { status: 400 },
     );
   }
@@ -61,12 +52,7 @@ export async function PATCH(request: NextRequest) {
   const updated = await prisma.guest.update({
     where: { token },
     data: {
-      ...(needsFullName &&
-        firstNameInput &&
-        !hasGuestFirstName(guest.firstName) && { firstName: firstNameInput }),
-      ...(needsFullName &&
-        lastNameInput &&
-        !hasGuestLastName(guest.lastName) && { lastName: lastNameInput }),
+      ...(needsFullName && fullNameInput && { fullName: fullNameInput }),
       rsvpStatus: status,
       confirmedAt: status === RsvpStatus.CONFIRMED ? new Date() : null,
     },
@@ -75,8 +61,7 @@ export async function PATCH(request: NextRequest) {
   return NextResponse.json({
     rsvpStatus: updated.rsvpStatus,
     confirmedAt: updated.confirmedAt?.toISOString() ?? null,
-    firstName: updated.firstName,
-    lastName: updated.lastName,
-    displayName: guestDisplayName(updated.firstName, updated.lastName),
+    fullName: updated.fullName,
+    displayName: guestDisplayName(updated.fullName),
   });
 }

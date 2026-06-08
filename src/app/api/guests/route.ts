@@ -28,8 +28,7 @@ export async function GET(request: NextRequest) {
       ...(statusFilter && { rsvpStatus: statusFilter }),
       ...(search && {
         OR: [
-          { firstName: { contains: search, mode: "insensitive" } },
-          { lastName: { contains: search, mode: "insensitive" } },
+          { fullName: { contains: search, mode: "insensitive" } },
           { email: { contains: search, mode: "insensitive" } },
           { phone: { contains: search, mode: "insensitive" } },
         ],
@@ -49,8 +48,7 @@ export async function POST(request: NextRequest) {
   }
 
   let body: {
-    firstName?: string;
-    lastName?: string;
+    fullName?: string;
     email?: string;
     phone?: string;
     eventDay?: string | string[];
@@ -63,8 +61,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
 
-  const firstName = body.firstName?.trim() || null;
-  const lastName = body.lastName?.trim() || null;
+  const fullName = body.fullName?.trim() || null;
 
   const phoneResult = parseGuestPhoneField(body.phone);
   if ("error" in phoneResult) {
@@ -84,8 +81,7 @@ export async function POST(request: NextRequest) {
   const token = await createUniqueGuestToken(prisma);
   const guest = await prisma.guest.create({
     data: {
-      firstName,
-      lastName,
+      fullName,
       email: body.email?.trim() || null,
       phone: phoneResult.phone,
       eventDays: eventDaysToDbDates(dayResult.eventDays),

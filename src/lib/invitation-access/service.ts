@@ -115,7 +115,7 @@ export async function requestInvitationAccessOtp(
     await deliverOtpCode({
       channel: input.channel,
       address,
-      firstName: guestFirstNameLabel(guest.firstName),
+      firstName: guestFirstNameLabel(guest.fullName),
       code: code ?? "",
     });
   } catch (e) {

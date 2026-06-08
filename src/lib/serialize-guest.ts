@@ -23,8 +23,7 @@ function asInvitationSentVia(v: string | null): InvitationSentVia | null {
 export function serializeGuest(g: Guest, baseUrl: string): GuestRow {
   return {
     id: g.id,
-    firstName: g.firstName,
-    lastName: g.lastName,
+    fullName: g.fullName,
     email: g.email,
     phone: g.phone,
     token: g.token,

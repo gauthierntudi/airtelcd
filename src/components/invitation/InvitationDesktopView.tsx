@@ -279,7 +279,7 @@ function RsvpPanel({
         </h2>
         <p className="mt-1 font-vodafone-rg-bd text-base text-white/95">
           {invitationRsvpSlideHeadline(
-            guest.firstName,
+            guest.fullName,
             isConfirmed ? RsvpStatus.CONFIRMED : RsvpStatus.PENDING,
           )}
         </p>
@@ -290,7 +290,7 @@ function RsvpPanel({
             <LucideIcon icon={CheckCircle2} size={40} className="mx-auto text-emerald-600" />
             <p className="font-vodafone-rg-bd text-emerald-800">
               À bientôt sur le green
-              {guest.firstName?.trim() ? `, ${guest.firstName.trim()}` : ""} !
+              {guest.fullName?.trim() ? `, ${guest.fullName.trim()}` : ""} !
             </p>
             {confirmedAt && (
               <p
@@ -330,8 +330,8 @@ function RsvpPanel({
               {loading && <LucideIcon icon={Loader2} size={20} className="animate-spin" />}
               {loading
                 ? "En cours…"
-                : guest.firstName?.trim()
-                  ? `Je confirme, ${guest.firstName.trim()} !`
+                : guest.fullName?.trim()
+                  ? `Je confirme, ${guest.fullName.trim()} !`
                   : "Je confirme !"}
             </button>
             <button

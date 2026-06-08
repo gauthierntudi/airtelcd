@@ -10,10 +10,10 @@ function confirmedHeadline(prefix: string): string {
 
 /** Texte principal — slide RSVP mobile / en-tête desktop. */
 export function invitationRsvpSlideHeadline(
-  firstName: string | null,
+  fullName: string | null,
   status: RsvpStatus,
 ): string {
-  const prefix = guestSalutationPrefix(firstName);
+  const prefix = guestSalutationPrefix(fullName);
   if (status === RsvpStatus.CONFIRMED) {
     return confirmedHeadline(prefix);
   }
@@ -29,10 +29,10 @@ export function invitationRsvpSlideSubline(status: RsvpStatus): string {
 }
 
 export function invitationPassHeadline(
-  firstName: string | null,
+  fullName: string | null,
   status: RsvpStatus,
 ): string {
-  const prefix = guestSalutationPrefix(firstName);
+  const prefix = guestSalutationPrefix(fullName);
   if (status === RsvpStatus.CONFIRMED) {
     return confirmedHeadline(prefix);
   }

@@ -11,13 +11,13 @@ import {
 
 type Props = {
   invitationUrl: string;
-  firstName: string | null;
+  fullName: string | null;
   rsvpStatus: RsvpStatus;
 };
 
 /** Carte hors écran — reproduit le slide RSVP pour export PNG. */
 export const InvitationDownloadPassCard = forwardRef<HTMLDivElement, Props>(
-  function InvitationDownloadPassCard({ invitationUrl, firstName, rsvpStatus }, ref) {
+  function InvitationDownloadPassCard({ invitationUrl, fullName, rsvpStatus }, ref) {
     return (
       <div
         ref={ref}
@@ -38,7 +38,7 @@ export const InvitationDownloadPassCard = forwardRef<HTMLDivElement, Props>(
               Votre accès Privilège
             </h2>
             <p className="font-vodafone-rg-bd text-2xl leading-snug text-vodacom-red">
-              {invitationPassHeadline(firstName, rsvpStatus)}
+              {invitationPassHeadline(fullName, rsvpStatus)}
             </p>
             <p className="font-vodafone-lt text-xl leading-snug text-white">
               {invitationPassSubline(rsvpStatus)}

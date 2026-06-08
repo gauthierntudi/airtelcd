@@ -1,8 +1,7 @@
 import { normalizePhone } from "@/lib/phone";
 
 export type GuestImportRow = {
-  firstName?: string;
-  lastName?: string;
+  fullName?: string;
   email?: string;
   phone?: string;
 };
@@ -13,16 +12,19 @@ export type ParseResult = {
 };
 
 const HEADER_MAP: Record<string, keyof GuestImportRow> = {
-  prenom: "firstName",
-  prénom: "firstName",
-  firstname: "firstName",
-  first_name: "firstName",
-  "first name": "firstName",
-  nom: "lastName",
-  lastname: "lastName",
-  last_name: "lastName",
-  "last name": "lastName",
-  name: "lastName",
+  nom_complet: "fullName",
+  "nom complet": "fullName",
+  nomcomplet: "fullName",
+  fullname: "fullName",
+  full_name: "fullName",
+  "full name": "fullName",
+  name: "fullName",
+  nom: "fullName",
+  prenom: "fullName",
+  prénom: "fullName",
+  firstname: "fullName",
+  first_name: "fullName",
+  "first name": "fullName",
   email: "email",
   mail: "email",
   courriel: "email",
@@ -70,12 +72,12 @@ function mapHeaders(headerCells: string[]): Map<number, keyof GuestImportRow> | 
     const key = HEADER_MAP[normalizeHeader(headerCells[i])];
     if (key) map.set(i, key);
   }
-  const hasFirst = [...map.values()].includes("firstName");
-  if (!hasFirst) return null;
+  const hasName = [...map.values()].includes("fullName");
+  if (!hasName) return null;
   return map;
 }
 
-/** Détecte en-têtes ; sinon colonnes fixes : prénom, nom, email, téléphone. */
+/** Détecte en-têtes ; sinon colonnes fixes : nom complet, email, téléphone. */
 export function parseGuestCsv(text: string): ParseResult {
   const lines = text
     .split(/\r?\n/)
@@ -95,10 +97,9 @@ export function parseGuestCsv(text: string): ParseResult {
 
   if (!columnMap) {
     columnMap = new Map([
-      [0, "firstName"],
-      [1, "lastName"],
-      [2, "email"],
-      [3, "phone"],
+      [0, "fullName"],
+      [1, "email"],
+      [2, "phone"],
     ]);
     startIndex = 0;
   }
@@ -114,9 +115,7 @@ export function parseGuestCsv(text: string): ParseResult {
       if (val) draft[field] = val;
     });
 
-    const firstName = draft.firstName?.trim();
-    const lastName = draft.lastName?.trim();
-
+    const fullName = draft.fullName?.trim();
     const email = draft.email?.trim();
     const phoneRaw = draft.phone?.trim();
     let phoneE164: string | undefined;
@@ -129,8 +128,7 @@ export function parseGuestCsv(text: string): ParseResult {
       if (normalized.e164) phoneE164 = normalized.e164;
     }
     rows.push({
-      ...(firstName && { firstName }),
-      ...(lastName && { lastName }),
+      ...(fullName && { fullName }),
       ...(email && { email }),
       ...(phoneE164 && { phone: phoneE164 }),
     });
@@ -140,4 +138,4 @@ export function parseGuestCsv(text: string): ParseResult {
 }
 
 export const GUEST_CSV_TEMPLATE =
-  "prenom,nom,email,telephone\nJean,Dupont,jean.dupont@exemple.com,+243810000001\nMarie,Kabila,,0810000002\n";
+  "nom_complet,email,telephone\nJean Dupont,jean.dupont@exemple.com,+243810000001\nMarie Kabila,,0810000002\n";

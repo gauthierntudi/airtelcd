@@ -58,8 +58,7 @@ export async function POST(request: NextRequest) {
 
   for (let i = 0; i < guests.length; i++) {
     const row = guests[i];
-    const firstName = row.firstName?.trim() || null;
-    const lastName = row.lastName?.trim() || null;
+    const fullName = row.fullName?.trim() || null;
 
     const phoneResult = parseGuestPhoneField(row.phone);
     if ("error" in phoneResult) {
@@ -71,8 +70,7 @@ export async function POST(request: NextRequest) {
       const token = await createUniqueGuestToken(prisma);
       const guest = await prisma.guest.create({
         data: {
-          firstName,
-          lastName,
+          fullName,
           email: row.email?.trim() || null,
           phone: phoneResult.phone,
           eventDays: eventDaysDb,

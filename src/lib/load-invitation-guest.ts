@@ -6,8 +6,7 @@ import { guestInvitationTimeRange } from "@/lib/invitation-time-range";
 import { prisma } from "@/lib/prisma";
 
 export type InvitationGuestView = {
-  firstName: string | null;
-  lastName: string | null;
+  fullName: string | null;
   token: string;
   eventDays: EventDayId[];
   invitationTimeRange: string;
@@ -22,8 +21,7 @@ export async function loadInvitationGuestByToken(
   if (!guest) notFound();
 
   return {
-    firstName: guest.firstName,
-    lastName: guest.lastName,
+    fullName: guest.fullName,
     token: guest.token,
     eventDays: eventDaysFromDbDates(guest.eventDays),
     invitationTimeRange: guestInvitationTimeRange(guest),

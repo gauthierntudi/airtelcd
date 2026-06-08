@@ -5,8 +5,7 @@ import type { EventDayId } from "@/lib/event-days";
 /** Ordre aligné sur le modèle Guest / export CSV / tableau admin */
 export type GuestRow = {
   id: string;
-  firstName: string | null;
-  lastName: string | null;
+  fullName: string | null;
   email: string | null;
   phone: string | null;
   token: string;
@@ -64,9 +63,9 @@ export function formatGuestDate(iso: string | null): string {
 
 /** Export CSV — mêmes colonnes que le modèle d'import */
 export function guestsToCsv(rows: GuestRow[]): string {
-  const header = ["prenom", "nom", "email", "telephone"];
+  const header = ["nom_complet", "email", "telephone"];
   const lines = rows.map((g) =>
-    [g.firstName, g.lastName, g.email ?? "", g.phone ?? ""]
+    [g.fullName ?? "", g.email ?? "", g.phone ?? ""]
       .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
       .join(","),
   );

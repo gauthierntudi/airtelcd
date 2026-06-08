@@ -13,90 +13,70 @@ export const EVENT = {
 
 export const GUEST_NAME_FALLBACK = "Invité";
 
-export function hasGuestFirstName(
-  firstName: string | null | undefined,
-): boolean {
-  return Boolean(firstName?.trim());
+export function normalizeGuestFullName(
+  fullName: string | null | undefined,
+): string | null {
+  const trimmed = fullName?.trim();
+  return trimmed || null;
 }
 
-export function hasGuestLastName(lastName: string | null | undefined): boolean {
-  return Boolean(lastName?.trim());
-}
-
-/** Prénom et nom renseignés — requis pour confirmer la présence si absent en base. */
 export function hasGuestFullName(
-  firstName: string | null | undefined,
-  lastName: string | null | undefined,
+  fullName: string | null | undefined,
 ): boolean {
-  return hasGuestFirstName(firstName) && hasGuestLastName(lastName);
+  return Boolean(normalizeGuestFullName(fullName));
 }
 
-function guestFullName(
-  firstName: string | null | undefined,
-  lastName: string | null | undefined,
-): string {
-  return `${firstName?.trim() ?? ""} ${lastName?.trim() ?? ""}`.trim();
+/** Premier mot du nom complet (salutations « Jean, »). */
+export function guestFirstWord(
+  fullName: string | null | undefined,
+): string | null {
+  const full = normalizeGuestFullName(fullName);
+  if (!full) return null;
+  return full.split(/\s+/)[0] ?? null;
 }
 
 export function guestDisplayName(
-  firstName: string | null | undefined,
-  lastName: string | null | undefined,
+  fullName: string | null | undefined,
 ): string {
-  return guestFullName(firstName, lastName) || GUEST_NAME_FALLBACK;
+  return normalizeGuestFullName(fullName) ?? GUEST_NAME_FALLBACK;
 }
 
-/** Nom complet pour la page invitation — `null` si prénom et nom absents (pas de « Invité »). */
+/** Nom complet pour la page invitation — `null` si absent (pas de « Invité »). */
 export function guestInvitationDisplayName(
-  firstName: string | null | undefined,
-  lastName: string | null | undefined,
+  fullName: string | null | undefined,
 ): string | null {
-  const full = guestFullName(firstName, lastName);
-  return full || null;
+  return normalizeGuestFullName(fullName);
 }
 
-/** Libellé court (prénom ou repli) — emails OTP, boutons invitation. */
+/** Libellé court (1er mot ou repli) — emails OTP, boutons invitation. */
 export function guestFirstNameLabel(
-  firstName: string | null | undefined,
+  fullName: string | null | undefined,
 ): string {
-  return firstName?.trim() || GUEST_NAME_FALLBACK;
+  return guestFirstWord(fullName) ?? GUEST_NAME_FALLBACK;
 }
 
-/** « Jean, » ou chaîne vide si pas de prénom — textes page invitation. */
+/** « Jean, » ou chaîne vide si pas de nom — textes page invitation. */
 export function guestSalutationPrefix(
-  firstName: string | null | undefined,
+  fullName: string | null | undefined,
 ): string {
-  const first = firstName?.trim();
+  const first = guestFirstWord(fullName);
   return first ? `${first}, ` : "";
 }
 
 /** Affichage admin : nom complet, sinon email/téléphone. */
 export function guestAdminDisplayName(guest: {
-  firstName: string | null;
-  lastName: string | null;
+  fullName: string | null;
   email: string | null;
   phone: string | null;
 }): string {
-  const full = guestDisplayName(guest.firstName, guest.lastName);
+  const full = guestDisplayName(guest.fullName);
   if (full !== GUEST_NAME_FALLBACK) return full;
   return guest.email?.trim() || guest.phone?.trim() || GUEST_NAME_FALLBACK;
 }
 
-export function guestInitials(
-  firstName: string | null | undefined,
-  lastName: string | null | undefined,
-): string {
-  const first = firstName?.trim().charAt(0) ?? "";
-  const last = lastName?.trim().charAt(0) ?? "";
-  const initials = `${first}${last}`.toUpperCase();
-  return initials || "?";
-}
-
-export function guestMissingNameFields(guest: {
-  firstName: string | null;
-  lastName: string | null;
-}): { firstName: boolean; lastName: boolean } {
-  return {
-    firstName: !hasGuestFirstName(guest.firstName),
-    lastName: !hasGuestLastName(guest.lastName),
-  };
+export function guestInitials(fullName: string | null | undefined): string {
+  const parts = normalizeGuestFullName(fullName)?.split(/\s+/).filter(Boolean) ?? [];
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
 }

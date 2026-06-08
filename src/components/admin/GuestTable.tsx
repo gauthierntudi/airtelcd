@@ -9,7 +9,7 @@ import {
   ChevronRight,
   Send,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GuestRowActions } from "@/components/admin/GuestRowActions";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { guestInitials } from "@/lib/event";
@@ -29,11 +29,15 @@ import {
 
 type Props = {
   rows: GuestRow[];
+  selectedIds: ReadonlySet<string>;
   messagingStatus: MessagingStatus;
   sendOptions: SendInvitationOptions;
   copiedId: string | null;
   sendingId: string | null;
   bulkSending: boolean;
+  bulkDeleting: boolean;
+  onToggleGuestSelected: (id: string, checked: boolean) => void;
+  onTogglePageSelected: (pageIds: string[], checked: boolean) => void;
   onSend: (g: GuestRow) => void;
   onCopy: (url: string, id: string) => void;
   onDetails: (g: GuestRow) => void;
@@ -43,11 +47,15 @@ type Props = {
 
 export function GuestTable({
   rows,
+  selectedIds,
   messagingStatus,
   sendOptions,
   copiedId,
   sendingId,
   bulkSending,
+  bulkDeleting,
+  onToggleGuestSelected,
+  onTogglePageSelected,
   onSend,
   onCopy,
   onDetails,
@@ -72,6 +80,14 @@ export function GuestTable({
     return sorted.slice(start, start + pageSize);
   }, [sorted, page, pageSize, totalPages]);
 
+  const pageIds = useMemo(() => paginated.map((g) => g.id), [paginated]);
+  const pageSelectedCount = pageIds.filter((id) => selectedIds.has(id)).length;
+  const allPageSelected =
+    pageIds.length > 0 && pageSelectedCount === pageIds.length;
+  const somePageSelected =
+    pageSelectedCount > 0 && pageSelectedCount < pageIds.length;
+  const rowBusy = bulkSending || bulkDeleting;
+
   function toggleSort(key: GuestSortKey) {
     setPage(1);
     if (sortKey === key) {
@@ -88,13 +104,22 @@ export function GuestTable({
         <table className="w-full min-w-[640px] border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-white/10 bg-[#121212]">
+              <th className="w-12 pl-4 pr-0">
+                <PageSelectCheckbox
+                  checked={allPageSelected}
+                  indeterminate={somePageSelected}
+                  disabled={rowBusy || pageIds.length === 0}
+                  onChange={(checked) => onTogglePageSelected(pageIds, checked)}
+                  label="Sélectionner la page"
+                />
+              </th>
               <SortHeader
                 label="Invité"
                 sortKey="name"
                 active={sortKey}
                 dir={sortDir}
                 onSort={toggleSort}
-                className="min-w-[200px] pl-6"
+                className="min-w-[200px] pl-2"
               />
               <SortHeader
                 label="RSVP"
@@ -136,12 +161,24 @@ export function GuestTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.06]">
-            {paginated.map((g) => (
+            {paginated.map((g) => {
+              const isSelected = selectedIds.has(g.id);
+              return (
               <tr
                 key={g.id}
-                className="group bg-[#161616] transition-colors hover:bg-[#1c1c1c]"
+                className={`group transition-colors hover:bg-[#1c1c1c] ${
+                  isSelected ? "bg-vodacom-red/[0.07]" : "bg-[#161616]"
+                }`}
               >
-                <td className="py-4 pl-6 pr-4">
+                <td className="py-4 pl-4 pr-0">
+                  <RowSelectCheckbox
+                    checked={isSelected}
+                    disabled={rowBusy}
+                    onChange={(checked) => onToggleGuestSelected(g.id, checked)}
+                    label={`Sélectionner ${g.displayName}`}
+                  />
+                </td>
+                <td className="py-4 pl-2 pr-4">
                   <GuestIdentity guest={g} />
                 </td>
                 <td className="py-4 pr-4">
@@ -163,7 +200,7 @@ export function GuestTable({
                     sendOptions={sendOptions}
                     copied={copiedId === g.id}
                     sending={sendingId === g.id}
-                    busy={bulkSending || (sendingId !== null && sendingId !== g.id)}
+                    busy={rowBusy || (sendingId !== null && sendingId !== g.id)}
                     onSend={() => onSend(g)}
                     onCopy={() => onCopy(g.invitationUrl, g.id)}
                     onDetails={() => onDetails(g)}
@@ -172,7 +209,8 @@ export function GuestTable({
                   />
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>
@@ -193,8 +231,63 @@ export function GuestTable({
   );
 }
 
+function PageSelectCheckbox({
+  checked,
+  indeterminate,
+  disabled,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  indeterminate: boolean;
+  disabled?: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = indeterminate;
+  }, [indeterminate]);
+
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={checked}
+      disabled={disabled}
+      onChange={(e) => onChange(e.target.checked)}
+      aria-label={label}
+      className="h-4 w-4 rounded border-white/25 bg-[#0c0c0c] text-vodacom-red focus:ring-vodacom-red/30 disabled:opacity-40"
+    />
+  );
+}
+
+function RowSelectCheckbox({
+  checked,
+  disabled,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+}) {
+  return (
+    <input
+      type="checkbox"
+      checked={checked}
+      disabled={disabled}
+      onChange={(e) => onChange(e.target.checked)}
+      aria-label={label}
+      className="h-4 w-4 rounded border-white/25 bg-[#0c0c0c] text-vodacom-red focus:ring-vodacom-red/30 disabled:opacity-40"
+    />
+  );
+}
+
 function GuestIdentity({ guest }: { guest: GuestRow }) {
-  const initials = guestInitials(guest.firstName, guest.lastName);
+  const initials = guestInitials(guest.fullName);
 
   return (
     <div className="flex items-center gap-3">

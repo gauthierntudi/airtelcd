@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!token) return { title: "Invitation" };
   const guest = await prisma.guest.findUnique({
     where: { token },
-    select: { firstName: true, lastName: true },
+    select: { fullName: true },
   });
   if (!guest) return { title: "Invitation" };
-  const name = guestInvitationDisplayName(guest.firstName, guest.lastName);
+  const name = guestInvitationDisplayName(guest.fullName);
   return {
     title: name ? `${name} — ${EVENT.title}` : `Votre invitation — ${EVENT.title}`,
     description: `Confirmez votre présence à ${EVENT.title}.`,

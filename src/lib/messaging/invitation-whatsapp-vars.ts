@@ -25,7 +25,7 @@ export function buildInvitationWhatsAppVariables(
 
   if (variant === "nominative") {
     return {
-      "1": guestDisplayName(guest.firstName, guest.lastName),
+      "1": guestDisplayName(guest.fullName),
       "2": dates,
       "3": time,
       "4": token,

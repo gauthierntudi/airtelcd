@@ -218,8 +218,8 @@ export function InvitationMobileOnboarding({
               {loading && <LucideIcon icon={Loader2} size={22} className="animate-spin" />}
               {loading
                 ? "Enregistrement…"
-                : guest.firstName?.trim()
-                  ? `Je confirme, ${guest.firstName.trim()} !`
+                : guest.fullName?.trim()
+                  ? `Je confirme, ${guest.fullName.trim()} !`
                   : "Je confirme !"}
             </button>
             <button

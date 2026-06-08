@@ -20,8 +20,7 @@ export async function getMpesaGuestFromCookies() {
     where: { id: guestId },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
+      fullName: true,
       email: true,
       phone: true,
     },

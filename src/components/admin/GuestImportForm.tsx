@@ -100,9 +100,8 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
         body: JSON.stringify({
           eventDays,
           invitationTimeRange,
-          guests: preview.map(({ firstName, lastName, email, phone }) => ({
-            firstName: firstName?.trim() || null,
-            lastName: lastName?.trim() || null,
+          guests: preview.map(({ fullName, email, phone }) => ({
+            fullName: fullName?.trim() || null,
             email: email?.trim() || null,
             phone: phone?.trim() || null,
           })),
@@ -171,8 +170,8 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
           </label>
 
           <p className="text-xs text-white/45">
-            Colonnes CSV : <code className="text-[11px]">prenom</code>,{" "}
-            <code className="text-[11px]">nom</code>, <code className="text-[11px]">email</code>,{" "}
+            Colonnes CSV : <code className="text-[11px]">nom_complet</code>,{" "}
+            <code className="text-[11px]">email</code>,{" "}
             <code className="text-[11px]">telephone</code>. Virgule ou point-virgule.
           </p>
 
@@ -204,8 +203,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
               <table className="w-full text-left text-xs text-white">
                 <thead className="sticky top-0 bg-[#1f1f1f]">
                   <tr>
-                    <th className="px-3 py-2 font-semibold text-white/70">Prénom</th>
-                    <th className="px-3 py-2 font-semibold text-white/70">Nom</th>
+                    <th className="px-3 py-2 font-semibold text-white/70">Nom complet</th>
                     <th className="px-3 py-2 font-semibold text-white/70">Email</th>
                     <th className="px-3 py-2 font-semibold text-white/70">Tél.</th>
                   </tr>
@@ -213,8 +211,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
                 <tbody>
                   {preview.slice(0, 8).map((r) => (
                     <tr key={r.line} className="border-t border-white/10">
-                      <td className="px-3 py-2">{r.firstName}</td>
-                      <td className="px-3 py-2">{r.lastName}</td>
+                      <td className="px-3 py-2">{r.fullName ?? "—"}</td>
                       <td className="px-3 py-2 text-white/55">{r.email ?? "—"}</td>
                       <td className="px-3 py-2 text-white/55">{r.phone ?? "—"}</td>
                     </tr>

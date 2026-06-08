@@ -9,10 +9,11 @@ import {
   RefreshCw,
   Search,
   Send,
+  Trash2,
   UserPlus,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AdminModal,
   ModalField,
@@ -40,6 +41,12 @@ import {
   type SendInvitationOptions,
 } from "@/lib/messaging/send-options";
 import { AdminPhoneInput } from "@/components/admin/AdminPhoneInput";
+import {
+  GUEST_EVENT_DAY_LOTS,
+  getGuestEventDayLotLabel,
+  guestMatchesEventDayLot,
+  type GuestEventDayLotId,
+} from "@/lib/guest-event-day-lots";
 import { notify } from "@/lib/toast";
 
 const FILTERS: { id: RsvpFilter; label: string }[] = [
@@ -66,21 +73,26 @@ export function GuestList({
 }: Props) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<RsvpFilter>("ALL");
+  const [dayLot, setDayLot] = useState<GuestEventDayLotId>("ALL");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [details, setDetails] = useState<GuestRow | null>(null);
   const [editing, setEditing] = useState<GuestRow | null>(null);
   const [deleting, setDeleting] = useState<GuestRow | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [bulkSending, setBulkSending] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [bulkSendConfirm, setBulkSendConfirm] = useState(false);
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [sendOptions, setSendOptions] =
     useState<SendInvitationOptions>(DEFAULT_SEND_OPTIONS);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return guests.filter((g) => {
+      if (!guestMatchesEventDayLot(g.eventDays, dayLot)) return false;
       if (filter !== "ALL" && g.rsvpStatus !== filter) return false;
       if (!q) return true;
       return (
@@ -89,7 +101,32 @@ export function GuestList({
         (g.phone?.toLowerCase().includes(q) ?? false)
       );
     });
-  }, [guests, search, filter]);
+  }, [guests, search, filter, dayLot]);
+
+  const selectedCount = selectedIds.size;
+
+  useEffect(() => {
+    const visible = new Set(filtered.map((g) => g.id));
+    setSelectedIds((prev) => {
+      const next = new Set([...prev].filter((id) => visible.has(id)));
+      if (next.size === prev.size && [...next].every((id) => prev.has(id))) {
+        return prev;
+      }
+      return next;
+    });
+  }, [filtered]);
+
+  const dayLotCounts = useMemo(() => {
+    const c = Object.fromEntries(
+      GUEST_EVENT_DAY_LOTS.map((lot) => [lot.id, 0]),
+    ) as Record<GuestEventDayLotId, number>;
+    for (const g of guests) {
+      for (const lot of GUEST_EVENT_DAY_LOTS) {
+        if (guestMatchesEventDayLot(g.eventDays, lot.id)) c[lot.id]++;
+      }
+    }
+    return c;
+  }, [guests]);
 
   const counts = useMemo(() => {
     const c: Record<RsvpFilter, number> = {
@@ -168,6 +205,65 @@ export function GuestList({
     }
   }
 
+  function toggleGuestSelected(id: string, checked: boolean) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
+  function togglePageSelected(pageIds: string[], checked: boolean) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      for (const id of pageIds) {
+        if (checked) next.add(id);
+        else next.delete(id);
+      }
+      return next;
+    });
+  }
+
+  function selectAllFiltered() {
+    setSelectedIds(new Set(filtered.map((g) => g.id)));
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set());
+  }
+
+  async function deleteBulkGuests() {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    setBulkDeleteConfirm(false);
+    setBulkDeleting(true);
+    try {
+      const res = await fetch("/api/guests/delete", {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ guestIds: ids }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Erreur");
+      const deleted = data.deleted as number;
+      notify.success(
+        deleted !== 1 ? `${deleted} invités supprimés` : "1 invité supprimé",
+      );
+      if (deleted < ids.length) {
+        notify.warning(
+          `${ids.length - deleted} suppression(s) non effectuée(s)`,
+        );
+      }
+      clearSelection();
+      onChanged();
+    } catch {
+      notify.error("Échec suppression");
+    } finally {
+      setBulkDeleting(false);
+    }
+  }
+
   async function sendBulkInvitations() {
     if (sendableFiltered.length === 0 || !canSendNow) return;
     setBulkSendConfirm(false);
@@ -222,6 +318,18 @@ export function GuestList({
             <h2 className="mt-1 text-lg font-bold text-white">Registre des participants</h2>
             <p className="mt-1 text-sm text-white/45">
               {filtered.length} affiché{filtered.length !== 1 ? "s" : ""} sur {guests.length}
+              {dayLot !== "ALL" && (
+                <span className="text-white/35">
+                  {" "}
+                  · lot « {getGuestEventDayLotLabel(dayLot)} »
+                </span>
+              )}
+              {selectedCount > 0 && (
+                <span className="text-vodacom-red/90">
+                  {" "}
+                  · {selectedCount} sélectionné{selectedCount !== 1 ? "s" : ""}
+                </span>
+              )}
               {notSentCount > 0 && (
                 <span className="text-white/35"> · {notSentCount} sans invitation</span>
               )}
@@ -244,12 +352,21 @@ export function GuestList({
                 !messagingStatus.canSendAny ||
                 !canSendNow ||
                 bulkSending ||
+                bulkDeleting ||
                 sendableFiltered.length === 0
               }
               variant="primary"
               spin={bulkSending}
             >
               Envoyer ({sendableFiltered.length})
+            </ToolbarBtn>
+            <ToolbarBtn
+              icon={bulkDeleting ? Loader2 : Trash2}
+              onClick={() => setBulkDeleteConfirm(true)}
+              disabled={bulkDeleting || bulkSending || selectedCount === 0}
+              spin={bulkDeleting}
+            >
+              Supprimer ({selectedCount})
             </ToolbarBtn>
             <ToolbarBtn icon={Download} onClick={exportCsv} disabled={filtered.length === 0}>
               CSV
@@ -316,6 +433,41 @@ export function GuestList({
             ))}
           </div>
         </div>
+
+        <div className="mt-3">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/40">
+            Lot d&apos;invitation (envoi groupé)
+          </p>
+          <div
+            className="flex flex-wrap gap-1.5"
+            role="tablist"
+            aria-label="Filtrer par lot de jours"
+          >
+            {GUEST_EVENT_DAY_LOTS.map((lot) => (
+              <button
+                key={lot.id}
+                type="button"
+                role="tab"
+                aria-selected={dayLot === lot.id}
+                onClick={() => setDayLot(lot.id)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  dayLot === lot.id
+                    ? "border-vodacom-red/50 bg-vodacom-red/15 text-white"
+                    : "border-white/10 bg-[#0c0c0c] text-white/55 hover:border-white/20 hover:text-white"
+                }`}
+              >
+                {lot.label}
+                <span
+                  className={`ml-1.5 tabular-nums ${
+                    dayLot === lot.id ? "text-white/75" : "text-white/35"
+                  }`}
+                >
+                  {dayLotCounts[lot.id]}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {loading ? (
@@ -329,24 +481,57 @@ export function GuestList({
         <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
           <p className="text-sm font-medium text-white/70">Aucun résultat</p>
           <p className="mt-1 max-w-sm text-xs text-white/40">
-            Modifiez la recherche ou le filtre RSVP pour afficher des invités.
+            Modifiez la recherche, le lot ou le filtre RSVP pour afficher des invités.
           </p>
         </div>
       ) : (
-        <GuestTable
-          key={`${filter}-${search.trim()}`}
-          rows={filtered}
-          messagingStatus={messagingStatus}
-          sendOptions={sendOptions}
-          copiedId={copiedId}
-          sendingId={sendingId}
-          bulkSending={bulkSending}
-          onSend={sendInvitation}
-          onCopy={copyLink}
-          onDetails={setDetails}
-          onEdit={setEditing}
-          onDelete={setDeleting}
-        />
+        <>
+          {selectedCount > 0 && (
+            <div className="flex flex-wrap items-center gap-3 border-b border-white/10 bg-[#121212] px-6 py-2.5">
+              <p className="text-sm text-white/70">
+                <span className="font-vodafone-rg-bd text-white">
+                  {selectedCount}
+                </span>{" "}
+                invité{selectedCount !== 1 ? "s" : ""} sélectionné
+                {selectedCount !== 1 ? "s" : ""}
+              </p>
+              {selectedCount < filtered.length && (
+                <button
+                  type="button"
+                  onClick={selectAllFiltered}
+                  className="text-xs font-medium text-vodacom-red hover:underline"
+                >
+                  Tout sélectionner ({filtered.length} affichés)
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={clearSelection}
+                className="text-xs font-medium text-white/50 hover:text-white/80"
+              >
+                Tout désélectionner
+              </button>
+            </div>
+          )}
+          <GuestTable
+            key={`${dayLot}-${filter}-${search.trim()}`}
+            rows={filtered}
+            selectedIds={selectedIds}
+            messagingStatus={messagingStatus}
+            sendOptions={sendOptions}
+            copiedId={copiedId}
+            sendingId={sendingId}
+            bulkSending={bulkSending}
+            bulkDeleting={bulkDeleting}
+            onToggleGuestSelected={toggleGuestSelected}
+            onTogglePageSelected={togglePageSelected}
+            onSend={sendInvitation}
+            onCopy={copyLink}
+            onDetails={setDetails}
+            onEdit={setEditing}
+            onDelete={setDeleting}
+          />
+        </>
       )}
 
       {showCreate && (
@@ -378,6 +563,30 @@ export function GuestList({
         </AdminModal>
       )}
 
+      {bulkDeleteConfirm && (
+        <ConfirmDialog
+          title="Supprimer les invités"
+          message={
+            <div className="space-y-3">
+              <p>
+                Supprimer définitivement <strong>{selectedCount}</strong> invité
+                {selectedCount !== 1 ? "s" : ""} sélectionné
+                {selectedCount !== 1 ? "s" : ""} ? Les liens d&apos;invitation ne
+                fonctionneront plus.
+              </p>
+              <p className="text-xs text-white/50">
+                Cette action est irréversible (RSVP, OTP, carte M-Pesa liés inclus).
+              </p>
+            </div>
+          }
+          confirmLabel="Supprimer"
+          variant="danger"
+          loading={bulkDeleting}
+          onClose={() => setBulkDeleteConfirm(false)}
+          onConfirm={deleteBulkGuests}
+        />
+      )}
+
       {bulkSendConfirm && (
         <ConfirmDialog
           title="Envoyer les invitations"
@@ -387,7 +596,14 @@ export function GuestList({
                 Envoyer l&apos;invitation à{" "}
                 <strong>{sendableFiltered.length}</strong> invité
                 {sendableFiltered.length !== 1 ? "s" : ""} affiché
-                {sendableFiltered.length !== 1 ? "s" : ""} ?
+                {sendableFiltered.length !== 1 ? "s" : ""}
+                {dayLot !== "ALL" ? (
+                  <>
+                    {" "}
+                    du lot <strong>{getGuestEventDayLotLabel(dayLot)}</strong>
+                  </>
+                ) : null}
+                ?
               </p>
               <InvitationSendOptions
                 compact
@@ -504,8 +720,7 @@ function GuestEditModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [firstName, setFirstName] = useState(guest.firstName ?? "");
-  const [lastName, setLastName] = useState(guest.lastName ?? "");
+  const [fullName, setFullName] = useState(guest.fullName ?? "");
   const [email, setEmail] = useState(guest.email ?? "");
   const [phone, setPhone] = useState(guest.phone ?? "");
   const [rsvpStatus, setRsvpStatus] = useState(guest.rsvpStatus);
@@ -523,8 +738,7 @@ function GuestEditModal({
         method: "PATCH",
         headers,
         body: JSON.stringify({
-          firstName: firstName.trim() || null,
-          lastName: lastName.trim() || null,
+          fullName: fullName.trim() || null,
           email: email || null,
           phone: phone || null,
           rsvpStatus,
@@ -545,22 +759,13 @@ function GuestEditModal({
   return (
     <AdminModal title={`Modifier — ${guest.displayName}`} onClose={onClose}>
       <form onSubmit={handleSave} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <ModalField label="Prénom" hint="Facultatif">
-            <input
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className={modalInputClass}
-            />
-          </ModalField>
-          <ModalField label="Nom" hint="Facultatif">
-            <input
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className={modalInputClass}
-            />
-          </ModalField>
-        </div>
+        <ModalField label="Nom complet" hint="Facultatif">
+          <input
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className={modalInputClass}
+          />
+        </ModalField>
         <ModalField label="Email">
           <input
             type="email"

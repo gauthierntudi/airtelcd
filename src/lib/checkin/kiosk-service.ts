@@ -198,8 +198,7 @@ async function getSessionByToken(token: string) {
       guest: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          fullName: true,
           rsvpStatus: true,
           checkedInAt: true,
         },
@@ -215,8 +214,7 @@ async function getActiveKioskSession() {
       guest: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          fullName: true,
           rsvpStatus: true,
           checkedInAt: true,
         },
@@ -233,13 +231,13 @@ async function getActiveKioskSession() {
 
 async function markCheckinSuccess(
   sessionId: string,
-  guest: { id: string; firstName: string | null; lastName: string | null },
+  guest: { id: string; fullName: string | null },
   confirmRsvp: boolean,
 ) {
   const successEndsAt = new Date(
     Date.now() + CHECKIN_SUCCESS_COUNTDOWN_SEC * 1000,
   );
-  const displayName = guestDisplayName(guest.firstName, guest.lastName);
+  const displayName = guestDisplayName(guest.fullName);
 
   await prisma.$transaction([
     prisma.guest.update({
@@ -309,8 +307,7 @@ export async function markKioskScanned(token: string) {
       guest: {
         select: {
           id: true,
-          firstName: true,
-          lastName: true,
+          fullName: true,
           rsvpStatus: true,
           checkedInAt: true,
         },
@@ -364,8 +361,7 @@ export async function verifyCheckinOtp(
     where: { id: guestId },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
+      fullName: true,
       rsvpStatus: true,
       checkedInAt: true,
     },
@@ -387,7 +383,7 @@ export async function verifyCheckinOtp(
       data: {
         status: CheckinKioskStatus.WAITING_CONFIRM,
         guestId: guest.id,
-        displayName: guestDisplayName(guest.firstName, guest.lastName),
+        displayName: guestDisplayName(guest.fullName),
       },
     });
   }

@@ -50,7 +50,7 @@ export function buildInvitationEmailParams(
   const eventDays = eventDaysFromDbDates(guest.eventDays);
   return {
     variant,
-    displayName: guestDisplayName(guest.firstName, guest.lastName),
+    displayName: guestDisplayName(guest.fullName),
     eventDates: formatInvitationTemplateDates(eventDays),
     eventTime: guestInvitationTimeRange(guest),
     venue: INVITATION_EXPERIENCE.venue,

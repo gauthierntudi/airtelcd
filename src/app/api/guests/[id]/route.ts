@@ -17,8 +17,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
   const { id } = await context.params;
   let body: {
-    firstName?: string;
-    lastName?: string;
+    fullName?: string;
     email?: string | null;
     phone?: string | null;
     rsvpStatus?: RsvpStatus;
@@ -37,8 +36,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Invité introuvable" }, { status: 404 });
   }
 
-  const firstName = body.firstName?.trim();
-  const lastName = body.lastName?.trim();
+  const fullName = body.fullName?.trim();
 
   const rsvpStatus = body.rsvpStatus;
   if (rsvpStatus && !Object.values(RsvpStatus).includes(rsvpStatus)) {
@@ -77,10 +75,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const updated = await prisma.guest.update({
     where: { id },
     data: {
-      ...(body.firstName !== undefined && { firstName: firstName || null }),
-      ...(body.lastName !== undefined && {
-        lastName: lastName || null,
-      }),
+      ...(body.fullName !== undefined && { fullName: fullName || null }),
       ...(body.email !== undefined && {
         email: body.email?.trim() || null,
       }),
