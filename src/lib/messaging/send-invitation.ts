@@ -7,7 +7,10 @@ import {
   assertSendOptions,
   type SendInvitationOptions,
 } from "@/lib/messaging/send-options";
-import { buildInvitationWhatsAppVariables } from "@/lib/messaging/invitation-whatsapp-vars";
+import {
+  buildInvitationWhatsAppVariables,
+  resolveInvitationWhatsAppTemplate,
+} from "@/lib/messaging/invitation-whatsapp-vars";
 import { sendInvitationWhatsApp } from "@/lib/messaging/twilio-whatsapp";
 import { guestDisplayName, hasGuestFullName } from "@/lib/event";
 import type { InvitationEmailVariant } from "@/lib/messaging/invitation-email-vars";
@@ -55,10 +58,11 @@ async function sendOnChannel(
     return;
   }
 
+  const whatsappTemplate = resolveInvitationWhatsAppTemplate(guest);
   await sendInvitationWhatsApp({
     phoneE164: guest.phone!,
-    variant: template,
-    contentVariables: buildInvitationWhatsAppVariables(guest, template),
+    template: whatsappTemplate,
+    contentVariables: buildInvitationWhatsAppVariables(guest, whatsappTemplate),
   });
 }
 

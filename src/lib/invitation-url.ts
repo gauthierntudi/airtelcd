@@ -29,7 +29,7 @@ export function getAppBaseUrl(fallback?: string): string {
 /**
  * Origine des liens de confirmation invité.
  * Lien final : `{URL_ORIGIN_CONFIRM}/api/confirm/action={token}`
- * (équivalent template WhatsApp : `…/action={{3}}` simple, `…/action={{4}}` nominatif).
+ * (équivalent template WhatsApp : `…/action={{3}}` 1 jour, `…/action={{1}}` 3 jours).
  */
 export function getConfirmOrigin(fallback?: string): string {
   const configured = process.env.URL_ORIGIN_CONFIRM?.trim();

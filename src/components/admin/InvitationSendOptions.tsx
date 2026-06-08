@@ -18,8 +18,8 @@ const INVITATION_TEMPLATES: {
   label: string;
   hint: string;
 }[] = [
-  { id: "nominative", label: "Nominatif", hint: "Cher/Chère + nom (email & WhatsApp)" },
-  { id: "simple", label: "Simple", hint: "Sans nom (email & WhatsApp)" },
+  { id: "nominative", label: "Nominatif", hint: "Cher/Chère + nom (email uniquement)" },
+  { id: "simple", label: "Simple", hint: "Sans nom (email uniquement)" },
 ];
 
 export function InvitationSendOptions({

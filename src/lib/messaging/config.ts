@@ -8,14 +8,27 @@ export type TwilioCredentials = {
 };
 
 export type TwilioWhatsappCredentials = TwilioCredentials & {
-  /** @deprecated Préférer contentInviteNominativeSid */
+  /** @deprecated Préférer contentInviteThreeDaysSid */
   contentInviteSid: string | undefined;
+  /** Template 3 jours — {{1}} token */
+  contentInviteThreeDaysSid: string | undefined;
+  /** Template 1 jour — {{1}} date, {{2}} horaire, {{3}} token */
+  contentInviteOneDaySid: string | undefined;
+  /** @deprecated Alias contentInviteThreeDaysSid */
   contentInviteNominativeSid: string | undefined;
+  /** @deprecated Alias contentInviteOneDaySid */
   contentInviteSimpleSid: string | undefined;
 };
 
 function twilioWhatsappCredentials(): TwilioWhatsappCredentials {
   const legacyInviteSid = process.env.TWILIO_WHATSAPP_CONTENT_INVITE_SID?.trim();
+  const threeDaysSid =
+    process.env.TWILIO_WHATSAPP_CONTENT_INVITE_THREE_DAYS_SID?.trim() ||
+    process.env.TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID?.trim() ||
+    legacyInviteSid;
+  const oneDaySid =
+    process.env.TWILIO_WHATSAPP_CONTENT_INVITE_ONE_DAY_SID?.trim() ||
+    process.env.TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID?.trim();
   return {
     accountSid:
       process.env.TWILIO_WHATSAPP_ACCOUNT_SID?.trim() ||
@@ -25,11 +38,10 @@ function twilioWhatsappCredentials(): TwilioWhatsappCredentials {
       process.env.TWILIO_AUTH_TOKEN?.trim(),
     from: process.env.TWILIO_WHATSAPP_FROM?.trim(),
     contentInviteSid: legacyInviteSid,
-    contentInviteNominativeSid:
-      process.env.TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID?.trim() ||
-      legacyInviteSid,
-    contentInviteSimpleSid:
-      process.env.TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID?.trim(),
+    contentInviteThreeDaysSid: threeDaysSid,
+    contentInviteOneDaySid: oneDaySid,
+    contentInviteNominativeSid: threeDaysSid,
+    contentInviteSimpleSid: oneDaySid,
   };
 }
 
@@ -89,8 +101,8 @@ export function isTwilioWhatsappConfigured(): boolean {
     whatsapp.accountSid &&
       whatsapp.authToken &&
       whatsapp.from &&
-      whatsapp.contentInviteNominativeSid &&
-      whatsapp.contentInviteSimpleSid,
+      whatsapp.contentInviteThreeDaysSid &&
+      whatsapp.contentInviteOneDaySid,
   );
 }
 
@@ -224,14 +236,14 @@ export function getSystemMessagingReport(): SystemMessagingReport {
       configured: Boolean(cfg.twilio.whatsapp.from),
     },
     {
-      name: "TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID",
-      label: "Template WhatsApp nominatif (Content SID)",
-      configured: Boolean(cfg.twilio.whatsapp.contentInviteNominativeSid),
+      name: "TWILIO_WHATSAPP_CONTENT_INVITE_THREE_DAYS_SID",
+      label: "Template WhatsApp 3 jours (Content SID)",
+      configured: Boolean(cfg.twilio.whatsapp.contentInviteThreeDaysSid),
     },
     {
-      name: "TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID",
-      label: "Template WhatsApp simple (Content SID)",
-      configured: Boolean(cfg.twilio.whatsapp.contentInviteSimpleSid),
+      name: "TWILIO_WHATSAPP_CONTENT_INVITE_ONE_DAY_SID",
+      label: "Template WhatsApp 1 jour (Content SID)",
+      configured: Boolean(cfg.twilio.whatsapp.contentInviteOneDaySid),
     },
   ];
 
@@ -336,7 +348,7 @@ export function assertChannelConfigured(channel: ContactChannel): void {
   }
   if (channel === "whatsapp" && !isTwilioWhatsappConfigured()) {
     throw new Error(
-      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID et TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID requis.",
+      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, TWILIO_WHATSAPP_CONTENT_INVITE_ONE_DAY_SID et TWILIO_WHATSAPP_CONTENT_INVITE_THREE_DAYS_SID requis.",
     );
   }
 }

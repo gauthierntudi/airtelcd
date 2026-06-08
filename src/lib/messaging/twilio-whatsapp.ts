@@ -1,30 +1,30 @@
 import twilio from "twilio";
 import { assertChannelConfigured, getMessagingConfig } from "@/lib/messaging/config";
-import type { InvitationEmailVariant } from "@/lib/messaging/invitation-email-vars";
+import type { InvitationWhatsAppTemplate } from "@/lib/messaging/invitation-whatsapp-vars";
 
 export type InvitationWhatsAppParams = {
   phoneE164: string;
-  variant: InvitationEmailVariant;
+  template: InvitationWhatsAppTemplate;
   contentVariables: Record<string, string>;
 };
 
-function resolveContentSid(variant: InvitationEmailVariant): string {
+function resolveContentSid(template: InvitationWhatsAppTemplate): string {
   const { whatsapp: cfg } = getMessagingConfig().twilio;
 
-  if (variant === "simple") {
-    const sid = cfg.contentInviteSimpleSid;
+  if (template === "one_day") {
+    const sid = cfg.contentInviteOneDaySid;
     if (!sid) {
       throw new Error(
-        "Template WhatsApp simple non configuré : TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID requis.",
+        "Template WhatsApp 1 jour non configuré : TWILIO_WHATSAPP_CONTENT_INVITE_ONE_DAY_SID ou TWILIO_WHATSAPP_CONTENT_INVITE_SIMPLE_SID requis.",
       );
     }
     return sid;
   }
 
-  const sid = cfg.contentInviteNominativeSid;
+  const sid = cfg.contentInviteThreeDaysSid;
   if (!sid) {
     throw new Error(
-      "Template WhatsApp nominatif non configuré : TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID requis.",
+      "Template WhatsApp 3 jours non configuré : TWILIO_WHATSAPP_CONTENT_INVITE_THREE_DAYS_SID ou TWILIO_WHATSAPP_CONTENT_INVITE_NOMINATIVE_SID requis.",
     );
   }
   return sid;
@@ -49,7 +49,7 @@ export async function sendInvitationWhatsApp(
   await client.messages.create({
     from,
     to: toWhatsAppAddress(params.phoneE164),
-    contentSid: resolveContentSid(params.variant),
+    contentSid: resolveContentSid(params.template),
     contentVariables: JSON.stringify(params.contentVariables),
   });
 }
