@@ -13,7 +13,7 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AdminModal,
   ModalField,
@@ -47,6 +47,10 @@ import {
   guestMatchesEventDayLot,
   type GuestEventDayLotId,
 } from "@/lib/guest-event-day-lots";
+import {
+  DEFAULT_INVITATION_TIME_RANGE,
+  invitationTimeRangeForEventDays,
+} from "@/lib/invitation-time-range";
 import { notify } from "@/lib/toast";
 
 const FILTERS: { id: RsvpFilter; label: string }[] = [
@@ -728,7 +732,18 @@ function GuestEditModal({
   const [invitationTimeRange, setInvitationTimeRange] = useState(
     guest.invitationTimeRange,
   );
+  const initialEventDaysRef = useRef(guest.eventDays);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const initial = initialEventDaysRef.current;
+    const daysChanged =
+      eventDays.length !== initial.length ||
+      eventDays.some((d, i) => d !== initial[i]);
+    if (daysChanged) {
+      setInvitationTimeRange(invitationTimeRangeForEventDays(eventDays));
+    }
+  }, [eventDays]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -790,7 +805,7 @@ function GuestEditModal({
             value={invitationTimeRange}
             onChange={(e) => setInvitationTimeRange(e.target.value)}
             className={modalInputClass}
-            placeholder="08h00 – 17h00"
+            placeholder={DEFAULT_INVITATION_TIME_RANGE}
           />
           <p className="mt-1 text-xs text-white/45">
             Utilisé dans l&apos;email (variables horaires) et la page invitation.

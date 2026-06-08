@@ -1,7 +1,7 @@
 "use client";
 
 import { UserPlus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { modalInputClass } from "@/components/admin/AdminModal";
 import {
@@ -9,7 +9,10 @@ import {
   EventDayMultiSelect,
 } from "@/components/admin/EventDayMultiSelect";
 import type { EventDayId } from "@/lib/event-days";
-import { DEFAULT_INVITATION_TIME_RANGE } from "@/lib/invitation-time-range";
+import {
+  DEFAULT_INVITATION_TIME_RANGE,
+  invitationTimeRangeForEventDays,
+} from "@/lib/invitation-time-range";
 import { AdminPhoneInput } from "@/components/admin/AdminPhoneInput";
 import { notify } from "@/lib/toast";
 
@@ -26,10 +29,14 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [eventDays, setEventDays] = useState<EventDayId[]>([DEFAULT_EVENT_DAY_ID]);
-  const [invitationTimeRange, setInvitationTimeRange] = useState(
-    DEFAULT_INVITATION_TIME_RANGE,
+  const [invitationTimeRange, setInvitationTimeRange] = useState(() =>
+    invitationTimeRangeForEventDays([DEFAULT_EVENT_DAY_ID]),
   );
   const [creating, setCreating] = useState(false);
+
+  useEffect(() => {
+    setInvitationTimeRange(invitationTimeRangeForEventDays(eventDays));
+  }, [eventDays]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -64,7 +71,7 @@ export function GuestCreateForm({ onCreated, headers, embedded, onClose }: Props
       setEmail("");
       setPhone("");
       setEventDays([DEFAULT_EVENT_DAY_ID]);
-      setInvitationTimeRange(DEFAULT_INVITATION_TIME_RANGE);
+      setInvitationTimeRange(invitationTimeRangeForEventDays([DEFAULT_EVENT_DAY_ID]));
       onCreated();
     } catch (err) {
       notify.error(err instanceof Error ? err.message : "Erreur");

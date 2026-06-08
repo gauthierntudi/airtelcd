@@ -73,7 +73,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: dayResult.error }, { status: 400 });
   }
 
-  const timeResult = parseInvitationTimeRangeInput(body.invitationTimeRange);
+  const timeResult = parseInvitationTimeRangeInput(
+    body.invitationTimeRange,
+    dayResult.eventDays,
+  );
   if ("error" in timeResult) {
     return NextResponse.json({ error: timeResult.error }, { status: 400 });
   }

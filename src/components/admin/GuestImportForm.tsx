@@ -8,7 +8,7 @@ import {
   Loader2,
   Upload,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import {
   DEFAULT_EVENT_DAY_ID,
@@ -20,7 +20,10 @@ import {
   type GuestImportRow,
 } from "@/lib/parse-guest-csv";
 import type { EventDayId } from "@/lib/event-days";
-import { DEFAULT_INVITATION_TIME_RANGE } from "@/lib/invitation-time-range";
+import {
+  DEFAULT_INVITATION_TIME_RANGE,
+  invitationTimeRangeForEventDays,
+} from "@/lib/invitation-time-range";
 import { formatInvitedDaysShort } from "@/lib/event-days";
 import { notify } from "@/lib/toast";
 
@@ -41,9 +44,13 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
   const [fileName, setFileName] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [eventDays, setEventDays] = useState<EventDayId[]>([DEFAULT_EVENT_DAY_ID]);
-  const [invitationTimeRange, setInvitationTimeRange] = useState(
-    DEFAULT_INVITATION_TIME_RANGE,
+  const [invitationTimeRange, setInvitationTimeRange] = useState(() =>
+    invitationTimeRangeForEventDays([DEFAULT_EVENT_DAY_ID]),
   );
+
+  useEffect(() => {
+    setInvitationTimeRange(invitationTimeRangeForEventDays(eventDays));
+  }, [eventDays]);
 
   function downloadTemplate() {
     const blob = new Blob([GUEST_CSV_TEMPLATE], { type: "text/csv;charset=utf-8" });
@@ -137,7 +144,8 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
               Horaire pour cet import
             </p>
             <p className="mt-1 text-xs text-white/45">
-              Appliqué à tous les invités — variable horaire dans l&apos;email.
+              Prérempli selon les jours (12 : 14h–19h · 13 : 15h–21h · 14 : 12h–18h).
+              Modifiable avant import.
             </p>
             <input
               value={invitationTimeRange}
@@ -175,10 +183,12 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
             <code className="text-[11px]">telephone</code>. Virgule ou point-virgule.
           </p>
 
-          {fileName && (
+          {fileName && preview.length > 0 && (
             <p className="text-sm text-white/70">
-              Fichier : <strong>{fileName}</strong> — {preview.length} ligne(s) ·{" "}
-              <strong>{formatInvitedDaysShort(eventDays)}</strong>
+              Fichier : <strong>{fileName}</strong> —{" "}
+              <strong>{preview.length}</strong> invité(s) ·{" "}
+              <strong>{formatInvitedDaysShort(eventDays)}</strong> ·{" "}
+              <strong>{invitationTimeRange}</strong>
             </p>
           )}
 
@@ -199,30 +209,32 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
           )}
 
           {preview.length > 0 && (
-            <div className="max-h-48 overflow-auto rounded-lg border border-white/10">
-              <table className="w-full text-left text-xs text-white">
-                <thead className="sticky top-0 bg-[#1f1f1f]">
-                  <tr>
-                    <th className="px-3 py-2 font-semibold text-white/70">Nom complet</th>
-                    <th className="px-3 py-2 font-semibold text-white/70">Email</th>
-                    <th className="px-3 py-2 font-semibold text-white/70">Tél.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preview.slice(0, 8).map((r) => (
-                    <tr key={r.line} className="border-t border-white/10">
-                      <td className="px-3 py-2">{r.fullName ?? "—"}</td>
-                      <td className="px-3 py-2 text-white/55">{r.email ?? "—"}</td>
-                      <td className="px-3 py-2 text-white/55">{r.phone ?? "—"}</td>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-white">
+                Aperçu complet — vérifiez avant d&apos;importer
+              </p>
+              <div className="max-h-[min(60vh,28rem)] overflow-auto rounded-lg border border-white/10">
+                <table className="w-full text-left text-xs text-white">
+                  <thead className="sticky top-0 z-10 bg-[#1f1f1f]">
+                    <tr>
+                      <th className="w-10 px-3 py-2 font-semibold text-white/70">#</th>
+                      <th className="px-3 py-2 font-semibold text-white/70">Nom complet</th>
+                      <th className="px-3 py-2 font-semibold text-white/70">Email</th>
+                      <th className="px-3 py-2 font-semibold text-white/70">Tél.</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              {preview.length > 8 && (
-                <p className="border-t border-white/10 px-3 py-2 text-xs text-white/45">
-                  + {preview.length - 8} autre(s)…
-                </p>
-              )}
+                  </thead>
+                  <tbody>
+                    {preview.map((r) => (
+                      <tr key={r.line} className="border-t border-white/10">
+                        <td className="px-3 py-2 text-white/40">{r.line}</td>
+                        <td className="px-3 py-2">{r.fullName ?? "—"}</td>
+                        <td className="px-3 py-2 text-white/55">{r.email ?? "—"}</td>
+                        <td className="px-3 py-2 text-white/55">{r.phone ?? "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -268,8 +280,8 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
     return (
       <>
         <p className="mb-4 text-sm text-white/55">
-          Choisissez les jours d&apos;invitation, puis importez un CSV (prénom/nom facultatifs, email,
-          téléphone). Les dates ne sont pas dans le fichier.
+          Choisissez les jours d&apos;invitation, puis importez un CSV (nom complet facultatif,
+          email, téléphone). La liste complète s&apos;affiche avant validation.
         </p>
         {importBody}
       </>
@@ -288,7 +300,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose }: Prop
           <div>
             <h2 className="text-lg font-bold text-vodacom-black">Importer des invités</h2>
             <p className="mt-1 text-sm text-vodacom-black/60">
-              Jours choisis à l&apos;import · CSV : prénom, nom, email, téléphone
+              Jours et horaires à l&apos;import · CSV : nom_complet, email, telephone
             </p>
           </div>
         </div>
