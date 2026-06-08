@@ -1,4 +1,4 @@
-/** Bannière hero — emails invitation (simple + nominatif) */
+/** Bannière hero — emails invitation */
 export const INVITATION_HERO_IMAGE_URL =
   "https://mypullzond243.b-cdn.net/golf2026/flyer-gen.jpg";
 

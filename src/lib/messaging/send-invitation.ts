@@ -12,19 +12,8 @@ import {
   resolveInvitationWhatsAppTemplate,
 } from "@/lib/messaging/invitation-whatsapp-vars";
 import { sendInvitationWhatsApp } from "@/lib/messaging/twilio-whatsapp";
-import { guestDisplayName, hasGuestFullName } from "@/lib/event";
-import type { InvitationEmailVariant } from "@/lib/messaging/invitation-email-vars";
+import { guestDisplayName } from "@/lib/event";
 import { prisma } from "@/lib/prisma";
-
-/** Nominatif uniquement si prénom + nom connus — sinon template simple. */
-function resolveInvitationTemplate(
-  guest: Guest,
-  preferred: InvitationEmailVariant,
-): InvitationEmailVariant {
-  if (preferred === "simple") return "simple";
-  if (!hasGuestFullName(guest.fullName)) return "simple";
-  return "nominative";
-}
 
 export type InvitationSentVia = ContactChannel | "both";
 
@@ -47,10 +36,8 @@ async function sendOnChannel(
   baseUrl: string,
   options: SendInvitationOptions,
 ): Promise<void> {
-  const template = resolveInvitationTemplate(guest, options.emailTemplate);
-
   if (channel === "email") {
-    const emailParams = buildInvitationEmailParams(guest, baseUrl, template);
+    const emailParams = buildInvitationEmailParams(guest, baseUrl);
     await sendInvitationEmail({
       ...emailParams,
       email: guest.email!.trim(),

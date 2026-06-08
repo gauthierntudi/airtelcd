@@ -11,8 +11,6 @@ export const INVITATION_EXPERIENCE = {
   organizer: "Vodacom Privilège",
 } as const;
 
-export type InvitationEmailVariant = "simple" | "nominative";
-
 /** Jours pour le template — ex. « 12 et 13 », « 12 », « 12, 13 et 14 » */
 export function formatInvitationTemplateDates(dayIds: EventDayId[]): string {
   const order = new Map<EventDayId, number>([
@@ -33,7 +31,6 @@ export function formatInvitationTemplateDates(dayIds: EventDayId[]): string {
 }
 
 export type InvitationEmailRenderParams = {
-  variant: InvitationEmailVariant;
   displayName: string;
   eventDates: string;
   eventTime: string;
@@ -45,11 +42,9 @@ export type InvitationEmailRenderParams = {
 export function buildInvitationEmailParams(
   guest: Guest,
   _baseUrl: string,
-  variant: InvitationEmailVariant,
 ): InvitationEmailRenderParams {
   const eventDays = eventDaysFromDbDates(guest.eventDays);
   return {
-    variant,
     displayName: guestDisplayName(guest.fullName),
     eventDates: formatInvitationTemplateDates(eventDays),
     eventTime: guestInvitationTimeRange(guest),

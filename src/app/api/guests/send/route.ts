@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
   let body: {
     guestIds?: string[];
     channels?: { email?: boolean; whatsapp?: boolean };
-    emailTemplate?: string;
   };
   try {
     body = await request.json();

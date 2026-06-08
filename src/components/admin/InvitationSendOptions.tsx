@@ -2,7 +2,6 @@
 
 import { Mail, MessageCircle } from "lucide-react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import type { InvitationEmailVariant } from "@/lib/messaging/invitation-email-vars";
 import type { MessagingStatus } from "@/lib/messaging/config";
 import type { SendInvitationOptions } from "@/lib/messaging/send-options";
 
@@ -12,15 +11,6 @@ type Props = {
   messagingStatus: MessagingStatus;
   compact?: boolean;
 };
-
-const INVITATION_TEMPLATES: {
-  id: InvitationEmailVariant;
-  label: string;
-  hint: string;
-}[] = [
-  { id: "nominative", label: "Nominatif", hint: "Cher/Chère + nom (email uniquement)" },
-  { id: "simple", label: "Simple", hint: "Sans nom (email uniquement)" },
-];
 
 export function InvitationSendOptions({
   value,
@@ -39,13 +29,6 @@ export function InvitationSendOptions({
     });
   }
 
-  function setInvitationTemplate(template: InvitationEmailVariant) {
-    onChange({ ...value, emailTemplate: template });
-  }
-
-  const showTemplatePicker =
-    value.channels.email || value.channels.whatsapp;
-
   return (
     <div
       className={
@@ -62,48 +45,25 @@ export function InvitationSendOptions({
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
-        <section className="shrink-0 space-y-2">
-          <p className="text-xs font-semibold text-white/60">Canaux</p>
-          <div className="flex flex-wrap gap-2">
-            <ChannelSwitchRow
-              icon={Mail}
-              label="Email"
-              checked={value.channels.email}
-              disabled={emailDisabled}
-              onCheckedChange={(c) => setChannel("email", c)}
-            />
-            <ChannelSwitchRow
-              icon={MessageCircle}
-              label="WhatsApp"
-              checked={value.channels.whatsapp}
-              disabled={whatsappDisabled}
-              onCheckedChange={(c) => setChannel("whatsapp", c)}
-            />
-          </div>
-        </section>
-
-        {showTemplatePicker ? (
-          <section
-            className="shrink-0 space-y-2"
-            role="radiogroup"
-            aria-label="Template invitation"
-          >
-            <p className="text-xs font-semibold text-white/60">Template invitation</p>
-            <div className="flex flex-wrap gap-2">
-              {INVITATION_TEMPLATES.map((tpl) => (
-                <TemplateSwitchRow
-                  key={tpl.id}
-                  label={tpl.label}
-                  hint={tpl.hint}
-                  selected={value.emailTemplate === tpl.id}
-                  onSelect={() => setInvitationTemplate(tpl.id)}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-      </div>
+      <section className="shrink-0 space-y-2">
+        <p className="text-xs font-semibold text-white/60">Canaux</p>
+        <div className="flex flex-wrap gap-2">
+          <ChannelSwitchRow
+            icon={Mail}
+            label="Email"
+            checked={value.channels.email}
+            disabled={emailDisabled}
+            onCheckedChange={(c) => setChannel("email", c)}
+          />
+          <ChannelSwitchRow
+            icon={MessageCircle}
+            label="WhatsApp"
+            checked={value.channels.whatsapp}
+            disabled={whatsappDisabled}
+            onCheckedChange={(c) => setChannel("whatsapp", c)}
+          />
+        </div>
+      </section>
 
       {noChannel ? (
         <p className="mt-3 text-xs text-amber-400/90">Activez au moins un canal.</p>
@@ -154,39 +114,6 @@ function ChannelSwitchRow({
   );
 }
 
-function TemplateSwitchRow({
-  label,
-  hint,
-  selected,
-  onSelect,
-}: {
-  label: string;
-  hint: string;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={selected}
-      title={hint}
-      onClick={onSelect}
-      className={`inline-flex items-center gap-2.5 rounded-xl border py-2 pl-3 pr-2.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vodacom-red/50 ${
-        selected
-          ? "border-vodacom-red/35 bg-vodacom-red/[0.08]"
-          : "border-white/10 bg-[#1a1a1a] hover:border-white/18"
-      }`}
-    >
-      <span className="text-left">
-        <span className="block text-sm font-medium text-white">{label}</span>
-        <span className="block text-[10px] text-white/40">{hint}</span>
-      </span>
-      <ToggleSwitchVisual checked={selected} />
-    </button>
-  );
-}
-
 function ToggleSwitchVisual({ checked }: { checked: boolean }) {
   return (
     <span
@@ -203,5 +130,3 @@ function ToggleSwitchVisual({ checked }: { checked: boolean }) {
     </span>
   );
 }
-
-export type { InvitationEmailVariant };

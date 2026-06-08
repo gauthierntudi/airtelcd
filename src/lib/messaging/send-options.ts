@@ -5,7 +5,6 @@ import {
   isBrevoConfigured,
   isTwilioWhatsappConfigured,
 } from "@/lib/messaging/config";
-import type { InvitationEmailVariant } from "@/lib/messaging/invitation-email-vars";
 
 export type SendChannelSelection = {
   email: boolean;
@@ -14,14 +13,12 @@ export type SendChannelSelection = {
 
 export type SendInvitationOptions = {
   channels: SendChannelSelection;
-  emailTemplate: InvitationEmailVariant;
 };
 
 export type SendApiContext = Pick<MessagingStatus, "brevo" | "twilioWhatsapp">;
 
 export const DEFAULT_SEND_OPTIONS: SendInvitationOptions = {
   channels: { email: true, whatsapp: true },
-  emailTemplate: "nominative",
 };
 
 export function parseSendChannelSelection(
@@ -110,14 +107,11 @@ export function parseSendInvitationOptions(
   body:
     | {
         channels?: Partial<SendChannelSelection>;
-        emailTemplate?: string;
       }
     | null
     | undefined,
 ): SendInvitationOptions {
   const channels = body?.channels;
-  const emailTemplate =
-    body?.emailTemplate === "simple" ? "simple" : "nominative";
 
   return {
     channels: {
@@ -130,6 +124,5 @@ export function parseSendInvitationOptions(
           ? Boolean(channels.whatsapp)
           : DEFAULT_SEND_OPTIONS.channels.whatsapp,
     },
-    emailTemplate,
   };
 }

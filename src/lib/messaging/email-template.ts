@@ -5,19 +5,15 @@ import { invitationQrCodeImageUrl } from "@/lib/invitation-qr";
 import {
   INVITATION_EXPERIENCE,
   type InvitationEmailRenderParams,
-  type InvitationEmailVariant,
 } from "@/lib/messaging/invitation-email-vars";
 
 export const INVITATION_EMAIL_HERO_URL = INVITATION_HERO_IMAGE_URL;
 
-const TEMPLATE_FILES: Record<InvitationEmailVariant, string> = {
-  simple: path.join("public", "tamplate-email", "email_template_simple.html"),
-  nominative: path.join(
-    "public",
-    "tamplate-email",
-    "email_template_nominative.html",
-  ),
-};
+const TEMPLATE_FILE = path.join(
+  "public",
+  "tamplate-email",
+  "email_template_simple.html",
+);
 
 function escapeHtmlText(text: string): string {
   return text
@@ -31,15 +27,14 @@ function escapeHtmlAttr(text: string): string {
   return text.replace(/"/g, "&quot;");
 }
 
-function loadTemplate(variant: InvitationEmailVariant): string {
-  const filePath = path.join(process.cwd(), TEMPLATE_FILES[variant]);
+function loadTemplate(): string {
+  const filePath = path.join(process.cwd(), TEMPLATE_FILE);
   return fs.readFileSync(filePath, "utf-8");
 }
 
-export function invitationEmailSubject(params: InvitationEmailRenderParams): string {
-  if (params.variant === "nominative") {
-    return `${params.displayName}, votre invitation — ${INVITATION_EXPERIENCE.title}`;
-  }
+export function invitationEmailSubject(
+  _params: InvitationEmailRenderParams,
+): string {
   return `Votre invitation — ${INVITATION_EXPERIENCE.title}`;
 }
 
@@ -64,7 +59,7 @@ export function renderInvitationEmailFromTemplate(
     ["{{event_venue}}", escapeHtmlText(params.venue)],
   ];
 
-  let html = loadTemplate(params.variant);
+  let html = loadTemplate();
   for (const [token, value] of replacements) {
     html = html.split(token).join(value);
   }

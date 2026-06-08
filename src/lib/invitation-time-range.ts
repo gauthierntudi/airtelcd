@@ -12,7 +12,7 @@ export const EVENT_DAY_INVITATION_TIME_RANGES: Record<EventDayId, string> = {
   "2026-06-14": "12h00 – 18h00",
 };
 
-/** Horaire par défaut (12 juin) — variable {{2}} (simple) / {{3}} (nominatif) dans les emails */
+/** Horaire par défaut (12 juin) — emails et WhatsApp 1 jour */
 export const DEFAULT_INVITATION_TIME_RANGE =
   EVENT_DAY_INVITATION_TIME_RANGES[DEFAULT_EVENT_DAY_ID];
 
