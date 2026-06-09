@@ -2,21 +2,11 @@
 
 import { Lock } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
-import { fetchInvitationSessionRedirect } from "@/lib/invitation-access/client-session";
-import type { InvitationAccessPostAuth } from "@/lib/invitation-access/types";
-import {
-  fetchMpesaVisaState,
-  peekMpesaVisaCache,
-} from "@/lib/mpesa-visa/client";
-import type { MpesaVisaExperienceState } from "@/lib/mpesa-visa/service";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import { InvitationAccessModal } from "@/components/home/InvitationAccessModal";
-import { VodacomMarketModal } from "@/components/vodacom-market/VodacomMarketModal";
-import { MpesaVisaUssdModal } from "@/components/home/MpesaVisaUssdModal";
+import { ExperienceAccessModals } from "@/components/home/ExperienceAccessModals";
 import { PLATFORM_MODULE_ICONS } from "@/lib/invitation-assets";
 import { MPESA_VISA_WELCOME_BONUS_USD, VODACOM_MARKET_NAME } from "@/lib/mpesa-visa/constants";
-import { notify } from "@/lib/toast";
+import { useExperienceAccess } from "@/hooks/use-experience-access";
 
 type ModuleId = "invitation" | "mpesa" | "market" | "privilege" | "games";
 
@@ -41,7 +31,7 @@ const MODULES: {
       "Invitation personnalisée par lien sécurisé, RSVP, QR code, calendrier et itinéraire.",
     available: true,
     accessEnabled: true,
-    accessLabel: "Accéder à mon invitation",
+    accessLabel: "Commencez l'expérience",
     background: "linear-gradient(180deg, #850001 0%, #e60000 100%)",
   },
   {
@@ -92,100 +82,14 @@ const MODULES: {
   },
 ];
 
-export function ExperienceCardsSection() {
-  const [accessOpen, setAccessOpen] = useState(false);
-  const [accessPostAuth, setAccessPostAuth] =
-    useState<InvitationAccessPostAuth>("invitation");
-  const [mpesaOpen, setMpesaOpen] = useState(false);
-  const [marketOpen, setMarketOpen] = useState(false);
-  const [sessionLoading, setSessionLoading] = useState(false);
-  const [mpesaExperience, setMpesaExperience] =
-    useState<MpesaVisaExperienceState | null>(null);
+type Props = {
+  access?: ReturnType<typeof useExperienceAccess>;
+};
 
-  const openAccessModal = useCallback((intent: InvitationAccessPostAuth) => {
-    setAccessPostAuth(intent);
-    setAccessOpen(true);
-  }, []);
-
-  const handleAccessAuthenticated = useCallback(
-    async (intent: Exclude<InvitationAccessPostAuth, "invitation">) => {
-      try {
-        const state = await fetchMpesaVisaState();
-        if (intent === "market") {
-          setMarketOpen(true);
-          return;
-        }
-        setMpesaExperience(state);
-        setMpesaOpen(true);
-      } catch (err) {
-        notify.error(
-          err instanceof Error ? err.message : "Impossible d'ouvrir l'expérience",
-        );
-      }
-    },
-    [],
-  );
-
-  /** Précharge carte + bonus en arrière-plan si l'invité est déjà connecté (OTP). */
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (peekMpesaVisaCache()) return;
-      const redirectPath = await fetchInvitationSessionRedirect();
-      if (!redirectPath || cancelled) return;
-      try {
-        await fetchMpesaVisaState();
-      } catch {
-        /* session expirée ou DB — ignoré */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const openInvitationAccess = useCallback(async () => {
-    setSessionLoading(true);
-    try {
-      const redirectPath = await fetchInvitationSessionRedirect();
-      if (redirectPath) {
-        window.location.href = redirectPath;
-        return;
-      }
-      openAccessModal("invitation");
-    } finally {
-      setSessionLoading(false);
-    }
-  }, [openAccessModal]);
-
-  const openMpesaExperience = useCallback(async () => {
-    const hasSession = await fetchInvitationSessionRedirect();
-    if (!hasSession) {
-      openAccessModal("mpesa");
-      return;
-    }
-    try {
-      const state = peekMpesaVisaCache() ?? (await fetchMpesaVisaState());
-      setMpesaExperience(state);
-      setMpesaOpen(true);
-    } catch {
-      openAccessModal("mpesa");
-    }
-  }, [openAccessModal]);
-
-  const openMarketExperience = useCallback(async () => {
-    const hasSession = await fetchInvitationSessionRedirect();
-    if (!hasSession) {
-      openAccessModal("market");
-      return;
-    }
-    try {
-      await fetchMpesaVisaState();
-      setMarketOpen(true);
-    } catch {
-      openAccessModal("market");
-    }
-  }, [openAccessModal]);
+export function ExperienceCardsSection({ access: externalAccess }: Props) {
+  const internalAccess = useExperienceAccess();
+  const access = externalAccess ?? internalAccess;
+  const showModals = !externalAccess;
 
   return (
     <>
@@ -201,52 +105,24 @@ export function ExperienceCardsSection() {
             onAccess={
               mod.accessEnabled
                 ? mod.id === "invitation"
-                  ? openInvitationAccess
+                  ? access.openInvitationAccess
                   : mod.id === "mpesa"
-                    ? openMpesaExperience
+                    ? () => void access.openMpesaExperience()
                     : mod.id === "market"
-                      ? openMarketExperience
+                      ? () => void access.openMarketExperience()
                       : undefined
                 : undefined
             }
             accessLoading={
-              mod.id === "invitation" && mod.accessEnabled ? sessionLoading : false
+              mod.id === "invitation" && mod.accessEnabled
+                ? access.sessionLoading
+                : false
             }
           />
         ))}
       </ul>
 
-      <InvitationAccessModal
-        open={accessOpen}
-        onClose={() => setAccessOpen(false)}
-        postAuth={accessPostAuth}
-        onAuthenticated={handleAccessAuthenticated}
-      />
-      <MpesaVisaUssdModal
-        open={mpesaOpen}
-        initialExperience={mpesaExperience}
-        onClose={() => {
-          setMpesaOpen(false);
-          setMpesaExperience(null);
-        }}
-        onAuthRequired={() => {
-          setMpesaOpen(false);
-          setMpesaExperience(null);
-          openAccessModal("mpesa");
-        }}
-      />
-      <VodacomMarketModal
-        open={marketOpen}
-        onClose={() => setMarketOpen(false)}
-        onAuthRequired={() => {
-          setMarketOpen(false);
-          openAccessModal("market");
-        }}
-        onRequestVisaCard={() => {
-          setMarketOpen(false);
-          openMpesaExperience();
-        }}
-      />
+      {showModals ? <ExperienceAccessModals access={access} /> : null}
     </>
   );
 }
@@ -324,7 +200,7 @@ function ModuleCard({
                 light ? "text-vodacom-black/50" : "text-white/55"
               }`}
             >
-              Accès via le lien reçu par e-mail ou WhatsApp.
+              Accès via le lien reçu par SMS ou WhatsApp.
             </p>
           ) : (
             <span

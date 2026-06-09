@@ -497,6 +497,65 @@ body {
   animation: checkin-orbit-ring-pulse 4s ease-in-out infinite;
 }
 
+/* Home — sélection de profil */
+@keyframes experience-profile-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.experience-profile-enter {
+  animation: experience-profile-fade-in 0.45s ease-out both;
+}
+
+.experience-profile-card {
+  animation: experience-profile-fade-in 0.5s ease-out both;
+}
+
+/* Home — avatars en orbite (visages toujours droits) */
+@keyframes home-orbit-spin-cw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes home-orbit-spin-ccw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.home-orbit-track {
+  transform-origin: center center;
+}
+
+.home-orbit-track--cw {
+  animation: home-orbit-spin-cw linear infinite;
+}
+
+.home-orbit-track--ccw {
+  animation: home-orbit-spin-ccw linear infinite;
+}
+
+.home-orbit-upright--cw {
+  animation: home-orbit-spin-cw linear infinite;
+}
+
+.home-orbit-upright--ccw {
+  animation: home-orbit-spin-ccw linear infinite;
+}
+
 /* Admin — toggle switches (options d'envoi) */
 @media (prefers-reduced-motion: reduce) {
   .invite-toggle,
@@ -515,7 +574,13 @@ body {
   .checkin-success-glow,
   .checkin-orbit-avatar,
   .checkin-orbit-avatar-inner,
-  .checkin-orbit-ring {
+  .checkin-orbit-ring,
+  .home-orbit-track--cw,
+  .home-orbit-track--ccw,
+  .home-orbit-upright--cw,
+  .home-orbit-upright--ccw,
+  .experience-profile-enter,
+  .experience-profile-card {
     animation: none;
   }
 }

@@ -4,7 +4,6 @@ import {
   AlertCircle,
   ArrowLeft,
   Check,
-  CreditCard,
   Loader2,
   Lock,
   Search,
@@ -16,7 +15,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import { PLATFORM_MODULE_ICONS } from "@/lib/invitation-assets";
+import { BRAND } from "@/lib/branding";
 import { getCarrefourProductUi } from "@/lib/mpesa-visa/carrefour-products-ui";
 import {
   CARREFOUR_PRODUCTS,
@@ -246,69 +245,76 @@ export function VodacomMarketModal({
   const canPay =
     panReady && expiryReady && cvvReady && !purchasing && !card?.blocked;
 
+  const firstName = experience?.guest.displayName?.split(" ")[0];
+
   return createPortal(
     <div
-      className="fixed inset-0 z-[75] flex flex-col bg-[#EAEDED] sm:p-3"
+      className="fixed inset-0 z-[75] flex flex-col bg-vodacom-cream sm:p-3"
       role="dialog"
       aria-modal="true"
       aria-labelledby="vodacom-market-title"
     >
-      <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden shadow-xl sm:my-auto sm:max-h-[min(94dvh,56rem)] sm:rounded-lg">
-        {/* Barre supérieure type Amazon */}
-        <header className="shrink-0 bg-[#131921] text-white">
-          <div className="flex items-center gap-3 px-3 py-2.5 sm:px-4">
-            <Image
-              src={PLATFORM_MODULE_ICONS.market}
-              alt=""
-              width={36}
-              height={36}
-              unoptimized
-              className="h-9 w-9 object-contain brightness-0 invert"
-            />
+      <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden shadow-2xl ring-1 ring-black/5 sm:my-auto sm:max-h-[min(94dvh,56rem)] sm:rounded-2xl">
+        <header className="shrink-0 bg-[linear-gradient(135deg,#e60000_0%,#b30000_55%,#8b0000_100%)] text-white">
+          <div className="flex items-center gap-3 px-4 py-3 sm:px-5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-md ring-2 ring-white/90">
+              <Image
+                src={BRAND.icon}
+                alt=""
+                width={40}
+                height={40}
+                unoptimized
+                className="h-9 w-9 object-contain"
+              />
+            </div>
             <div className="min-w-0 flex-1">
+              <p className="font-vodafone-rg-bd text-[10px] uppercase tracking-[0.18em] text-white/75">
+                Bonus Carte Visa M-Pesa
+              </p>
               <h2
                 id="vodacom-market-title"
-                className="truncate font-vodafone-exb text-base font-normal sm:text-lg"
+                className="truncate font-vodafone-exb text-lg font-normal leading-tight sm:text-xl"
               >
                 {VODACOM_MARKET_NAME}
               </h2>
-              {experience?.guest.displayName ? (
-                <p className="truncate font-vodafone-lt text-[11px] text-white/65">
-                  Bonjour, {experience.guest.displayName.split(" ")[0]}
+              {firstName ? (
+                <p className="truncate font-vodafone-lt text-xs text-white/80">
+                  Bonjour, {firstName}
                 </p>
               ) : null}
             </div>
             {card && !loading ? (
-              <div className="hidden shrink-0 text-right sm:block">
-                <p className="font-vodafone-lt text-[10px] text-[#FFD814]">
-                  Bonus Visa
+              <div className="shrink-0 rounded-xl bg-white/15 px-3 py-2 text-right ring-1 ring-white/20 backdrop-blur-sm">
+                <p className="font-vodafone-lt text-[10px] uppercase tracking-wide text-white/75">
+                  Solde bonus
                 </p>
-                <p className="font-vodafone-exb text-sm">
-                  {balance.toFixed(2)} USD
+                <p className="font-vodafone-exb text-base leading-tight">
+                  {balance.toFixed(2)}{" "}
+                  <span className="text-xs font-vodafone-rg-bd">USD</span>
                 </p>
               </div>
             ) : null}
             <button
               type="button"
               onClick={onClose}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded text-white/90 hover:bg-white/10"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/20"
               aria-label="Fermer"
             >
               <LucideIcon icon={X} size={20} />
             </button>
           </div>
-          <div className="flex items-center gap-2 border-t border-white/10 px-3 py-2 sm:px-4">
-            <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-md bg-white">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center text-[#131921]/50">
+          <div className="flex items-center gap-2 border-t border-white/15 px-4 py-2.5 sm:px-5">
+            <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-xl bg-white shadow-sm">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center text-vodacom-red/60">
                 <LucideIcon icon={Search} size={18} />
               </span>
               <input
                 readOnly
                 placeholder="Rechercher dans Vodacom Market"
-                className="h-9 min-w-0 flex-1 bg-transparent pr-3 font-vodafone-lt text-sm text-[#131921] outline-none placeholder:text-[#131921]/40"
+                className="h-10 min-w-0 flex-1 bg-transparent pr-3 font-vodafone-lt text-sm text-vodacom-black outline-none placeholder:text-vodacom-black/40"
               />
             </div>
-            <span className="flex shrink-0 items-center gap-1 font-vodafone-rg-bd text-sm text-[#FFD814]">
+            <span className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-white/15 px-3 font-vodafone-rg-bd text-sm ring-1 ring-white/20">
               <LucideIcon icon={ShoppingCart} size={18} />
               <span className="hidden sm:inline">Panier</span>
             </span>
@@ -317,17 +323,33 @@ export function VodacomMarketModal({
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           {loading ? (
-            <div className="flex flex-col items-center justify-center gap-3 bg-white py-20 text-[#565959]">
-              <LucideIcon icon={Loader2} size={32} className="animate-spin" />
-              <p className="font-vodafone-lt text-sm">Chargement…</p>
+            <div className="flex flex-col items-center justify-center gap-3 bg-white py-20 text-vodacom-black/55">
+              <LucideIcon
+                icon={Loader2}
+                size={32}
+                className="animate-spin text-vodacom-red"
+              />
+              <p className="font-vodafone-lt text-sm">Chargement du marché…</p>
             </div>
           ) : !card ? (
             <NoCardState onRequestVisaCard={onRequestVisaCard} onClose={onClose} />
           ) : view === "shop" ? (
-            <div className="px-3 py-4 sm:px-5">
+            <div className="px-4 py-5 sm:px-6">
+              <div className="overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#2b292c_0%,#474b4e_100%)] p-4 text-white shadow-md sm:p-5">
+                <p className="font-vodafone-rg-bd text-[10px] uppercase tracking-[0.2em] text-white/70">
+                  Vodacom Privilège Golf
+                </p>
+                <p className="mt-1 font-vodafone-exb text-lg leading-snug sm:text-xl">
+                  Dépensez votre bonus {MPESA_VISA_WELCOME_BONUS_USD} USD
+                </p>
+                <p className="mt-1 font-vodafone-lt text-sm text-white/75">
+                  Spiritueux et accessoires premium — paiement Carte Visa M-Pesa.
+                </p>
+              </div>
+
               {purchaseSuccess ? (
                 <div
-                  className="mb-4 flex items-center gap-2 rounded border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+                  className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
                   role="status"
                 >
                   <LucideIcon icon={Check} size={18} />
@@ -336,18 +358,13 @@ export function VodacomMarketModal({
               ) : null}
 
               {card.blocked ? (
-                <div className="mb-4 flex items-start gap-2 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
                   <LucideIcon icon={AlertCircle} size={18} className="mt-0.5" />
                   Carte bloquée — débloquez-la via le menu USSD pour acheter.
                 </div>
               ) : null}
 
-              <p className="font-vodafone-lt text-sm text-[#565959]">
-                Dépensez votre bonus de {MPESA_VISA_WELCOME_BONUS_USD} USD avec
-                votre Carte Visa M-Pesa.
-              </p>
-
-              <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {CARREFOUR_PRODUCTS.map((product) => {
                   const ui = getCarrefourProductUi(product.id);
                   const affordable = balance >= product.priceUsd;
@@ -355,36 +372,41 @@ export function VodacomMarketModal({
 
                   return (
                     <li key={product.id}>
-                      <article className="flex h-full flex-col overflow-hidden rounded bg-white p-3 shadow-sm ring-1 ring-black/5">
+                      <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white p-4 shadow-md ring-1 ring-vodacom-silver/20 transition hover:shadow-lg">
                         {ui ? (
-                          <div className="relative mx-auto aspect-square w-full max-w-[220px]">
+                          <div className="relative mx-auto aspect-square w-full max-w-[220px] rounded-xl bg-vodacom-cream/60">
                             <Image
                               src={ui.image}
                               alt={product.name}
                               fill
                               unoptimized
                               sizes="220px"
-                              className="object-contain p-2"
+                              className="object-contain p-3"
                             />
                           </div>
                         ) : null}
-                        <h3 className="mt-2 line-clamp-2 font-vodafone-lt text-sm leading-snug text-[#0F1111]">
+                        {ui?.tagline ? (
+                          <p className="mt-3 font-vodafone-lt text-[11px] uppercase tracking-wide text-vodacom-black/45">
+                            {ui.tagline}
+                          </p>
+                        ) : null}
+                        <h3 className="mt-1 line-clamp-2 font-vodafone-rg-bd text-sm leading-snug text-vodacom-black">
                           {product.name}
                         </h3>
                         {ui ? (
                           <>
                             <StarRating rating={ui.rating} />
-                            <p className="mt-1 font-vodafone-lt text-xs text-[#565959]">
+                            <p className="mt-1 font-vodafone-lt text-xs text-vodacom-black/50">
                               {ui.reviewCount} avis
                             </p>
                           </>
                         ) : null}
-                        <p className="mt-2 font-vodafone-exb text-xl text-[#B12704]">
+                        <p className="mt-2 font-vodafone-exb text-2xl text-vodacom-red">
                           {product.priceUsd}{" "}
                           <span className="text-xs font-vodafone-rg-bd">USD</span>
                         </p>
                         {!affordable && !card.blocked ? (
-                          <p className="mt-1 text-xs text-[#B12704]">
+                          <p className="mt-1 text-xs text-vodacom-red/80">
                             Solde insuffisant ({balance.toFixed(2)} USD)
                           </p>
                         ) : null}
@@ -392,9 +414,9 @@ export function VodacomMarketModal({
                           type="button"
                           disabled={disabled}
                           onClick={() => handleStartCheckout(product.id)}
-                          className="mt-auto pt-3"
+                          className="mt-auto pt-4"
                         >
-                          <span className="flex w-full items-center justify-center rounded-lg bg-[#FFD814] py-2 font-vodafone-rg-bd text-sm text-[#0F1111] shadow-sm ring-1 ring-[#FCD200] transition hover:bg-[#F7CA00] disabled:cursor-not-allowed disabled:bg-[#EAEDED] disabled:text-[#565959] disabled:ring-[#D5D9D9]">
+                          <span className="flex w-full items-center justify-center rounded-xl bg-vodacom-red py-2.5 font-vodafone-rg-bd text-sm text-white shadow-sm transition hover:bg-[#c40000] disabled:cursor-not-allowed disabled:bg-vodacom-silver/40 disabled:text-vodacom-black/45">
                             Acheter
                           </span>
                         </button>
@@ -404,8 +426,8 @@ export function VodacomMarketModal({
                 })}
               </ul>
 
-              <section className="mt-8 rounded bg-white p-4 shadow-sm ring-1 ring-black/5">
-                <h3 className="font-vodafone-exb text-sm text-[#0F1111]">
+              <section className="mt-8 rounded-2xl bg-white p-5 shadow-md ring-1 ring-vodacom-silver/20">
+                <h3 className="font-vodafone-exb text-base text-vodacom-black">
                   Vos commandes récentes
                 </h3>
                 {experience && experience.purchases.length > 0 ? (
@@ -430,7 +452,7 @@ export function VodacomMarketModal({
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-2 font-vodafone-lt text-sm text-[#565959]">
+                  <p className="mt-2 font-vodafone-lt text-sm text-vodacom-black/55">
                     Aucune commande pour le moment.
                   </p>
                 )}
@@ -531,7 +553,7 @@ export function VodacomMarketModal({
                     <button
                       type="submit"
                       disabled={!canPay}
-                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#FFD814] py-3 font-vodafone-rg-bd text-sm text-[#0F1111] ring-1 ring-[#FCD200] transition hover:bg-[#F7CA00] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-vodacom-red py-3 font-vodafone-rg-bd text-sm text-white shadow-sm transition hover:bg-[#c40000] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {purchasing ? (
                         <LucideIcon icon={Loader2} size={18} className="animate-spin" />
@@ -604,22 +626,29 @@ function NoCardState({
   onClose: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center bg-white px-4 py-12 text-center">
-      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#131921]/5 text-[#131921]">
-        <LucideIcon icon={CreditCard} size={32} />
-      </span>
-      <h3 className="mt-4 font-vodafone-exb text-lg text-[#0F1111]">
+    <div className="flex flex-col items-center bg-white px-4 py-14 text-center sm:px-8">
+      <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-vodacom-cream shadow-md ring-2 ring-vodacom-red/20">
+        <Image
+          src={BRAND.icon}
+          alt=""
+          width={48}
+          height={48}
+          unoptimized
+          className="h-12 w-12 object-contain"
+        />
+      </div>
+      <h3 className="mt-5 font-vodafone-exb text-xl text-vodacom-black">
         Carte Visa M-Pesa requise
       </h3>
-      <p className="mt-2 max-w-md font-vodafone-lt text-sm leading-relaxed text-[#565959]">
+      <p className="mt-2 max-w-md font-vodafone-lt text-sm leading-relaxed text-vodacom-black/65">
         Créez votre carte pour recevoir{" "}
-        <strong className="text-[#0F1111]">
+        <strong className="text-vodacom-black">
           {MPESA_VISA_WELCOME_BONUS_USD} USD
         </strong>{" "}
         de bonus {VODACOM_MARKET_NAME}, puis payez avec vos 16 chiffres, date
         d&apos;expiration et CVV.
       </p>
-      <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
+      <div className="mt-8 flex w-full max-w-xs flex-col gap-2">
         {onRequestVisaCard ? (
           <button
             type="button"
@@ -627,7 +656,7 @@ function NoCardState({
               onClose();
               onRequestVisaCard();
             }}
-            className="w-full rounded-lg bg-[#FFD814] py-3 font-vodafone-rg-bd text-sm text-[#0F1111] ring-1 ring-[#FCD200] hover:bg-[#F7CA00]"
+            className="w-full rounded-xl bg-vodacom-red py-3 font-vodafone-rg-bd text-sm text-white shadow-sm hover:bg-[#c40000]"
           >
             Obtenir Carte Visa
           </button>
@@ -635,7 +664,7 @@ function NoCardState({
         <button
           type="button"
           onClick={onClose}
-          className="w-full rounded-lg border border-[#D5D9D9] py-2.5 font-vodafone-rg-bd text-sm text-[#0F1111] hover:bg-[#F7FAFA]"
+          className="w-full rounded-xl border border-vodacom-silver/40 py-2.5 font-vodafone-rg-bd text-sm text-vodacom-black hover:bg-vodacom-cream"
         >
           Fermer
         </button>

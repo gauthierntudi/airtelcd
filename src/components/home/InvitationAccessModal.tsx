@@ -24,7 +24,7 @@ const POST_AUTH_COPY: Record<
 > = {
   invitation: {
     badge: "Invitation",
-    title: "Accéder à mon invitation",
+    title: "Commencez l'expérience",
     submit: "Voir mon invitation",
   },
   market: {
@@ -56,13 +56,13 @@ export function InvitationAccessModal({
   const copy = POST_AUTH_COPY[postAuth];
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<Step>("contact");
-  const [channel, setChannel] = useState<InvitationAccessChannel>("email");
+  const [channel, setChannel] = useState<InvitationAccessChannel>("sms");
   const [emailContact, setEmailContact] = useState("");
   const [smsContact, setSmsContact] = useState("");
   /** Coordonnées utilisées pour la vérification OTP (figées après envoi du code). */
   const [lockedContact, setLockedContact] = useState("");
   const [lockedChannel, setLockedChannel] =
-    useState<InvitationAccessChannel>("email");
+    useState<InvitationAccessChannel>("sms");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const codeRef = useRef<OtpSixDigitInputHandle>(null);
@@ -77,8 +77,8 @@ export function InvitationAccessModal({
       setSmsContact("");
       setLockedContact("");
       setCode("");
-      setChannel("email");
-      setLockedChannel("email");
+      setChannel("sms");
+      setLockedChannel("sms");
       setLoading(false);
     }
   }, [open]);
@@ -238,8 +238,8 @@ export function InvitationAccessModal({
             </h2>
             <p className="mt-1 font-vodafone-lt text-sm text-vodacom-black/60">
               {step === "contact"
-                ? "Saisissez l’e-mail ou le mobile enregistré pour votre invitation."
-                : "Entrez le code reçu par e-mail ou SMS."}
+                ? "Saisissez le mobile ou l’e-mail enregistré pour votre invitation."
+                : "Entrez le code reçu par SMS ou e-mail."}
             </p>
           </div>
           <button
@@ -257,16 +257,16 @@ export function InvitationAccessModal({
             <form onSubmit={handleRequestCode} className="space-y-4">
               <div className="flex gap-2 rounded-xl bg-vodacom-cream/80 p-1 ring-1 ring-vodacom-silver/25">
                 <ChannelTab
+                  active={channel === "sms"}
+                  icon={Phone}
+                  label="Mobile"
+                  onClick={() => handleChannelChange("sms")}
+                />
+                <ChannelTab
                   active={channel === "email"}
                   icon={Mail}
                   label="E-mail"
                   onClick={() => handleChannelChange("email")}
-                />
-                <ChannelTab
-                  active={channel === "sms"}
-                  icon={Phone}
-                  label="SMS"
-                  onClick={() => handleChannelChange("sms")}
                 />
               </div>
 
