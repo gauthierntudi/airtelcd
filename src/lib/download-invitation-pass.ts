@@ -46,16 +46,20 @@ async function waitForDecodedImage(img: HTMLImageElement): Promise<void> {
   });
 }
 
-/** Intègre img08 (ou autre fond) en base64 avant capture — requis sur iPhone. */
-async function embedPassBackground(element: HTMLElement): Promise<void> {
-  const bg = element.querySelector<HTMLImageElement>("img[data-pass-bg]");
-  if (!bg) return;
-
-  const rawSrc = bg.getAttribute("src") ?? bg.src;
-  const dataUrl = await imageSrcToDataUrl(rawSrc);
-  bg.crossOrigin = "anonymous";
-  bg.src = dataUrl;
-  await waitForDecodedImage(bg);
+/** Intègre fond + logo en base64 avant capture — requis sur iPhone. */
+async function embedPassImages(element: HTMLElement): Promise<void> {
+  const images = element.querySelectorAll<HTMLImageElement>(
+    "img[data-pass-bg], img[data-pass-logo]",
+  );
+  await Promise.all(
+    Array.from(images).map(async (img) => {
+      const rawSrc = img.getAttribute("src") ?? img.src;
+      const dataUrl = await imageSrcToDataUrl(rawSrc);
+      img.crossOrigin = "anonymous";
+      img.src = dataUrl;
+      await waitForDecodedImage(img);
+    }),
+  );
 }
 
 async function capturePassPng(element: HTMLElement): Promise<string> {
@@ -90,7 +94,7 @@ export async function downloadInvitationPassPng(
   element: HTMLElement,
   filename: string,
 ): Promise<void> {
-  await embedPassBackground(element);
+  await embedPassImages(element);
 
   if (typeof document !== "undefined" && document.fonts?.ready) {
     await document.fonts.ready;

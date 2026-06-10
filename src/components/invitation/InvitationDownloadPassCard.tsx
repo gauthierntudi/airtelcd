@@ -3,6 +3,7 @@
 import type { RsvpStatus } from "@prisma/client";
 import { forwardRef } from "react";
 import { InvitationQrCode } from "@/components/invitation/InvitationQrCode";
+import { logoSrc } from "@/lib/branding";
 import { INVITATION_RSVP_PASS_IMAGE } from "@/lib/invitation-assets";
 import {
   invitationPassHeadline,
@@ -33,6 +34,18 @@ export const InvitationDownloadPassCard = forwardRef<HTMLDivElement, Props>(
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="invitation-slide-overlay absolute inset-0" aria-hidden />
+
+        <div className="absolute inset-x-0 top-0 z-10 px-8 pt-10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            data-pass-logo
+            src={logoSrc("white")}
+            alt="Vodacom Privilège"
+            decoding="sync"
+            crossOrigin="anonymous"
+            className="h-11 w-auto max-w-[72%] object-contain object-left"
+          />
+        </div>
 
         <div className="relative flex h-full flex-col px-8 pb-10 pt-[5.5rem]">
           <div className="shrink-0 space-y-2">
