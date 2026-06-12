@@ -5,10 +5,7 @@ import {
   CHECKIN_SUCCESS_COUNTDOWN_SEC,
 } from "@/lib/checkin/constants";
 import { checkinScanAbsoluteUrl } from "@/lib/checkin/urls";
-import {
-  requestInvitationAccessOtp,
-  verifyInvitationAccessOtp,
-} from "@/lib/invitation-access/service";
+import { authenticateInvitationAccess } from "@/lib/invitation-access/service";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
 import { guestDisplayName } from "@/lib/event";
 import { prisma } from "@/lib/prisma";
@@ -318,28 +315,10 @@ export async function markKioskScanned(token: string) {
   return mapGuestView(updated);
 }
 
-export async function requestCheckinOtp(
+export async function authenticateCheckinGuest(
   token: string,
   channel: InvitationAccessChannel,
   contact: string,
-) {
-  const session = await getSessionByToken(token);
-  if (!session) throw new Error("Session introuvable.");
-  if (
-    session.status !== CheckinKioskStatus.WAITING_GUEST &&
-    session.status !== CheckinKioskStatus.WAITING_CONFIRM
-  ) {
-    throw new Error("Cette étape n'est plus disponible.");
-  }
-
-  return requestInvitationAccessOtp({ channel, contact });
-}
-
-export async function verifyCheckinOtp(
-  token: string,
-  channel: InvitationAccessChannel,
-  contact: string,
-  code: string,
 ): Promise<CheckinGuestView> {
   const session = await getSessionByToken(token);
   if (!session) throw new Error("Session introuvable.");
@@ -351,11 +330,7 @@ export async function verifyCheckinOtp(
     throw new Error("Cette étape n'est plus disponible.");
   }
 
-  const { guestId } = await verifyInvitationAccessOtp({
-    channel,
-    contact,
-    code,
-  });
+  const { guestId } = await authenticateInvitationAccess({ channel, contact });
 
   const guest = await prisma.guest.findUnique({
     where: { id: guestId },

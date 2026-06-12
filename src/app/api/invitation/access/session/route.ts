@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { resolveInvitationSessionRedirect } from "@/lib/invitation-access/resolve-session";
 import {
+  clearInvitationSessionCookie,
   INVITATION_SESSION_COOKIE,
 } from "@/lib/invitation-access/session";
 
@@ -15,4 +16,10 @@ export async function GET() {
   }
 
   return NextResponse.json(result);
+}
+
+export async function DELETE() {
+  const response = NextResponse.json({ ok: true });
+  clearInvitationSessionCookie(response);
+  return response;
 }

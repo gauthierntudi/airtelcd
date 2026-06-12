@@ -134,7 +134,7 @@ export function getUssdScreenView(state: VisaSimulationState): UssdScreenView {
           ? [
               VODACOM_MARKET_NAME,
               "",
-              "Ouvrez Vodacom Market sur la plateforme",
+              "Ouvrez M-pesa Mall sur la plateforme",
               "sur la page d'accueil pour",
               "consommer votre bonus.",
             ]

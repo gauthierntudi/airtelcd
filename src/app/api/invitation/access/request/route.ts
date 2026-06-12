@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
-import { requestInvitationAccessOtp } from "@/lib/invitation-access/service";
+import { authenticateInvitationAccess } from "@/lib/invitation-access/service";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
+import {
+  createInvitationSessionValue,
+  INVITATION_SESSION_COOKIE,
+  invitationSessionCookieOptions,
+} from "@/lib/invitation-access/session";
 
+/** Compatibilité — même comportement que POST /authenticate (sans envoi de code). */
 export async function POST(req: Request) {
   let body: { channel?: string; contact?: string };
   try {
@@ -21,14 +27,16 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await requestInvitationAccessOtp({ channel, contact });
-    const payload: { message: string; devCode?: string } = {
-      message: result.message,
-    };
-    if (process.env.NODE_ENV === "development" && result.devCode) {
-      payload.devCode = result.devCode;
-    }
-    return NextResponse.json(payload);
+    const result = await authenticateInvitationAccess({ channel, contact });
+    const response = NextResponse.json({
+      redirectPath: result.redirectPath,
+    });
+    response.cookies.set(
+      INVITATION_SESSION_COOKIE,
+      createInvitationSessionValue(result.guestId),
+      invitationSessionCookieOptions(),
+    );
+    return response;
   } catch (e) {
     const message = e instanceof Error ? e.message : "Erreur";
     return NextResponse.json({ error: message }, { status: 400 });

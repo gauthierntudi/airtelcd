@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { VodacomLogo } from "@/components/branding/VodacomLogo";
 import { LucideIcon } from "@/components/ui/lucide-icon";
+import { PurchasedForfaitVerticalStack } from "@/components/privilege/PurchasedForfaitVerticalStack";
 import {
   EXPERIENCE_PROFILE_COPY,
   EXPERIENCE_PROFILE_ORBIT_RADIUS,
@@ -17,6 +18,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onSelect: (profile: ExperienceProfile) => void;
+  showPurchasedForfait?: boolean;
 };
 
 const PROFILE_ICONS = {
@@ -24,7 +26,12 @@ const PROFILE_ICONS = {
   BUSINESS: Briefcase,
 } as const;
 
-export function ExperienceProfileModal({ open, onClose, onSelect }: Props) {
+export function ExperienceProfileModal({
+  open,
+  onClose,
+  onSelect,
+  showPurchasedForfait = false,
+}: Props) {
   const [mounted, setMounted] = useState(false);
   const [selected, setSelected] = useState<ExperienceProfile | null>(null);
   const [continuing, setContinuing] = useState(false);
@@ -102,11 +109,14 @@ export function ExperienceProfileModal({ open, onClose, onSelect }: Props) {
           </p>
         </section>
 
-        <div className="flex min-h-0 flex-1 flex-col justify-center px-4 sm:px-8">
+        <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 sm:px-8">
+          {showPurchasedForfait ? (
+            <PurchasedForfaitVerticalStack className="experience-profile-enter absolute left-[5%] top-1/2 z-20 -translate-x-1/2 -translate-y-1/2" />
+          ) : null}
           <div
             role="list"
             aria-labelledby="experience-profile-title"
-            className="experience-profile-enter relative mx-auto aspect-square w-full max-w-[min(94vw,30rem)] overflow-visible sm:max-w-2xl"
+            className="experience-profile-enter relative mx-auto aspect-square w-full max-w-[min(96vw,34rem)] overflow-visible sm:max-w-[36rem]"
           >
             <div className="absolute inset-[2%] overflow-visible">
               <div
@@ -203,15 +213,15 @@ function ProfileOrbitNode({
       }}
     >
       <span
-        className={`flex h-[7.25rem] w-[7.25rem] flex-col items-center justify-center rounded-full p-3 text-center text-white shadow-[0_10px_32px_rgba(0,0,0,0.28)] ring-4 transition duration-300 sm:h-[8.25rem] sm:w-[8.25rem] ${
+        className={`flex h-[12.5rem] w-[12.5rem] flex-col items-center justify-center rounded-full p-4 text-center text-white shadow-[0_10px_32px_rgba(0,0,0,0.28)] ring-4 transition duration-300 sm:h-[14rem] sm:w-[14rem] ${
           selected
             ? "scale-105 ring-white"
             : "ring-white/35 hover:scale-[1.03] hover:ring-white/60"
         }`}
         style={{ background: copy.circleBg }}
       >
-        <LucideIcon icon={Icon} size={26} className="shrink-0" />
-        <span className="mt-2 font-vodafone-exb text-[11px] font-normal uppercase leading-tight tracking-wide sm:text-xs">
+        <LucideIcon icon={Icon} size={44} className="shrink-0" />
+        <span className="mt-3 max-w-[92%] font-vodafone-exb text-[1.35rem] font-normal capitalize leading-[1.05] tracking-wide sm:mt-3.5 sm:text-[1.65rem]">
           {copy.title}
         </span>
       </span>

@@ -13,6 +13,7 @@ import {
 import { generateVisaCardDetails } from "@/lib/mpesa-visa/card-generator";
 import { isTwilioSmsConfigured } from "@/lib/messaging/config";
 import { sendMpesaCardCredentialsSms } from "@/lib/messaging/send-mpesa-card-sms";
+import { sendPrivilegeForfaitActivatedSms } from "@/lib/messaging/send-privilege-forfait-sms";
 import { normalizeMpesaVodacomPhone } from "@/lib/mpesa-visa/mpesa-phone";
 import { prisma } from "@/lib/prisma";
 import { withPrismaRetry } from "@/lib/prisma-query";
@@ -319,6 +320,81 @@ export async function listAdminMpesaOverview(): Promise<AdminMpesaCardRow[]> {
       totalSpentUsd,
     };
   });
+}
+
+async function guestPhoneE164(guestId: string): Promise<string> {
+  const guest = await prisma.guest.findUnique({
+    where: { id: guestId },
+    select: { phone: true },
+  });
+  const phoneRaw = guest?.phone?.trim();
+  if (!phoneRaw) {
+    throw new Error(
+      "Aucun numéro de téléphone enregistré pour votre invitation.",
+    );
+  }
+  const phone = normalizeMpesaVodacomPhone(phoneRaw);
+  if (!phone.ok) throw new Error(phone.error);
+  return phone.e164;
+}
+
+/** Active le forfait Privilège : SMS forfait + création carte Visa M-Pesa si absente. */
+export async function activatePrivilegeForfait(guestId: string): Promise<{
+  cardCreated: boolean;
+  state: MpesaVisaExperienceState | null;
+}> {
+  try {
+    const phoneE164 = await guestPhoneE164(guestId);
+    if (isTwilioSmsConfigured()) {
+      await sendPrivilegeForfaitActivatedSms({ phoneE164 });
+    }
+  } catch {
+    /* SMS forfait optionnel si téléphone absent */
+  }
+
+  const before = await getMpesaVisaExperienceState(guestId);
+  let cardCreated = false;
+
+  if (!before?.card) {
+    if (isTwilioSmsConfigured()) {
+      await createMpesaVisaCard(guestId);
+      cardCreated = true;
+    } else {
+      const details = generateVisaCardDetails(guestId);
+      await prisma.mpesaVisaCard.create({
+        data: {
+          guestId,
+          cardLastFour: details.cardLastFour,
+          cardMasked: details.cardMasked,
+          expiryMonth: details.expiryMonth,
+          expiryYear: details.expiryYear,
+          bonusBalanceUsd: MPESA_VISA_WELCOME_BONUS_USD,
+        },
+      });
+      await prisma.guest.update({
+        where: { id: guestId },
+        data: { mpesaVisaCardIssuedAt: new Date() },
+      });
+      cardCreated = true;
+    }
+  }
+
+  const state = await getMpesaVisaExperienceState(guestId);
+  return { cardCreated, state };
+}
+
+export async function confirmTravelerBookingPayment(
+  guestId: string,
+  payment: VisaPaymentInput,
+): Promise<void> {
+  assertVisaPayment(guestId, payment);
+  const state = await getMpesaVisaExperienceState(guestId);
+  if (!state?.card) {
+    throw new Error("Aucune Carte Visa M-Pesa active.");
+  }
+  if (state.card.blocked) {
+    throw new Error("Carte Visa M-Pesa bloquée.");
+  }
 }
 
 export { MPESA_VISA_WELCOME_BONUS_USD, VODACOM_MARKET_NAME };

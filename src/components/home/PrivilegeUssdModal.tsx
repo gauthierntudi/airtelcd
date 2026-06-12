@@ -10,9 +10,14 @@ import { MPESA_USSD_COLORS, MPESA_USSD_Z_INDEX } from "@/lib/mpesa-ussd/theme";
 type Props = {
   open: boolean;
   onClose: () => void;
+  onPurchaseComplete?: () => void;
 };
 
-export function PrivilegeUssdModal({ open, onClose }: Props) {
+export function PrivilegeUssdModal({
+  open,
+  onClose,
+  onPurchaseComplete,
+}: Props) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -58,7 +63,11 @@ export function PrivilegeUssdModal({ open, onClose }: Props) {
         className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden"
         style={{ backgroundColor: MPESA_USSD_COLORS.dark }}
       >
-        <PrivilegeUssdPhoneSimulator key={open ? "open" : "closed"} onClose={onClose} />
+        <PrivilegeUssdPhoneSimulator
+          key={open ? "open" : "closed"}
+          onClose={onClose}
+          onPurchaseComplete={onPurchaseComplete}
+        />
       </div>
     </div>,
     document.body,

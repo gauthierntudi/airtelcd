@@ -21,7 +21,7 @@ export const EXPERIENCE_PROFILE_COPY: Record<
     orbitAngleDeg: 180,
   },
   BUSINESS: {
-    title: "Business",
+    title: "Business & Family",
     description: "Je travaille constamment connecté.",
     circleBg: "#474b4e",
     orbitAngleDeg: 0,
@@ -29,7 +29,7 @@ export const EXPERIENCE_PROFILE_COPY: Record<
 };
 
 /** Distance centre → profil, en % du champ orbital */
-export const EXPERIENCE_PROFILE_ORBIT_RADIUS = 44;
+export const EXPERIENCE_PROFILE_ORBIT_RADIUS = 52;
 
 const STORAGE_KEY = "golf2026-experience-profile";
 
@@ -49,4 +49,12 @@ export function readExperienceProfile(): ExperienceProfile | null {
     /* ignore */
   }
   return null;
+}
+
+export function clearExperienceProfile(): void {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
 }

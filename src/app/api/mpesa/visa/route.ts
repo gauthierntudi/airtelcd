@@ -18,7 +18,7 @@ export async function GET() {
     const guestId = await getMpesaGuestIdFromCookies();
     if (!guestId) {
       return NextResponse.json(
-        { error: "Connectez-vous via OTP pour accéder à Carte Visa M-Pesa." },
+        { error: "Identifiez-vous pour accéder à Carte Visa M-Pesa." },
         { status: 401 },
       );
     }
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   const guest = await getMpesaGuestFromCookies();
   if (!guest) {
     return NextResponse.json(
-      { error: "Connectez-vous via OTP pour accéder à Carte Visa M-Pesa." },
+      { error: "Identifiez-vous pour accéder à Carte Visa M-Pesa." },
       { status: 401 },
     );
   }

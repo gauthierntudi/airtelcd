@@ -14,12 +14,17 @@ import {
   type PrivilegeSimulationState,
 } from "@/lib/privilege-ussd/simulation";
 import { MPESA_USSD_COLORS as C } from "@/lib/mpesa-ussd/theme";
+import { PRIVILEGE_USSD_MENU_CODE } from "@/lib/privilege-onboarding";
 
 type Props = {
   onClose?: () => void;
+  onPurchaseComplete?: () => void;
 };
 
-export function PrivilegeUssdPhoneSimulator({ onClose }: Props) {
+export function PrivilegeUssdPhoneSimulator({
+  onClose,
+  onPurchaseComplete,
+}: Props) {
   const [sim, setSim] = useState<PrivilegeSimulationState>(
     INITIAL_PRIVILEGE_SIM_STATE,
   );
@@ -50,19 +55,36 @@ export function PrivilegeUssdPhoneSimulator({ onClose }: Props) {
     setInput("");
   }, [sim.screen]);
 
-  const applyChoice = useCallback((choice: string) => {
-    const prev = simRef.current;
-    const { state: next, accepted } = applyPrivilegeUssdChoice(prev, choice);
-    if (!accepted) {
-      setStatusMsg("Choix invalide");
-      window.setTimeout(() => setStatusMsg(null), 1200);
-      return;
-    }
-    setInput("");
-    setReplyOpen(false);
-    setStatusMsg(null);
-    setSim(next);
-  }, []);
+  const applyChoice = useCallback(
+    (choice: string) => {
+      const prev = simRef.current;
+      const { state: next, accepted, result } = applyPrivilegeUssdChoice(
+        prev,
+        choice,
+      );
+      if (!accepted) {
+        setStatusMsg("Choix invalide");
+        window.setTimeout(() => setStatusMsg(null), 1200);
+        return;
+      }
+
+      setInput("");
+      setReplyOpen(false);
+      setStatusMsg(null);
+
+      if (result.type === "complete") {
+        setStatusMsg("Achat confirmé…");
+        window.setTimeout(() => {
+          onPurchaseComplete?.();
+          onClose?.();
+        }, 700);
+        return;
+      }
+
+      setSim(next);
+    },
+    [onClose, onPurchaseComplete],
+  );
 
   const trySubmit = useCallback(() => {
     if (!input.trim()) {
@@ -109,13 +131,13 @@ export function PrivilegeUssdPhoneSimulator({ onClose }: Props) {
               className="text-center font-mono text-xs sm:text-sm"
               style={{ color: C.textMuted }}
             >
-              *111# — Privilege · Vodacom
+              {PRIVILEGE_USSD_MENU_CODE} — Privilege · Vodacom
             </p>
             <p
               className="mt-1 text-center font-vodafone-rg-bd text-[10px] uppercase tracking-wider"
               style={{ color: C.text }}
             >
-              Profil Business
+              Menu interactif
             </p>
           </div>
 

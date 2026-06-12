@@ -1,7 +1,11 @@
 export type InvitationAccessChannel = "email" | "sms";
 
-/** Destination après OTP réussi — selon l'expérience demandée. */
-export type InvitationAccessPostAuth = "invitation" | "market" | "mpesa";
+/** Destination après identification réussie — selon l'expérience demandée. */
+export type InvitationAccessPostAuth =
+  | "invitation"
+  | "market"
+  | "mpesa"
+  | "privilege";
 
 export const INVITATION_ACCESS_GENERIC_SENT =
   "Si vos coordonnées correspondent à une invitation, vous recevrez un code de confirmation.";

@@ -31,15 +31,7 @@ export type RequestOtpInput = {
   contact: string;
 };
 
-export type RequestOtpResult = {
-  message: string;
-  /** Dev uniquement — jamais exposé en production */
-  devCode?: string;
-};
-
-export async function requestInvitationAccessOtp(
-  input: RequestOtpInput,
-): Promise<RequestOtpResult> {
+async function findGuestForAccess(input: RequestOtpInput) {
   const normalized = normalizeAccessAddress(input.channel, input.contact);
   if (!normalized.ok) {
     throw new Error(normalized.error);
@@ -61,6 +53,36 @@ export async function requestInvitationAccessOtp(
   if (input.channel === "sms" && !guest.phone?.trim()) {
     throw new Error(INVITATION_ACCESS_SMS_NOT_FOUND);
   }
+
+  return { address, guest };
+}
+
+export type RequestOtpResult = {
+  message: string;
+  /** Dev uniquement — jamais exposé en production */
+  devCode?: string;
+};
+
+export type AuthenticateAccessResult = {
+  redirectPath: string;
+  guestId: string;
+};
+
+/** Valide mobile/e-mail contre la base invités — sans envoi de code. */
+export async function authenticateInvitationAccess(
+  input: RequestOtpInput,
+): Promise<AuthenticateAccessResult> {
+  const { guest } = await findGuestForAccess(input);
+  return {
+    redirectPath: invitationPath(guest.token),
+    guestId: guest.id,
+  };
+}
+
+export async function requestInvitationAccessOtp(
+  input: RequestOtpInput,
+): Promise<RequestOtpResult> {
+  const { address, guest } = await findGuestForAccess(input);
 
   const latest = await prisma.invitationAccessOtp.findFirst({
     where: { address, channel: input.channel },

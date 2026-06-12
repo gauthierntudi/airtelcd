@@ -69,3 +69,22 @@ export function invitationSessionCookieOptions(): InvitationSessionCookieOptions
     maxAge: sessionMaxAgeSeconds(),
   };
 }
+
+/** Supprime le cookie de session invité (fin d'expérience / kiosque partagé). */
+export function clearInvitationSessionCookie(response: {
+  cookies: {
+    set: (
+      name: string,
+      value: string,
+      options: InvitationSessionCookieOptions,
+    ) => void;
+  };
+}): void {
+  response.cookies.set(INVITATION_SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+}

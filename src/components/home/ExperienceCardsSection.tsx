@@ -105,7 +105,7 @@ export function ExperienceCardsSection({ access: externalAccess }: Props) {
             onAccess={
               mod.accessEnabled
                 ? mod.id === "invitation"
-                  ? access.openInvitationAccess
+                  ? () => void access.openInvitationModule()
                   : mod.id === "mpesa"
                     ? () => void access.openMpesaExperience()
                     : mod.id === "market"

@@ -61,13 +61,33 @@ export function formatGuestDate(iso: string | null): string {
   });
 }
 
-/** Export CSV — mêmes colonnes que le modèle d'import */
+function csvCell(value: string): string {
+  return `"${String(value).replace(/"/g, '""')}"`;
+}
+
+function invitationExportLabel(guest: GuestRow): string {
+  return guest.invitationSentAt ? "Envoyée" : "Non envoyée";
+}
+
+/** Export CSV — colonnes du registre admin (Registre des participants) */
 export function guestsToCsv(rows: GuestRow[]): string {
-  const header = ["nom_complet", "email", "telephone"];
+  const header = [
+    "Invité",
+    "RSVP",
+    "Invitation",
+    "Confirmé le",
+    "Ajouté le",
+  ];
   const lines = rows.map((g) =>
-    [g.fullName ?? "", g.email ?? "", g.phone ?? ""]
-      .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+    [
+      g.displayName,
+      RSVP_CONFIG[g.rsvpStatus].label,
+      invitationExportLabel(g),
+      formatGuestDate(g.confirmedAt),
+      formatGuestDate(g.createdAt),
+    ]
+      .map(csvCell)
       .join(","),
   );
-  return [header.join(","), ...lines].join("\n");
+  return [header.map(csvCell).join(","), ...lines].join("\n");
 }

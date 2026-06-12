@@ -22,6 +22,24 @@ export type OrbitalBubble = {
   size?: "sm" | "md" | "lg";
 };
 
+export type OrbitalBenefitCircle = {
+  label: string;
+  color?: string;
+  gradient?: readonly [string, string];
+  textColor?: string;
+};
+
+/** Palette cercles orbitaux — évite les répétitions de teintes */
+export const ORBIT_CIRCLE_PALETTE = {
+  slate: "#474b4e",
+  charcoal: "#2b292c",
+  gradient: ["#840000", "#e40000"] as const,
+  white: "#ffffff",
+} as const;
+
+/** @deprecated Alias — préférer ORBIT_CIRCLE_PALETTE */
+export const PRIVILEGE_ORBIT_CIRCLE_PALETTE = ORBIT_CIRCLE_PALETTE;
+
 export type OrbitalHomeTheme = {
   id: "privilege" | "mpesa";
   pageTitle: string;
@@ -34,10 +52,61 @@ export type OrbitalHomeTheme = {
   centerImageAlt: string;
   innerAvatarIndices: number[];
   outerAvatarIndices: number[];
+  /** Cercles texte sur les orbites (remplace les avatars si défini). */
+  innerBenefitCircles?: OrbitalBenefitCircle[];
+  outerBenefitCircles?: OrbitalBenefitCircle[];
   bubbles: OrbitalBubble[];
   otherHomeHref: string;
   otherHomeLabel: string;
 };
+
+/** Cercles avantages — orbite intérieure (4) */
+export const PRIVILEGE_ORBIT_INNER_CIRCLES: OrbitalBenefitCircle[] = [
+  { label: "Conversion", color: "#7daf04" },
+  { label: "Partage", color: ORBIT_CIRCLE_PALETTE.slate },
+  { label: "DATA", color: ORBIT_CIRCLE_PALETTE.charcoal },
+  {
+    label: "Appels",
+    color: ORBIT_CIRCLE_PALETTE.white,
+    textColor: ORBIT_CIRCLE_PALETTE.charcoal,
+  },
+];
+
+/** Cercles avantages Privilège — orbite extérieure (6) */
+export const PRIVILEGE_ORBIT_OUTER_CIRCLES: OrbitalBenefitCircle[] = [
+  { label: "SMS", color: ORBIT_CIRCLE_PALETTE.slate },
+  { label: "P2P", gradient: ORBIT_CIRCLE_PALETTE.gradient },
+  { label: "Roaming", color: "#9c0ee6" },
+  {
+    label: "Transfert",
+    color: ORBIT_CIRCLE_PALETTE.white,
+    textColor: ORBIT_CIRCLE_PALETTE.charcoal,
+  },
+  { label: "Flexible", color: ORBIT_CIRCLE_PALETTE.slate },
+  { label: "Visa", color: "#0832c2" },
+];
+
+/** Cercles M-Pesa — orbite intérieure (4) */
+export const MPESA_ORBIT_INNER_CIRCLES: OrbitalBenefitCircle[] = [
+  { label: "Transfert", gradient: ORBIT_CIRCLE_PALETTE.gradient },
+  { label: "Visa", color: "#0832c2" },
+  { label: "Rallonge", color: "#363b3e" },
+  { label: "Lona O defa", color: ORBIT_CIRCLE_PALETTE.charcoal },
+];
+
+/** Cercles M-Pesa — orbite extérieure (6) */
+export const MPESA_ORBIT_OUTER_CIRCLES: OrbitalBenefitCircle[] = [
+  {
+    label: "Transfert Mikili",
+    color: ORBIT_CIRCLE_PALETTE.white,
+    textColor: ORBIT_CIRCLE_PALETTE.charcoal,
+  },
+  { label: "Facture", color: "#7daf04" },
+  { label: "Petit commerce", color: "#16a34a" },
+  { label: "Retrait", color: "#e40000" },
+  { label: "Bonus", color: "#f59e0b", textColor: ORBIT_CIRCLE_PALETTE.charcoal },
+  { label: "Achat", color: "#ad07cb" },
+];
 
 export const PRIVILEGE_ORBITAL_HOME: OrbitalHomeTheme = {
   id: "privilege",
@@ -48,10 +117,12 @@ export const PRIVILEGE_ORBITAL_HOME: OrbitalHomeTheme = {
   background:
     "radial-gradient(ellipse 120% 90% at 50% 0%, #c40000 0%, #8b0000 42%, #1a1a1a 100%)",
   ringColor: "rgba(255,255,255,0.22)",
-  centerImage: "/img/kekekeke.jpg",
+  centerImage: "/img/logo-privi.jpg",
   centerImageAlt: "Vodacom Privilège",
   innerAvatarIndices: [0, 2, 4, 6],
   outerAvatarIndices: [1, 3, 5, 7, 8, 9],
+  innerBenefitCircles: PRIVILEGE_ORBIT_INNER_CIRCLES,
+  outerBenefitCircles: PRIVILEGE_ORBIT_OUTER_CIRCLES,
   bubbles: [
     {
       id: "vip",
@@ -110,6 +181,8 @@ export const MPESA_ORBITAL_HOME: OrbitalHomeTheme = {
   centerImageAlt: "M-Pesa",
   innerAvatarIndices: [1, 3, 5, 8],
   outerAvatarIndices: [0, 2, 4, 6, 7, 9],
+  innerBenefitCircles: MPESA_ORBIT_INNER_CIRCLES,
+  outerBenefitCircles: MPESA_ORBIT_OUTER_CIRCLES,
   bubbles: [
     {
       id: "visa",
@@ -129,7 +202,7 @@ export const MPESA_ORBITAL_HOME: OrbitalHomeTheme = {
     },
     {
       id: "market",
-      label: "Vodacom Market",
+      label: "M-pesa Mall",
       color: "#f59e0b",
       x: 88,
       y: 48,

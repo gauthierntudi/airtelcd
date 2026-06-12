@@ -24,7 +24,7 @@ export function PrivilegeHome() {
         <div className="mt-2 space-y-3">
           <button
             type="button"
-            onClick={access.openInvitationAccess}
+            onClick={() => void access.openInvitationAccess()}
             disabled={access.sessionLoading}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 font-vodafone-rg-bd text-base text-vodacom-red shadow-lg transition active:scale-[0.98] disabled:opacity-60"
           >

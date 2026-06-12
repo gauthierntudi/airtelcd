@@ -8,6 +8,8 @@ import {
   ORBIT_INNER_ANGLES,
   ORBIT_OUTER_ANGLES,
   ORBITAL_PERSON_AVATARS,
+  ORBIT_CIRCLE_PALETTE,
+  type OrbitalBenefitCircle,
   type OrbitalHomeTheme,
 } from "@/lib/orbital-home";
 
@@ -92,23 +94,41 @@ export function OrbitalCommunityLayout({ theme, children }: Props) {
             radiusPercent={OUTER_ORBIT_RADIUS}
             durationSec={110}
             clockwise
-            items={theme.outerAvatarIndices.map((index, i) => ({
-              key: `outer-${index}`,
-              src: ORBITAL_PERSON_AVATARS[index],
-              angleDeg: ORBIT_OUTER_ANGLES[i] ?? 0,
-              size: "lg" as const,
-            }))}
+            items={
+              theme.outerBenefitCircles
+                ? theme.outerBenefitCircles.map((circle, i) => ({
+                    key: `outer-benefit-${i}`,
+                    ...circle,
+                    angleDeg: ORBIT_OUTER_ANGLES[i] ?? 0,
+                    size: "lg" as const,
+                  }))
+                : theme.outerAvatarIndices.map((index, i) => ({
+                    key: `outer-${index}`,
+                    src: ORBITAL_PERSON_AVATARS[index],
+                    angleDeg: ORBIT_OUTER_ANGLES[i] ?? 0,
+                    size: "lg" as const,
+                  }))
+            }
           />
           <OrbitLayer
             radiusPercent={INNER_ORBIT_RADIUS}
             durationSec={85}
             clockwise={false}
-            items={theme.innerAvatarIndices.map((index, i) => ({
-              key: `inner-${index}`,
-              src: ORBITAL_PERSON_AVATARS[index],
-              angleDeg: ORBIT_INNER_ANGLES[i] ?? 0,
-              size: "md" as const,
-            }))}
+            items={
+              theme.innerBenefitCircles
+                ? theme.innerBenefitCircles.map((circle, i) => ({
+                    key: `inner-benefit-${i}`,
+                    ...circle,
+                    angleDeg: ORBIT_INNER_ANGLES[i] ?? 0,
+                    size: "md" as const,
+                  }))
+                : theme.innerAvatarIndices.map((index, i) => ({
+                    key: `inner-${index}`,
+                    src: ORBITAL_PERSON_AVATARS[index],
+                    angleDeg: ORBIT_INNER_ANGLES[i] ?? 0,
+                    size: "md" as const,
+                  }))
+            }
           />
 
           <div className="absolute left-1/2 top-1/2 z-20 flex h-[4.75rem] w-[4.75rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_8px_32px_rgba(0,0,0,0.35)] ring-4 ring-[#e60000] sm:h-[5.75rem] sm:w-[5.75rem]">
@@ -118,7 +138,7 @@ export function OrbitalCommunityLayout({ theme, children }: Props) {
               width={isMpesa ? 56 : 88}
               height={isMpesa ? 56 : 88}
               unoptimized
-              className="h-full w-full object-cover"
+              className={`h-full w-full ${isMpesa ? "object-cover" : "object-contain p-1.5"}`}
             />
           </div>
         </div>
@@ -152,12 +172,24 @@ function OrbitRing({
   );
 }
 
-type OrbitItem = {
-  key: string;
-  src: string;
-  angleDeg: number;
-  size: "md" | "lg";
-};
+type OrbitItem =
+  | {
+      key: string;
+      src: string;
+      angleDeg: number;
+      size: "md" | "lg";
+    }
+  | (OrbitalBenefitCircle & {
+      key: string;
+      angleDeg: number;
+      size: "md" | "lg";
+    });
+
+function isBenefitOrbitItem(
+  item: OrbitItem,
+): item is Extract<OrbitItem, { label: string }> {
+  return "label" in item;
+}
 
 function OrbitLayer({
   radiusPercent,
@@ -192,7 +224,11 @@ function OrbitLayer({
             className={uprightClass}
             style={{ animationDuration: `${durationSec}s` }}
           >
-            <OrbitAvatarImage src={item.src} size={item.size} />
+            {isBenefitOrbitItem(item) ? (
+              <OrbitBenefitCircle circle={item} size={item.size} />
+            ) : (
+              <OrbitAvatarImage src={item.src} size={item.size} />
+            )}
           </div>
         </OrbitArm>
       ))}
@@ -228,6 +264,43 @@ function OrbitArm({
       >
         {children}
       </div>
+    </div>
+  );
+}
+
+const ORBIT_BENEFIT_SIZE = {
+  md: "h-11 w-11 text-[7px] sm:h-14 sm:w-14 sm:text-[8px]",
+  lg: "h-[3.25rem] w-[3.25rem] text-[7px] sm:h-16 sm:w-16 sm:text-[8px]",
+} as const;
+
+function OrbitBenefitCircle({
+  circle,
+  size,
+}: {
+  circle: OrbitalBenefitCircle;
+  size: "md" | "lg";
+}) {
+  const isWhite = circle.color === ORBIT_CIRCLE_PALETTE.white;
+  const shadowColor = circle.gradient
+    ? "#c4000066"
+    : isWhite
+      ? "rgba(0,0,0,0.22)"
+      : `${circle.color ?? "#474b4e"}55`;
+
+  return (
+    <div
+      className={`flex items-center justify-center rounded-full p-1 text-center font-vodafone-exb uppercase leading-tight tracking-[0.06em] shadow-md ${ORBIT_BENEFIT_SIZE[size]} ${
+        isWhite ? "ring-2 ring-white/40" : "text-white ring-2 ring-white/60"
+      }`}
+      style={{
+        color: circle.textColor ?? "#ffffff",
+        background: circle.gradient
+          ? `linear-gradient(135deg, ${circle.gradient[0]}, ${circle.gradient[1]})`
+          : circle.color,
+        boxShadow: `0 6px 18px ${shadowColor}`,
+      }}
+    >
+      <span className="max-w-[92%]">{circle.label}</span>
     </div>
   );
 }

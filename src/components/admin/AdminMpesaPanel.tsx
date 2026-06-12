@@ -136,7 +136,7 @@ export function AdminMpesaPanel({
           icon={DollarSign}
           label="Total dépensé"
           value={`${metrics.totalSpent.toFixed(0)} $`}
-          sub="Achats Vodacom Market cumulés"
+          sub="Achats M-pesa Mall cumulés"
         />
         <KpiCard
           icon={ShoppingBag}
@@ -263,8 +263,8 @@ export function AdminMpesaPanel({
           </AdminPanel>
 
           <AdminPanel
-            title="Catalogue Vodacom Market"
-            description="Catalogue boutique Vodacom Market (accueil)"
+            title="Catalogue M-pesa Mall"
+            description="Catalogue boutique M-pesa Mall (accueil)"
           >
             <ul className="space-y-2">
               {metrics.productCounts.map((p) => (

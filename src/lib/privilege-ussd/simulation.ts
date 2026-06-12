@@ -1,4 +1,9 @@
-export type PrivilegeUssdScreenId = "root" | "forfaits" | "stub";
+export type PrivilegeUssdScreenId =
+  | "root"
+  | "forfaits"
+  | "forfaits_privilege_30j"
+  | "confirm"
+  | "stub";
 
 export type UssdMenuOption = {
   key: string;
@@ -15,8 +20,8 @@ export type UssdScreenView = {
 export type PrivilegeSimulationState = {
   screen: PrivilegeUssdScreenId;
   stubLabel: string | null;
-  /** Écran cible du « 0. Retour » depuis un stub */
   returnScreen: PrivilegeUssdScreenId;
+  selectedPackageLabel: string | null;
 };
 
 export const PRIVILEGE_USSD_ROOT_OPTIONS: UssdMenuOption[] = [
@@ -37,15 +42,29 @@ export const PRIVILEGE_FORFAITS_OPTIONS: UssdMenuOption[] = [
   { key: "2", label: "Appels" },
   { key: "3", label: "Internet" },
   { key: "4", label: "SMS" },
-  { key: "5", label: "Roaming" },
-  { key: "6", label: "International (Mikili)" },
 ];
+
+export const PRIVILEGE_FORFAITS_PRIVILEGE_30J_OPTIONS: UssdMenuOption[] = [
+  { key: "1", label: "Infos" },
+  { key: "2", label: "10Gb+1.1h-10$" },
+  { key: "3", label: "30Gb+2.2h+2P2P+Visa-25$" },
+  { key: "4", label: "50Gb+2.5h+3P2P+Visa-35$" },
+  { key: "5", label: "80Gb+4h+4P2P+Visa-50$" },
+  { key: "6", label: "Suivant" },
+];
+
+export const PRIVILEGE_PURCHASED_PACKAGE_LABEL = "80Gb+4h+4P2P+Visa-50$";
 
 export const INITIAL_PRIVILEGE_SIM_STATE: PrivilegeSimulationState = {
   screen: "root",
   stubLabel: null,
   returnScreen: "root",
+  selectedPackageLabel: null,
 };
+
+export type PrivilegeUssdResult =
+  | { type: "noop" }
+  | { type: "complete" };
 
 export function getPrivilegeUssdScreenView(
   state: PrivilegeSimulationState,
@@ -63,9 +82,32 @@ export function getPrivilegeUssdScreenView(
     return {
       title: "Forfaits",
       lines: [],
+      options: [...PRIVILEGE_FORFAITS_OPTIONS, { key: "0", label: "Retour" }],
+      showInput: true,
+    };
+  }
+
+  if (state.screen === "forfaits_privilege_30j") {
+    return {
+      title: "Forfaits Privilege (30j)",
+      lines: [],
       options: [
-        ...PRIVILEGE_FORFAITS_OPTIONS,
+        ...PRIVILEGE_FORFAITS_PRIVILEGE_30J_OPTIONS,
         { key: "0", label: "Retour" },
+      ],
+      showInput: true,
+    };
+  }
+
+  if (state.screen === "confirm") {
+    return {
+      title: "PRIVILEGE",
+      lines: [
+        `Confirmez | achat de ${state.selectedPackageLabel ?? PRIVILEGE_PURCHASED_PACKAGE_LABEL}?`,
+      ],
+      options: [
+        { key: "1", label: "Confirmer" },
+        { key: "2", label: "Annuler" },
       ],
       showInput: true,
     };
@@ -90,6 +132,7 @@ function toStub(
   returnScreen: PrivilegeUssdScreenId,
 ): PrivilegeSimulationState {
   return {
+    ...state,
     screen: "stub",
     stubLabel: label,
     returnScreen,
@@ -99,49 +142,125 @@ function toStub(
 export function applyPrivilegeUssdChoice(
   state: PrivilegeSimulationState,
   choice: string,
-): { state: PrivilegeSimulationState; accepted: boolean } {
+): {
+  state: PrivilegeSimulationState;
+  accepted: boolean;
+  result: PrivilegeUssdResult;
+} {
   const key = choice.trim();
+  const noop = { result: { type: "noop" } as const };
 
   if (state.screen === "root") {
     const option = PRIVILEGE_USSD_ROOT_OPTIONS.find((o) => o.key === key);
-    if (!option) return { state, accepted: false };
+    if (!option) return { state, accepted: false, ...noop };
     if (key === "1") {
       return {
         state: { ...state, screen: "forfaits", stubLabel: null },
         accepted: true,
+        ...noop,
       };
     }
     return {
       state: toStub(state, option.label, "root"),
       accepted: true,
+      ...noop,
     };
   }
 
   if (state.screen === "forfaits") {
     if (key === "0") {
       return {
-        state: { ...state, screen: "root", stubLabel: null, returnScreen: "root" },
+        state: { ...state, screen: "root", stubLabel: null },
         accepted: true,
+        ...noop,
       };
     }
     const option = PRIVILEGE_FORFAITS_OPTIONS.find((o) => o.key === key);
-    if (!option) return { state, accepted: false };
+    if (!option) return { state, accepted: false, ...noop };
+    if (key === "1") {
+      return {
+        state: { ...state, screen: "forfaits_privilege_30j", stubLabel: null },
+        accepted: true,
+        ...noop,
+      };
+    }
     return {
       state: toStub(state, option.label, "forfaits"),
       accepted: true,
+      ...noop,
     };
+  }
+
+  if (state.screen === "forfaits_privilege_30j") {
+    if (key === "0") {
+      return {
+        state: { ...state, screen: "forfaits", stubLabel: null },
+        accepted: true,
+        ...noop,
+      };
+    }
+    const option = PRIVILEGE_FORFAITS_PRIVILEGE_30J_OPTIONS.find(
+      (o) => o.key === key,
+    );
+    if (!option) return { state, accepted: false, ...noop };
+    if (key === "5") {
+      return {
+        state: {
+          ...state,
+          screen: "confirm",
+          selectedPackageLabel: option.label,
+        },
+        accepted: true,
+        ...noop,
+      };
+    }
+    if (key === "6") {
+      return {
+        state: toStub(state, option.label, "forfaits_privilege_30j"),
+        accepted: true,
+        ...noop,
+      };
+    }
+    return {
+      state: toStub(state, option.label, "forfaits_privilege_30j"),
+      accepted: true,
+      ...noop,
+    };
+  }
+
+  if (state.screen === "confirm") {
+    if (key === "1") {
+      return {
+        state,
+        accepted: true,
+        result: { type: "complete" },
+      };
+    }
+    if (key === "2") {
+      return {
+        state: {
+          ...state,
+          screen: "forfaits_privilege_30j",
+          selectedPackageLabel: null,
+        },
+        accepted: true,
+        ...noop,
+      };
+    }
+    return { state, accepted: false, ...noop };
   }
 
   if (key === "0") {
     return {
       state: {
+        ...state,
         screen: state.returnScreen,
         stubLabel: null,
-        returnScreen: state.returnScreen === "forfaits" ? "root" : "root",
       },
       accepted: true,
+      ...noop,
     };
   }
 
-  return { state, accepted: false };
+  return { state, accepted: false, ...noop };
 }

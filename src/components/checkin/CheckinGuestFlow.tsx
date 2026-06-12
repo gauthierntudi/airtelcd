@@ -5,17 +5,10 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { InvitationBottomSheet } from "@/components/invitation/InvitationBottomSheet";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import {
-  OtpSixDigitInput,
-  type OtpSixDigitInputHandle,
-} from "@/components/ui/OtpSixDigitInput";
 import type { CheckinGuestView } from "@/lib/checkin/kiosk-service";
 import { BRAND } from "@/lib/branding";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
-import { formatPhoneDisplay } from "@/lib/phone";
 import { notify } from "@/lib/toast";
-
-type Step = "contact" | "otp";
 
 type Props = {
   token: string;
@@ -26,18 +19,12 @@ const POLL_MS = 1500;
 export function CheckinGuestFlow({ token }: Props) {
   const [state, setState] = useState<CheckinGuestView | null>(null);
   const [booting, setBooting] = useState(true);
-  const [step, setStep] = useState<Step>("contact");
   const [channel, setChannel] = useState<InvitationAccessChannel>("email");
   const [emailContact, setEmailContact] = useState("");
   const [smsContact, setSmsContact] = useState("");
-  const [lockedContact, setLockedContact] = useState("");
-  const [lockedChannel, setLockedChannel] =
-    useState<InvitationAccessChannel>("email");
-  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const scannedRef = useRef(false);
-  const codeRef = useRef<OtpSixDigitInputHandle>(null);
 
   const contactValue = channel === "email" ? emailContact : smsContact;
   const setContactValue =
@@ -107,53 +94,17 @@ export function CheckinGuestFlow({ token }: Props) {
     return () => window.clearInterval(id);
   }, [state?.status, booting, refresh, applyState, state]);
 
-  useEffect(() => {
-    if (step === "otp") codeRef.current?.focus();
-  }, [step]);
-
-  async function handleRequestCode(e: React.FormEvent) {
+  async function handleAuthenticate(e: React.FormEvent) {
     e.preventDefault();
     const value = contactValue.trim();
     if (!value) return;
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/checkin/kiosk/${token}/otp/request`, {
+      const res = await fetch(`/api/checkin/kiosk/${token}/authenticate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel, contact: value }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erreur");
-
-      setLockedContact(value);
-      setLockedChannel(channel);
-      if (data.devCode) notify.info(`Code dev : ${data.devCode}`);
-      else notify.success("Code envoyé si votre invitation existe.");
-      setStep("otp");
-      setCode("");
-    } catch (err) {
-      notify.error(err instanceof Error ? err.message : "Erreur");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleVerify(e: React.FormEvent) {
-    e.preventDefault();
-    const otp = code.replace(/\D/g, "");
-    if (otp.length < 6) return;
-
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/checkin/kiosk/${token}/otp/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          channel: lockedChannel,
-          contact: lockedContact.trim(),
-          code: otp,
-        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur");
@@ -180,11 +131,6 @@ export function CheckinGuestFlow({ token }: Props) {
     } finally {
       setLoading(false);
     }
-  }
-
-  function contactLabel(): string {
-    if (lockedChannel === "email") return lockedContact;
-    return formatPhoneDisplay(lockedContact);
   }
 
   if (booting) {
@@ -241,88 +187,52 @@ export function CheckinGuestFlow({ token }: Props) {
           </p>
         ) : null}
 
-        {step === "contact" ? (
-          <form onSubmit={handleRequestCode} className="mt-8 space-y-4">
-            <div className="flex gap-2 rounded-xl bg-white p-1 ring-1 ring-vodacom-silver/30">
-              <ChannelTab
-                active={channel === "email"}
-                icon={Mail}
-                label="E-mail"
-                onClick={() => setChannel("email")}
-              />
-              <ChannelTab
-                active={channel === "sms"}
-                icon={Phone}
-                label="SMS"
-                onClick={() => setChannel("sms")}
-              />
-            </div>
-
-            <label className="block">
-              <span className="font-vodafone-rg-bd text-sm text-vodacom-black">
-                {channel === "email" ? "Adresse e-mail" : "Numéro mobile"}
-              </span>
-              <input
-                type={channel === "email" ? "email" : "tel"}
-                autoComplete={channel === "email" ? "email" : "tel"}
-                inputMode={channel === "email" ? "email" : "tel"}
-                required
-                disabled={loading}
-                value={contactValue}
-                onChange={(e) => setContactValue(e.target.value)}
-                placeholder={
-                  channel === "email" ? "vous@exemple.com" : "082 426 9291"
-                }
-                className="mt-1.5 w-full rounded-xl border border-vodacom-silver/40 bg-white px-4 py-3 font-vodafone-lt text-base outline-none focus:border-vodacom-red/50 focus:ring-2 focus:ring-vodacom-red/15"
-              />
-            </label>
-
-            <button
-              type="submit"
-              disabled={loading || !contactValue.trim()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-vodacom-red py-3.5 font-vodafone-rg-bd text-base text-white disabled:opacity-60"
-            >
-              {loading && (
-                <LucideIcon icon={Loader2} size={20} className="animate-spin" />
-              )}
-              {loading ? "Envoi…" : "Recevoir le code"}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerify} className="mt-8 space-y-4">
-            <div className="rounded-xl bg-white px-4 py-3 ring-1 ring-vodacom-silver/30">
-              <p className="font-vodafone-lt text-xs text-vodacom-black/50">
-                Code envoyé à
-              </p>
-              <p className="mt-0.5 font-vodafone-rg-bd text-sm">{contactLabel()}</p>
-              <button
-                type="button"
-                onClick={() => setStep("contact")}
-                className="mt-2 font-vodafone-lt text-sm text-vodacom-red"
-              >
-                Modifier
-              </button>
-            </div>
-
-            <OtpSixDigitInput
-              ref={codeRef}
-              value={code}
-              onChange={setCode}
-              disabled={loading}
+        <form onSubmit={handleAuthenticate} className="mt-8 space-y-4">
+          <div className="flex gap-2 rounded-xl bg-white p-1 ring-1 ring-vodacom-silver/30">
+            <ChannelTab
+              active={channel === "email"}
+              icon={Mail}
+              label="E-mail"
+              onClick={() => setChannel("email")}
             />
+            <ChannelTab
+              active={channel === "sms"}
+              icon={Phone}
+              label="SMS"
+              onClick={() => setChannel("sms")}
+            />
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading || code.replace(/\D/g, "").length < 6}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-vodacom-red py-3.5 font-vodafone-rg-bd text-base text-white disabled:opacity-60"
-            >
-              {loading && (
-                <LucideIcon icon={Loader2} size={20} className="animate-spin" />
-              )}
-              {loading ? "Vérification…" : "Valider"}
-            </button>
-          </form>
-        )}
+          <label className="block">
+            <span className="font-vodafone-rg-bd text-sm text-vodacom-black">
+              {channel === "email" ? "Adresse e-mail" : "Numéro mobile"}
+            </span>
+            <input
+              type={channel === "email" ? "email" : "tel"}
+              autoComplete={channel === "email" ? "email" : "tel"}
+              inputMode={channel === "email" ? "email" : "tel"}
+              required
+              disabled={loading}
+              value={contactValue}
+              onChange={(e) => setContactValue(e.target.value)}
+              placeholder={
+                channel === "email" ? "vous@exemple.com" : "082 426 9291"
+              }
+              className="mt-1.5 w-full rounded-xl border border-vodacom-silver/40 bg-white px-4 py-3 font-vodafone-lt text-base outline-none focus:border-vodacom-red/50 focus:ring-2 focus:ring-vodacom-red/15"
+            />
+          </label>
+
+          <button
+            type="submit"
+            disabled={loading || !contactValue.trim()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-vodacom-red py-3.5 font-vodafone-rg-bd text-base text-white disabled:opacity-60"
+          >
+            {loading && (
+              <LucideIcon icon={Loader2} size={20} className="animate-spin" />
+            )}
+            {loading ? "Vérification…" : "Continuer"}
+          </button>
+        </form>
       </div>
 
       {confirmOpen && state?.needsRsvpConfirm ? (
