@@ -76,14 +76,32 @@ function useLiveClock() {
   });
 }
 
+function useCheckinCancelReady(active: boolean, sessionToken: string | undefined) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!active || !sessionToken) {
+      setReady(false);
+      return;
+    }
+
+    setReady(false);
+    const timeoutId = window.setTimeout(
+      () => setReady(true),
+      CHECKIN_CANCEL_DELAY_MS,
+    );
+    return () => window.clearTimeout(timeoutId);
+  }, [active, sessionToken]);
+
+  return ready;
+}
+
 export function CheckinDisplayScreen() {
   const [state, setState] = useState<CheckinKioskView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(true);
-  const [showCancel, setShowCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const hasLoadedRef = useRef(false);
-  const waitingConfirmSinceRef = useRef<number | null>(null);
   const clock = useLiveClock();
 
   const load = useCallback(async () => {
@@ -109,35 +127,9 @@ export function CheckinDisplayScreen() {
     return () => window.clearInterval(id);
   }, [load]);
 
-  useEffect(() => {
-    if (state?.status === "WAITING_CONFIRM") {
-      if (waitingConfirmSinceRef.current == null) {
-        waitingConfirmSinceRef.current = Date.now();
-      }
-    } else {
-      waitingConfirmSinceRef.current = null;
-      setShowCancel(false);
-    }
-  }, [state?.status]);
-
-  useEffect(() => {
-    if (state?.status !== "WAITING_CONFIRM") return;
-
-    const since = waitingConfirmSinceRef.current;
-    if (since == null) return;
-
-    const elapsed = Date.now() - since;
-    if (elapsed >= CHECKIN_CANCEL_DELAY_MS) {
-      setShowCancel(true);
-      return;
-    }
-
-    const id = window.setTimeout(
-      () => setShowCancel(true),
-      CHECKIN_CANCEL_DELAY_MS - elapsed,
-    );
-    return () => window.clearTimeout(id);
-  }, [state?.status]);
+  const isWaiting =
+    state?.status === "WAITING_GUEST" || state?.status === "WAITING_CONFIRM";
+  const cancelReady = useCheckinCancelReady(isWaiting, state?.token);
 
   const handleCancelCheckin = useCallback(async () => {
     if (!state?.token || cancelling) return;
@@ -150,8 +142,6 @@ export function CheckinDisplayScreen() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur");
       setState(data as CheckinKioskView);
-      waitingConfirmSinceRef.current = null;
-      setShowCancel(false);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Impossible d'annuler");
@@ -163,8 +153,6 @@ export function CheckinDisplayScreen() {
   const activeStep = stepIndex(state?.status);
   const showQr = state?.status === "SHOW_QR";
   const isSuccess = state?.status === "SUCCESS";
-  const isWaiting =
-    state?.status === "WAITING_GUEST" || state?.status === "WAITING_CONFIRM";
 
   const countdownProgress = useMemo(() => {
     if (state?.countdownSeconds == null || state.countdownSeconds <= 0) {
@@ -297,21 +285,23 @@ export function CheckinDisplayScreen() {
                   Ne quittez pas cet écran
                 </p>
               ) : null}
-
-              {state.status === "WAITING_CONFIRM" && showCancel ? (
-                <button
-                  type="button"
-                  disabled={cancelling}
-                  onClick={() => void handleCancelCheckin()}
-                  className="mt-5 rounded-2xl border border-white/25 bg-white/10 px-8 py-3 font-vodafone-rg-bd text-sm text-white backdrop-blur-sm transition hover:bg-white/15 disabled:opacity-60"
-                >
-                  {cancelling ? "Réinitialisation…" : "Annuler"}
-                </button>
-              ) : null}
             </div>
           </div>
         )}
       </main>
+
+      {isWaiting && cancelReady ? (
+        <div className="fixed inset-x-0 bottom-20 z-30 flex justify-center px-6 sm:bottom-24">
+          <button
+            type="button"
+            disabled={cancelling}
+            onClick={() => void handleCancelCheckin()}
+            className="min-w-[12rem] rounded-2xl border-2 border-white bg-white px-10 py-4 font-vodafone-exb text-base text-vodacom-red shadow-[0_12px_40px_rgba(0,0,0,0.35)] transition hover:bg-vodacom-cream disabled:opacity-70"
+          >
+            {cancelling ? "Réinitialisation…" : "Annuler le check-in"}
+          </button>
+        </div>
+      ) : null}
 
       <footer className="relative z-10 border-t border-white/8 px-6 py-4 sm:px-10">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-x-8 gap-y-2 font-vodafone-lt text-xs text-white/45 sm:text-sm">
