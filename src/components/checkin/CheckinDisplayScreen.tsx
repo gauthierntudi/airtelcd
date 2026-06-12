@@ -11,6 +11,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import QRCode from "react-qr-code";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
@@ -325,12 +326,12 @@ export function CheckinDisplayScreen({ token }: Props) {
             {EVENT.venue}
           </span>
         </div>
-        <a
+        <Link
           href="/checkin/display?nouvelle=1"
           className="font-vodafone-lt text-[11px] text-white/35 underline-offset-2 hover:text-white/55 hover:underline"
         >
           Ouvrir une autre borne check-in
-        </a>
+        </Link>
         </div>
       </footer>
     </div>
