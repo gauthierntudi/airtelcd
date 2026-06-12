@@ -41,12 +41,7 @@ export function CheckinGuestFlow({ token }: Props) {
 
   const applyState = useCallback((next: CheckinGuestView) => {
     setState(next);
-    if (next.status === "WAITING_CONFIRM") {
-      setConfirmOpen(true);
-    }
-    if (next.status === "SUCCESS") {
-      setConfirmOpen(false);
-    }
+    setConfirmOpen(next.status === "WAITING_CONFIRM" && next.needsRsvpConfirm);
   }, []);
 
   useEffect(() => {

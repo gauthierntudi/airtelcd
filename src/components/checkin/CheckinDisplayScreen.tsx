@@ -14,7 +14,10 @@ import Image from "next/image";
 import QRCode from "react-qr-code";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import { CHECKIN_SUCCESS_COUNTDOWN_SEC } from "@/lib/checkin/constants";
+import {
+  CHECKIN_CANCEL_DELAY_MS,
+  CHECKIN_SUCCESS_COUNTDOWN_SEC,
+} from "@/lib/checkin/constants";
 import type { CheckinKioskView } from "@/lib/checkin/kiosk-service";
 import { BRAND } from "@/lib/branding";
 import { EVENT } from "@/lib/event";
@@ -77,7 +80,10 @@ export function CheckinDisplayScreen() {
   const [state, setState] = useState<CheckinKioskView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(true);
+  const [showCancel, setShowCancel] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const hasLoadedRef = useRef(false);
+  const waitingConfirmSinceRef = useRef<number | null>(null);
   const clock = useLiveClock();
 
   const load = useCallback(async () => {
@@ -102,6 +108,57 @@ export function CheckinDisplayScreen() {
     const id = window.setInterval(() => void load(), POLL_MS);
     return () => window.clearInterval(id);
   }, [load]);
+
+  useEffect(() => {
+    if (state?.status === "WAITING_CONFIRM") {
+      if (waitingConfirmSinceRef.current == null) {
+        waitingConfirmSinceRef.current = Date.now();
+      }
+    } else {
+      waitingConfirmSinceRef.current = null;
+      setShowCancel(false);
+    }
+  }, [state?.status]);
+
+  useEffect(() => {
+    if (state?.status !== "WAITING_CONFIRM") return;
+
+    const since = waitingConfirmSinceRef.current;
+    if (since == null) return;
+
+    const elapsed = Date.now() - since;
+    if (elapsed >= CHECKIN_CANCEL_DELAY_MS) {
+      setShowCancel(true);
+      return;
+    }
+
+    const id = window.setTimeout(
+      () => setShowCancel(true),
+      CHECKIN_CANCEL_DELAY_MS - elapsed,
+    );
+    return () => window.clearTimeout(id);
+  }, [state?.status]);
+
+  const handleCancelCheckin = useCallback(async () => {
+    if (!state?.token || cancelling) return;
+
+    setCancelling(true);
+    try {
+      const res = await fetch(`/api/checkin/kiosk/${state.token}/reset`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Erreur");
+      setState(data as CheckinKioskView);
+      waitingConfirmSinceRef.current = null;
+      setShowCancel(false);
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Impossible d'annuler");
+    } finally {
+      setCancelling(false);
+    }
+  }, [cancelling, state?.token]);
 
   const activeStep = stepIndex(state?.status);
   const showQr = state?.status === "SHOW_QR";
@@ -239,6 +296,17 @@ export function CheckinDisplayScreen() {
                 <p className="mt-6 font-vodafone-lt text-sm text-white/40">
                   Ne quittez pas cet écran
                 </p>
+              ) : null}
+
+              {state.status === "WAITING_CONFIRM" && showCancel ? (
+                <button
+                  type="button"
+                  disabled={cancelling}
+                  onClick={() => void handleCancelCheckin()}
+                  className="mt-5 rounded-2xl border border-white/25 bg-white/10 px-8 py-3 font-vodafone-rg-bd text-sm text-white backdrop-blur-sm transition hover:bg-white/15 disabled:opacity-60"
+                >
+                  {cancelling ? "Réinitialisation…" : "Annuler"}
+                </button>
               ) : null}
             </div>
           </div>

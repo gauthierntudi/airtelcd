@@ -4,6 +4,7 @@ import {
   CHECKIN_SESSION_STALE_MS,
   CHECKIN_SUCCESS_COUNTDOWN_SEC,
 } from "@/lib/checkin/constants";
+import { assertGuestCheckInDayAllowed } from "@/lib/checkin/event-day-access";
 import { checkinScanAbsoluteUrl } from "@/lib/checkin/urls";
 import { authenticateInvitationAccess } from "@/lib/invitation-access/service";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
@@ -198,6 +199,7 @@ async function getSessionByToken(token: string) {
           fullName: true,
           rsvpStatus: true,
           checkedInAt: true,
+          eventDays: true,
         },
       },
     },
@@ -214,6 +216,7 @@ async function getActiveKioskSession() {
           fullName: true,
           rsvpStatus: true,
           checkedInAt: true,
+          eventDays: true,
         },
       },
     },
@@ -276,6 +279,41 @@ export async function getKioskGuestState(
   return mapGuestView(session);
 }
 
+/** Réinitialise la session borne au QR initial (annulation manuelle). */
+export async function resetKioskSession(
+  token: string,
+  baseUrl?: string,
+): Promise<CheckinKioskView> {
+  const session = await getSessionByToken(token);
+  if (!session) {
+    throw new Error("Session de check-in introuvable.");
+  }
+
+  if (session.status === CheckinKioskStatus.SUCCESS) {
+    throw new Error("Ce check-in est déjà terminé.");
+  }
+
+  if (
+    session.status !== CheckinKioskStatus.WAITING_GUEST &&
+    session.status !== CheckinKioskStatus.WAITING_CONFIRM
+  ) {
+    throw new Error("Rien à annuler pour cette session.");
+  }
+
+  const updated = await prisma.checkinKioskSession.update({
+    where: { id: session.id },
+    data: {
+      status: CheckinKioskStatus.SHOW_QR,
+      guestId: null,
+      displayName: null,
+      scannedAt: null,
+      successEndsAt: null,
+    },
+  });
+
+  return mapKioskView(updated, baseUrl);
+}
+
 export async function markKioskScanned(token: string) {
   const session = await getSessionByToken(token);
   if (!session) {
@@ -307,6 +345,7 @@ export async function markKioskScanned(token: string) {
           fullName: true,
           rsvpStatus: true,
           checkedInAt: true,
+          eventDays: true,
         },
       },
     },
@@ -339,10 +378,13 @@ export async function authenticateCheckinGuest(
       fullName: true,
       rsvpStatus: true,
       checkedInAt: true,
+      eventDays: true,
     },
   });
 
   if (!guest) throw new Error("Invité introuvable.");
+
+  assertGuestCheckInDayAllowed(guest.eventDays);
 
   if (guest.rsvpStatus === RsvpStatus.DECLINED) {
     throw new Error(
@@ -381,6 +423,8 @@ export async function confirmCheckinRsvp(
   if (session.guest.rsvpStatus === RsvpStatus.DECLINED) {
     throw new Error("Invitation déclinée.");
   }
+
+  assertGuestCheckInDayAllowed(session.guest.eventDays);
 
   await markCheckinSuccess(session.id, session.guest, true);
 

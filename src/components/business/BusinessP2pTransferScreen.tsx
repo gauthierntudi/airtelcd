@@ -92,7 +92,7 @@ export function BusinessP2pTransferScreen({
           Profil {EXPERIENCE_PROFILE_COPY.BUSINESS.title} · Transfert P2P
         </p>
         <h1 className="mt-2 font-vodafone-exb text-[1.5rem] font-normal leading-tight tracking-tight sm:text-[1.85rem]">
-          Faites le transfert d&apos;argent à vos proches
+          Faites le transfert d'argent à vos proches
         </h1>
       </section>
 
