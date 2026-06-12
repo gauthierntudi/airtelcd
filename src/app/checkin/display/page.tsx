@@ -1,4 +1,4 @@
-import { CheckinDisplayScreen } from "@/components/checkin/CheckinDisplayScreen";
+import { CheckinDisplayBootstrap } from "@/components/checkin/CheckinDisplayBootstrap";
 
 export const metadata = {
   title: "Check-in — Vodacom Privilège Golf",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function CheckinDisplayPage() {
-  return <CheckinDisplayScreen />;
+  return <CheckinDisplayBootstrap />;
 }

@@ -168,25 +168,54 @@ async function createKioskSession() {
   });
 }
 
+/** Nouvelle session borne — une par écran / QR affiché. */
+export async function createKioskDisplaySession(
+  baseUrl?: string,
+): Promise<CheckinKioskView> {
+  const session = await createKioskSession();
+  return mapKioskView(session, baseUrl);
+}
+
+async function normalizeKioskSessionForDisplay(
+  session: {
+    id: string;
+    token: string;
+    status: CheckinKioskStatus;
+    displayName: string | null;
+    successEndsAt: Date | null;
+    updatedAt: Date;
+  },
+) {
+  const successExpired =
+    session.status === CheckinKioskStatus.SUCCESS &&
+    session.successEndsAt &&
+    session.successEndsAt.getTime() <= Date.now();
+
+  const waitingStale =
+    session.status !== CheckinKioskStatus.SHOW_QR &&
+    session.status !== CheckinKioskStatus.SUCCESS &&
+    isSessionStale(session.updatedAt, session.status);
+
+  if (!successExpired && !waitingStale) {
+    return session;
+  }
+
+  return prisma.checkinKioskSession.update({
+    where: { id: session.id },
+    data: {
+      status: CheckinKioskStatus.SHOW_QR,
+      guestId: null,
+      displayName: null,
+      scannedAt: null,
+      successEndsAt: null,
+    },
+  });
+}
+
 function isSessionStale(updatedAt: Date, status: CheckinKioskStatus): boolean {
   if (status === CheckinKioskStatus.SHOW_QR) return false;
   if (status === CheckinKioskStatus.SUCCESS) return false;
   return Date.now() - updatedAt.getTime() > CHECKIN_SESSION_STALE_MS;
-}
-
-function shouldRotateSession(session: {
-  status: CheckinKioskStatus;
-  successEndsAt: Date | null;
-  updatedAt: Date;
-}): boolean {
-  if (
-    session.status === CheckinKioskStatus.SUCCESS &&
-    session.successEndsAt &&
-    session.successEndsAt.getTime() <= Date.now()
-  ) {
-    return true;
-  }
-  return isSessionStale(session.updatedAt, session.status);
 }
 
 async function getSessionByToken(token: string) {
@@ -204,29 +233,6 @@ async function getSessionByToken(token: string) {
       },
     },
   });
-}
-
-async function getActiveKioskSession() {
-  const latest = await prisma.checkinKioskSession.findFirst({
-    orderBy: { createdAt: "desc" },
-    include: {
-      guest: {
-        select: {
-          id: true,
-          fullName: true,
-          rsvpStatus: true,
-          checkedInAt: true,
-          eventDays: true,
-        },
-      },
-    },
-  });
-
-  if (!latest || shouldRotateSession(latest)) {
-    return createKioskSession();
-  }
-
-  return latest;
 }
 
 async function markCheckinSuccess(
@@ -264,11 +270,17 @@ async function markCheckinSuccess(
   ]);
 }
 
-export async function getKioskDisplayState(
+export async function getKioskDisplayStateByToken(
+  token: string,
   baseUrl?: string,
 ): Promise<CheckinKioskView> {
-  const session = await getActiveKioskSession();
-  return mapKioskView(session, baseUrl);
+  const session = await getSessionByToken(token);
+  if (!session) {
+    throw new Error("Session de check-in introuvable.");
+  }
+
+  const normalized = await normalizeKioskSessionForDisplay(session);
+  return mapKioskView(normalized, baseUrl);
 }
 
 export async function getKioskGuestState(

@@ -53,3 +53,27 @@ export async function sendInvitationWhatsApp(
     contentVariables: JSON.stringify(params.contentVariables),
   });
 }
+
+export type GenericWhatsAppParams = {
+  phoneE164: string;
+  contentSid: string;
+};
+
+/** Template WhatsApp sans variables (contenu fixe Twilio). */
+export async function sendGenericWhatsApp(
+  params: GenericWhatsAppParams,
+): Promise<void> {
+  assertChannelConfigured("whatsapp");
+  const { whatsapp: cfg } = getMessagingConfig().twilio;
+
+  const client = twilio(cfg.accountSid!, cfg.authToken!);
+  const from = cfg.from!.startsWith("whatsapp:")
+    ? cfg.from!
+    : `whatsapp:${cfg.from}`;
+
+  await client.messages.create({
+    from,
+    to: toWhatsAppAddress(params.phoneE164),
+    contentSid: params.contentSid,
+  });
+}

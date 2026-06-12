@@ -1,6 +1,13 @@
 "use client";
 
-import { Activity, CreditCard, Home, LayoutDashboard, Mail } from "lucide-react";
+import {
+  Activity,
+  CreditCard,
+  Home,
+  LayoutDashboard,
+  Mail,
+  MessageCircle,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LucideIcon } from "@/components/ui/lucide-icon";
@@ -13,6 +20,12 @@ const NAV = [
     href: "/admin/mpesa",
     label: "M-Pesa & Market",
     icon: CreditCard,
+    exact: true,
+  },
+  {
+    href: "/admin/messages",
+    label: "Messages",
+    icon: MessageCircle,
     exact: true,
   },
   { href: "/admin/status", label: "Statut système", icon: Activity, exact: true },

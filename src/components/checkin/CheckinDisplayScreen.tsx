@@ -96,17 +96,24 @@ function useCheckinCancelReady(active: boolean, sessionToken: string | undefined
   return ready;
 }
 
-export function CheckinDisplayScreen() {
+type Props = {
+  token: string;
+};
+
+export function CheckinDisplayScreen({ token }: Props) {
   const [state, setState] = useState<CheckinKioskView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(true);
   const [cancelling, setCancelling] = useState(false);
   const hasLoadedRef = useRef(false);
   const clock = useLiveClock();
+  const screenLabel = `${token.slice(0, 6)}…${token.slice(-4)}`;
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch("/api/checkin/kiosk", { cache: "no-store" });
+      const res = await fetch(`/api/checkin/kiosk/${token}/display`, {
+        cache: "no-store",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erreur");
       setState(data as CheckinKioskView);
@@ -119,7 +126,7 @@ export function CheckinDisplayScreen() {
         setError(e instanceof Error ? e.message : "Erreur de connexion");
       }
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     void load();
@@ -129,14 +136,14 @@ export function CheckinDisplayScreen() {
 
   const isWaiting =
     state?.status === "WAITING_GUEST" || state?.status === "WAITING_CONFIRM";
-  const cancelReady = useCheckinCancelReady(isWaiting, state?.token);
+  const cancelReady = useCheckinCancelReady(isWaiting, token);
 
   const handleCancelCheckin = useCallback(async () => {
-    if (!state?.token || cancelling) return;
+    if (cancelling) return;
 
     setCancelling(true);
     try {
-      const res = await fetch(`/api/checkin/kiosk/${state.token}/reset`, {
+      const res = await fetch(`/api/checkin/kiosk/${token}/reset`, {
         method: "POST",
       });
       const data = await res.json();
@@ -148,7 +155,7 @@ export function CheckinDisplayScreen() {
     } finally {
       setCancelling(false);
     }
-  }, [cancelling, state?.token]);
+  }, [cancelling, token]);
 
   const activeStep = stepIndex(state?.status);
   const showQr = state?.status === "SHOW_QR";
@@ -185,6 +192,9 @@ export function CheckinDisplayScreen() {
               Check-in
             </p>
             <p className="font-vodafone-lt text-sm text-white/70">{EVENT.title}</p>
+            <p className="mt-0.5 font-mono text-[10px] text-white/35">
+              Borne {screenLabel}
+            </p>
           </div>
         </div>
 
@@ -304,7 +314,8 @@ export function CheckinDisplayScreen() {
       ) : null}
 
       <footer className="relative z-10 border-t border-white/8 px-6 py-4 sm:px-10">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-x-8 gap-y-2 font-vodafone-lt text-xs text-white/45 sm:text-sm">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 font-vodafone-lt text-xs text-white/45 sm:text-sm">
           <span className="inline-flex items-center gap-2">
             <LucideIcon icon={CalendarDays} size={14} className="text-vodacom-red/80" />
             {EVENT.dateLabel}
@@ -313,6 +324,13 @@ export function CheckinDisplayScreen() {
             <LucideIcon icon={MapPin} size={14} className="text-vodacom-red/80" />
             {EVENT.venue}
           </span>
+        </div>
+        <a
+          href="/checkin/display?nouvelle=1"
+          className="font-vodafone-lt text-[11px] text-white/35 underline-offset-2 hover:text-white/55 hover:underline"
+        >
+          Ouvrir une autre borne check-in
+        </a>
         </div>
       </footer>
     </div>
