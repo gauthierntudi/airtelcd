@@ -37,6 +37,18 @@ const POST_AUTH_COPY: Record<
   },
 };
 
+const EXPERIENCE_INTENTS = new Set<InvitationAccessPostAuth>([
+  "privilege",
+  "mpesa",
+  "market",
+]);
+
+function isExperienceIntent(
+  intent: InvitationAccessPostAuth,
+): intent is Exclude<InvitationAccessPostAuth, "invitation"> {
+  return EXPERIENCE_INTENTS.has(intent);
+}
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -71,7 +83,7 @@ export function InvitationAccessModal({
       setChannel("sms");
       setLoading(false);
     }
-  }, [open]);
+  }, [open, postAuth]);
 
   useEffect(() => {
     if (open) contactRef.current?.focus();
@@ -104,7 +116,11 @@ export function InvitationAccessModal({
 
     setLoading(true);
     try {
-      const res = await fetch("/api/invitation/access/authenticate", {
+      const authenticateUrl = isExperienceIntent(postAuth)
+        ? "/api/experience/access/authenticate"
+        : "/api/invitation/access/authenticate";
+
+      const res = await fetch(authenticateUrl, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -155,8 +171,9 @@ export function InvitationAccessModal({
               {copy.title}
             </h2>
             <p className="mt-1 font-vodafone-lt text-sm text-vodacom-black/60">
-              Saisissez le mobile ou l&apos;e-mail enregistré pour votre
-              invitation.
+              {isExperienceIntent(postAuth)
+                ? "Saisissez votre numéro mobile Vodacom M-Pesa (080–083). Les visiteurs sans invitation peuvent accéder à l'expérience."
+                : "Saisissez le mobile ou l'e-mail enregistré pour votre invitation."}
             </p>
           </div>
           <button

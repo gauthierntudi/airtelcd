@@ -10,9 +10,9 @@ export async function resolveInvitationSessionRedirect(
 
   const guest = await prisma.guest.findUnique({
     where: { id: parsed.guestId },
-    select: { token: true },
+    select: { token: true, experienceOnly: true },
   });
-  if (!guest) return null;
+  if (!guest || guest.experienceOnly) return null;
 
   return { redirectPath: invitationPath(guest.token) };
 }

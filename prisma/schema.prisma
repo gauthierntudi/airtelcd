@@ -38,6 +38,8 @@ model Guest {
   /// Date de la première (et unique) création Carte Visa M-Pesa — empêche une 2e carte
   mpesaVisaCardIssuedAt DateTime?
   checkedInAt        DateTime?
+  /// Créé via accès expérience kiosque (sans invitation événement)
+  experienceOnly     Boolean    @default(false)
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
   accessOtps         InvitationAccessOtp[]

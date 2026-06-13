@@ -5,6 +5,7 @@ import {
   CHECKIN_SUCCESS_COUNTDOWN_SEC,
 } from "@/lib/checkin/constants";
 import { assertGuestCheckInDayAllowed } from "@/lib/checkin/event-day-access";
+import { EXPERIENCE_ACCESS_CHECKIN_BLOCKED } from "@/lib/experience-access/types";
 import { checkinScanAbsoluteUrl } from "@/lib/checkin/urls";
 import { authenticateInvitationAccess } from "@/lib/invitation-access/service";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
@@ -391,10 +392,15 @@ export async function authenticateCheckinGuest(
       rsvpStatus: true,
       checkedInAt: true,
       eventDays: true,
+      experienceOnly: true,
     },
   });
 
   if (!guest) throw new Error("Invité introuvable.");
+
+  if (guest.experienceOnly) {
+    throw new Error(EXPERIENCE_ACCESS_CHECKIN_BLOCKED);
+  }
 
   assertGuestCheckInDayAllowed(guest.eventDays);
 
