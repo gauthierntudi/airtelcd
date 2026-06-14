@@ -8,7 +8,15 @@ import {
   ORBIT_OUTER_ANGLES,
   PRIVILEGE_ORBIT_INNER_CIRCLES,
   PRIVILEGE_ORBIT_OUTER_CIRCLES,
+  type OrbitalBenefitCircle,
 } from "@/lib/orbital-home";
+
+const ANIMATIC_PRIVILEGE_ORBIT_OUTER_CIRCLES: OrbitalBenefitCircle[] =
+  PRIVILEGE_ORBIT_OUTER_CIRCLES.map((circle) =>
+    circle.label === "P2P"
+      ? { label: "P2P", color: "#ec0404" }
+      : circle,
+  );
 
 const INNER_ORBIT_RADIUS = 30;
 const OUTER_ORBIT_RADIUS = 48;
@@ -34,7 +42,7 @@ export const AnimaticPrivilegeBenefitCircles = forwardRef<HTMLDivElement, Props>
         <OrbitRing diameterPercent={OUTER_ORBIT_RADIUS * 2} />
         <OrbitRing diameterPercent={INNER_ORBIT_RADIUS * 2} />
 
-        {PRIVILEGE_ORBIT_OUTER_CIRCLES.map((circle, index) => (
+        {ANIMATIC_PRIVILEGE_ORBIT_OUTER_CIRCLES.map((circle, index) => (
           <OrbitArm
             key={`outer-${circle.label}`}
             angleDeg={ORBIT_OUTER_ANGLES[index] ?? 0}
