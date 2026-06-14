@@ -20,7 +20,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#810100",
+  themeColor: "#e60000",
 };
 
 export default function AnimaticWelcomeLoaderLayout({

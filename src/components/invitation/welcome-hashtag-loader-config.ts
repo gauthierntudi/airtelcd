@@ -37,12 +37,15 @@ export type WelcomeHashtagLoaderConfig = {
   circlesHoldDuration?: number;
   /** Intro logo avant le cycle de mots (animatic public). */
   introLogoSrc?: string;
+  /** Fond uni — désactive le dégradé animé. */
+  solidBackground?: string;
 };
 
 export const ANIMATIC_WELCOME_HASHTAG_LOADER_CONFIG: WelcomeHashtagLoaderConfig = {
   words: [...ANIMATIC_LOADER_TEXTS],
   gradientFrom: "#810100",
   gradientTo: "#e60000",
+  solidBackground: "#e60000",
   angleStart: 180,
   angleEnd: 340,
   angleDuration: 6.5,

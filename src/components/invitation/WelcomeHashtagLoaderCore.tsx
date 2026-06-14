@@ -347,7 +347,7 @@ export function WelcomeHashtagLoaderCore({
       if (logo) gsap.killTweensOf(logo);
 
       gsap.set(root, { "--loader-angle": `${config.angleStart}deg` });
-      if (!prefersReducedMotion) {
+      if (!config.solidBackground && !prefersReducedMotion) {
         gsap.to(root, {
           "--loader-angle": `${config.angleEnd}deg`,
           duration: config.angleDuration,
@@ -436,6 +436,7 @@ export function WelcomeHashtagLoaderCore({
         config.wordInDuration,
         config.wordHoldDuration,
         config.wordOutDuration,
+        config.solidBackground,
         config.loop,
       ],
     },
@@ -443,16 +444,20 @@ export function WelcomeHashtagLoaderCore({
 
   const firstWordLines = (config.words[0] ?? "").split("\n");
 
+  const rootStyle = config.solidBackground
+    ? { backgroundColor: config.solidBackground }
+    : {
+        backgroundColor: config.gradientFrom,
+        backgroundImage: `linear-gradient(var(--loader-angle, ${config.angleStart}deg), ${config.gradientFrom} 0%, ${config.gradientTo} 100%)`,
+      };
+
   return (
     <div
       ref={rootRef}
       className={`${className} flex items-center justify-center overflow-hidden will-change-transform text-white`}
       aria-live="polite"
       aria-busy="true"
-      style={{
-        backgroundColor: config.gradientFrom,
-        backgroundImage: `linear-gradient(var(--loader-angle, ${config.angleStart}deg), ${config.gradientFrom} 0%, ${config.gradientTo} 100%)`,
-      }}
+      style={rootStyle}
     >
       {config.introLogoSrc ? (
         <div

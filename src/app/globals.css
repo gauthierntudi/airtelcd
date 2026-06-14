@@ -126,7 +126,7 @@ html:has(.animatic-pwa-root) body {
   min-height: 100svh;
   overflow: hidden;
   overscroll-behavior: none;
-  background-color: #810100;
+  background-color: #e60000;
   color: #ffffff;
 }
 
@@ -139,7 +139,7 @@ html:has(.animatic-pwa-root) body {
   height: 100svh;
   min-height: -webkit-fill-available;
   overflow: hidden;
-  background-color: #810100;
+  background-color: #e60000;
 }
 
 .animatic-pwa-root::after {
@@ -149,7 +149,7 @@ html:has(.animatic-pwa-root) body {
   right: 0;
   bottom: 0;
   height: env(safe-area-inset-bottom, 0px);
-  background-color: #810100;
+  background-color: #e60000;
   pointer-events: none;
   z-index: 1;
 }
