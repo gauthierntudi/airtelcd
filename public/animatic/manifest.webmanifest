@@ -1,0 +1,26 @@
+{
+  "name": "Vodacom Privilège — Animatic",
+  "short_name": "Privilège",
+  "description": "Animatic Vodacom Privilège Golf — affichage en boucle",
+  "start_url": "/animatic/welcome-loader",
+  "scope": "/animatic/",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#810100",
+  "theme_color": "#810100",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/img/logo-animatic.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/logo-animatic.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

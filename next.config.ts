@@ -23,6 +23,24 @@ const nextConfig: NextConfig = {
   },
   // Évite l’avertissement lockfile quand le repo n’est pas la racine du workspace
   outputFileTracingRoot: import.meta.dirname,
+  async headers() {
+    return [
+      {
+        source: "/animatic/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+        ],
+      },
+      {
+        source: "/animatic/manifest.webmanifest",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Content-Type", value: "application/manifest+json" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
