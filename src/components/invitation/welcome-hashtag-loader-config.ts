@@ -9,7 +9,7 @@ export const DEFAULT_LOADER_WORDS = [
 
 /** Textes de l'animatic public (/animatic/welcome-loader). */
 export const ANIMATIC_LOADER_TEXTS = [
-  "Rien ne se perd avec privilège.",
+  "Plus de flexibilité, plus de privilèges",
   "Convertissez votre volume\ninternet local en roaming\net vice-versa",
   "Devenez membre Privilège en\ncomposant *1111# option 4.",
   "Ensemble, tout devient possible",
