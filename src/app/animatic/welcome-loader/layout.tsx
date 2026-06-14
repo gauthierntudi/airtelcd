@@ -29,9 +29,9 @@ export default function AnimaticWelcomeLoaderLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <div className="animatic-pwa-root">
       {children}
       <AnimaticPwaRegister />
-    </>
+    </div>
   );
 }

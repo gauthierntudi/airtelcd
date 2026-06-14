@@ -8,7 +8,7 @@ export function WelcomeHashtagLoaderAnimatic() {
   return (
     <WelcomeHashtagLoaderCore
       config={ANIMATIC_WELCOME_HASHTAG_LOADER_CONFIG}
-      className="fixed inset-0 z-0 min-h-[100dvh]"
+      className="absolute inset-0 z-0 h-full w-full"
     />
   );
 }
