@@ -5,6 +5,7 @@ import gsap from "gsap";
 import Image from "next/image";
 import { useRef } from "react";
 import type { WelcomeHashtagLoaderConfig } from "@/components/invitation/welcome-hashtag-loader-config";
+import { AnimaticPrivilegeBenefitCircles } from "@/components/invitation/AnimaticPrivilegeBenefitCircles";
 import {
   DEFAULT_TEXT_MOTION,
   LOGO_MOTION_VARIANTS,
@@ -21,6 +22,10 @@ const INTRO_LOGO_OUT = 0.72;
 const LINE_STAGGER_IN = 0.11;
 const LINE_STAGGER_OUT = 0.07;
 const LOOP_BREATHE = 0.45;
+const CIRCLES_IN_DURATION = 0.62;
+const CIRCLES_OUT_DURATION = 0.48;
+const CIRCLES_IN_STAGGER = 0.09;
+const CIRCLES_OUT_STAGGER = 0.06;
 
 function mountWordLines(container: HTMLElement, word: string): HTMLElement[] {
   container.replaceChildren();
@@ -60,11 +65,15 @@ function appendLogoSegment(
   tl: gsap.core.Timeline,
   logo: HTMLElement,
   textWrap: HTMLElement,
+  circlesWrap: HTMLElement | null,
   variant: LogoMotionVariant,
   prefersReducedMotion: boolean,
 ) {
-  tl.set(textWrap, { opacity: 0, visibility: "hidden" })
-    .set(logo, { visibility: "visible", opacity: 0, ...variant.initial });
+  tl.set(textWrap, { opacity: 0, visibility: "hidden" });
+  if (circlesWrap) {
+    tl.set(circlesWrap, { opacity: 0, visibility: "hidden" });
+  }
+  tl.set(logo, { visibility: "visible", opacity: 0, ...variant.initial });
 
   if (prefersReducedMotion) {
     tl.set(logo, { opacity: 1, scale: 1, x: 0, y: 0, filter: "blur(0px)", rotation: 0 })
@@ -170,9 +179,104 @@ function appendWordSegment(
   tl.add(wordTl);
 }
 
+function getBenefitCircleElements(circlesWrap: HTMLElement): HTMLElement[] {
+  return Array.from(
+    circlesWrap.querySelectorAll<HTMLElement>("[data-benefit-circle]"),
+  );
+}
+
+function appendCirclesSegment(
+  tl: gsap.core.Timeline,
+  circlesWrap: HTMLElement,
+  textWrap: HTMLElement,
+  config: WelcomeHashtagLoaderConfig,
+  prefersReducedMotion: boolean,
+) {
+  const holdDuration = config.circlesHoldDuration ?? 3.2;
+  const circlesTl = gsap.timeline();
+
+  circlesTl
+    .set(textWrap, { opacity: 0, visibility: "hidden" })
+    .set(circlesWrap, { opacity: 1, visibility: "visible" });
+
+  if (prefersReducedMotion) {
+    circlesTl
+      .call(() => {
+        gsap.set(getBenefitCircleElements(circlesWrap), { opacity: 1, scale: 1 });
+      })
+      .to({}, { duration: holdDuration })
+      .set(circlesWrap, { opacity: 0, visibility: "hidden" });
+    tl.add(circlesTl);
+    return;
+  }
+
+  circlesTl.call(() => {
+    const circles = getBenefitCircleElements(circlesWrap);
+    gsap.killTweensOf(circles);
+    gsap.fromTo(
+      circles,
+      { opacity: 0, scale: 0.45, filter: "blur(8px)" },
+      {
+        opacity: 1,
+        scale: 1,
+        filter: "blur(0px)",
+        duration: CIRCLES_IN_DURATION,
+        ease: "back.out(1.6)",
+        stagger: CIRCLES_IN_STAGGER,
+      },
+    );
+  });
+
+  const circleCount = getBenefitCircleElements(circlesWrap).length;
+  const inTotal =
+    CIRCLES_IN_DURATION + Math.max(0, circleCount - 1) * CIRCLES_IN_STAGGER;
+  circlesTl.to({}, { duration: inTotal });
+
+  circlesTl.call(() => {
+    const circles = getBenefitCircleElements(circlesWrap);
+    gsap.to(circles, {
+      scale: 1.06,
+      duration: holdDuration * 0.45,
+      ease: "sine.inOut",
+      stagger: 0.04,
+      yoyo: true,
+      repeat: 1,
+    });
+  });
+  circlesTl.to({}, { duration: holdDuration });
+
+  circlesTl.call(() => {
+    const circles = getBenefitCircleElements(circlesWrap);
+    gsap.killTweensOf(circles);
+    gsap.to(circles, {
+      opacity: 0,
+      scale: 0.75,
+      filter: "blur(6px)",
+      duration: CIRCLES_OUT_DURATION,
+      ease: "power3.in",
+      stagger: CIRCLES_OUT_STAGGER,
+    });
+  });
+
+  const outTotal =
+    CIRCLES_OUT_DURATION + Math.max(0, circleCount - 1) * CIRCLES_OUT_STAGGER;
+  circlesTl
+    .to({}, { duration: outTotal })
+    .call(() => {
+      gsap.killTweensOf(getBenefitCircleElements(circlesWrap));
+      gsap.set(getBenefitCircleElements(circlesWrap), {
+        clearProps: "transform,filter,opacity,scale",
+      });
+    })
+    .set(circlesWrap, { opacity: 0, visibility: "hidden" });
+
+  tl.add(circlesTl);
+}
+
 function buildCycleTimeline(
   logo: HTMLElement | null,
   textWrap: HTMLElement,
+  circlesWrap: HTMLElement | null,
   words: string[],
   config: WelcomeHashtagLoaderConfig,
   prefersReducedMotion: boolean,
@@ -185,7 +289,7 @@ function buildCycleTimeline(
     const logoVariant = useVariedMotion
       ? LOGO_MOTION_VARIANTS[cycleIndex % LOGO_MOTION_VARIANTS.length]
       : LOGO_MOTION_VARIANTS[0];
-    appendLogoSegment(cycleTl, logo, textWrap, logoVariant, prefersReducedMotion);
+    appendLogoSegment(cycleTl, logo, textWrap, circlesWrap, logoVariant, prefersReducedMotion);
   }
 
   words.forEach((word, index) => {
@@ -194,6 +298,10 @@ function buildCycleTimeline(
       : DEFAULT_TEXT_MOTION;
     appendWordSegment(cycleTl, textWrap, word, variant, config, prefersReducedMotion);
   });
+
+  if (config.showBenefitCircles && circlesWrap) {
+    appendCirclesSegment(cycleTl, circlesWrap, textWrap, config, prefersReducedMotion);
+  }
 
   if (config.loop) {
     cycleTl.to({}, { duration: LOOP_BREATHE });
@@ -216,12 +324,14 @@ export function WelcomeHashtagLoaderCore({
   const rootRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const textWrapRef = useRef<HTMLDivElement>(null);
+  const circlesWrapRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       const root = rootRef.current;
       const logo = logoRef.current;
       const textWrap = textWrapRef.current;
+      const circlesWrap = circlesWrapRef.current;
       if (!root || !textWrap) return;
 
       const words = config.words.filter((w) => w.trim());
@@ -233,6 +343,7 @@ export function WelcomeHashtagLoaderCore({
 
       gsap.killTweensOf(root);
       gsap.killTweensOf(textWrap);
+      if (circlesWrap) gsap.killTweensOf(circlesWrap);
       if (logo) gsap.killTweensOf(logo);
 
       gsap.set(root, { "--loader-angle": `${config.angleStart}deg` });
@@ -256,11 +367,13 @@ export function WelcomeHashtagLoaderCore({
 
           if (logo) gsap.killTweensOf(logo);
           gsap.killTweensOf(textWrap);
+          if (circlesWrap) gsap.killTweensOf(circlesWrap);
           activeCycle?.kill();
 
           const cycle = buildCycleTimeline(
             logo,
             textWrap,
+            circlesWrap,
             words,
             config,
             prefersReducedMotion,
@@ -295,7 +408,17 @@ export function WelcomeHashtagLoaderCore({
         },
       });
 
-      tl.add(buildCycleTimeline(logo, textWrap, words, config, prefersReducedMotion, 0));
+      tl.add(
+        buildCycleTimeline(
+          logo,
+          textWrap,
+          circlesWrap,
+          words,
+          config,
+          prefersReducedMotion,
+          0,
+        ),
+      );
     },
     {
       scope: rootRef,
@@ -303,6 +426,8 @@ export function WelcomeHashtagLoaderCore({
         config.words.join("|"),
         config.introLogoSrc,
         config.variedAnimations,
+        config.showBenefitCircles,
+        config.circlesHoldDuration,
         config.gradientFrom,
         config.gradientTo,
         config.angleStart,
@@ -359,6 +484,10 @@ export function WelcomeHashtagLoaderCore({
           </span>
         ))}
       </div>
+
+      {config.showBenefitCircles ? (
+        <AnimaticPrivilegeBenefitCircles ref={circlesWrapRef} />
+      ) : null}
     </div>
   );
 }

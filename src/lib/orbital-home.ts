@@ -72,17 +72,13 @@ export const PRIVILEGE_ORBIT_INNER_CIRCLES: OrbitalBenefitCircle[] = [
   },
 ];
 
-/** Cercles avantages Privilège — orbite extérieure (6) */
+/** Cercles avantages Privilège — orbite extérieure (6), teintes toutes distinctes */
 export const PRIVILEGE_ORBIT_OUTER_CIRCLES: OrbitalBenefitCircle[] = [
-  { label: "SMS", color: ORBIT_CIRCLE_PALETTE.slate },
+  { label: "SMS", color: "#0d9488" },
   { label: "P2P", gradient: ORBIT_CIRCLE_PALETTE.gradient },
   { label: "Roaming", color: "#9c0ee6" },
-  {
-    label: "Transfert",
-    color: ORBIT_CIRCLE_PALETTE.white,
-    textColor: ORBIT_CIRCLE_PALETTE.charcoal,
-  },
-  { label: "Flexible", color: ORBIT_CIRCLE_PALETTE.slate },
+  { label: "Transfert", color: "#ea580c" },
+  { label: "Flexible", color: "#0891b2" },
   { label: "Visa", color: "#0832c2" },
 ];
 

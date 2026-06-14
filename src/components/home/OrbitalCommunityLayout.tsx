@@ -4,11 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { VodacomLogo } from "@/components/branding/VodacomLogo";
+import { OrbitBenefitCircle } from "@/components/branding/OrbitBenefitCircle";
 import {
   ORBIT_INNER_ANGLES,
   ORBIT_OUTER_ANGLES,
   ORBITAL_PERSON_AVATARS,
-  ORBIT_CIRCLE_PALETTE,
   type OrbitalBenefitCircle,
   type OrbitalHomeTheme,
 } from "@/lib/orbital-home";
@@ -264,43 +264,6 @@ function OrbitArm({
       >
         {children}
       </div>
-    </div>
-  );
-}
-
-const ORBIT_BENEFIT_SIZE = {
-  md: "h-11 w-11 text-[7px] sm:h-14 sm:w-14 sm:text-[8px]",
-  lg: "h-[3.25rem] w-[3.25rem] text-[7px] sm:h-16 sm:w-16 sm:text-[8px]",
-} as const;
-
-function OrbitBenefitCircle({
-  circle,
-  size,
-}: {
-  circle: OrbitalBenefitCircle;
-  size: "md" | "lg";
-}) {
-  const isWhite = circle.color === ORBIT_CIRCLE_PALETTE.white;
-  const shadowColor = circle.gradient
-    ? "#c4000066"
-    : isWhite
-      ? "rgba(0,0,0,0.22)"
-      : `${circle.color ?? "#474b4e"}55`;
-
-  return (
-    <div
-      className={`flex items-center justify-center rounded-full p-1 text-center font-vodafone-exb uppercase leading-tight tracking-[0.06em] shadow-md ${ORBIT_BENEFIT_SIZE[size]} ${
-        isWhite ? "ring-2 ring-white/40" : "text-white ring-2 ring-white/60"
-      }`}
-      style={{
-        color: circle.textColor ?? "#ffffff",
-        background: circle.gradient
-          ? `linear-gradient(135deg, ${circle.gradient[0]}, ${circle.gradient[1]})`
-          : circle.color,
-        boxShadow: `0 6px 18px ${shadowColor}`,
-      }}
-    >
-      <span className="max-w-[92%]">{circle.label}</span>
     </div>
   );
 }

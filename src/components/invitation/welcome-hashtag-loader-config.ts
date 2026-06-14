@@ -32,6 +32,9 @@ export type WelcomeHashtagLoaderConfig = {
   loop: boolean;
   /** Variantes d'animation (animatic en boucle). */
   variedAnimations?: boolean;
+  /** Cercles avantages Privilège en fin de cycle. */
+  showBenefitCircles?: boolean;
+  circlesHoldDuration?: number;
   /** Intro logo avant le cycle de mots (animatic public). */
   introLogoSrc?: string;
 };
@@ -51,6 +54,8 @@ export const ANIMATIC_WELCOME_HASHTAG_LOADER_CONFIG: WelcomeHashtagLoaderConfig 
   fontSizeFluid: "6.5vw",
   loop: true,
   variedAnimations: true,
+  showBenefitCircles: true,
+  circlesHoldDuration: 3.4,
   introLogoSrc: "/img/logo-animatic.png",
 };
 
