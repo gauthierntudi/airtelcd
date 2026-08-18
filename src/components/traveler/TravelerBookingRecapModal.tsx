@@ -20,6 +20,7 @@ import type {
   TravelerHotelOption,
 } from "@/lib/traveler-journey";
 import {
+import { publicPath } from "@/lib/branding";
   computeTravelerBookingTotalUsd,
   formatTravelerPriceUsd,
   parseTravelerPriceUsd,
@@ -118,7 +119,7 @@ export function TravelerBookingRecapModal({
     setPaying(true);
     setPaymentError(null);
     try {
-      const res = await fetch("/api/traveler/booking-payment", {
+      const res = await fetch(publicPath("/api/traveler/booking-payment"), {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

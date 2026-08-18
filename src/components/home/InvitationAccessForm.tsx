@@ -9,6 +9,7 @@ import type {
 } from "@/lib/invitation-access/types";
 import { notify } from "@/lib/toast";
 import { markAirtelSplashSkip } from "@/lib/airtel-splash";
+import { publicPath } from "@/lib/branding";
 
 const EXPERIENCE_INTENTS = new Set<InvitationAccessPostAuth>([
   "privilege",
@@ -75,9 +76,11 @@ export function InvitationAccessForm({
     setLoading(true);
     onBusyChange?.(true);
     try {
-      const authenticateUrl = isExperienceIntent(postAuth)
-        ? "/api/experience/access/authenticate"
-        : "/api/invitation/access/authenticate";
+      const authenticateUrl = publicPath(
+        isExperienceIntent(postAuth)
+          ? "/api/experience/access/authenticate"
+          : "/api/invitation/access/authenticate",
+      );
 
       const res = await fetch(authenticateUrl, {
         method: "POST",
@@ -92,7 +95,7 @@ export function InvitationAccessForm({
       if (postAuth === "invitation") {
         if (!blockInvitationRedirect) {
           markAirtelSplashSkip();
-          window.location.href = data.redirectPath as string;
+          window.location.href = publicPath(data.redirectPath as string);
         }
         return;
       }

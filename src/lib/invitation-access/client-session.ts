@@ -1,3 +1,5 @@
+import { publicPath } from "@/lib/branding";
+
 type InvitationSessionPayload = {
   redirectPath?: string;
   authenticated?: boolean;
@@ -12,7 +14,7 @@ export async function fetchInvitationSessionRedirect(): Promise<string | null> {
 
 export async function fetchInvitationSession(): Promise<InvitationSessionPayload | null> {
   try {
-    const res = await fetch("/api/invitation/access/session", {
+    const res = await fetch(publicPath("/api/invitation/access/session"), {
       credentials: "include",
     });
     if (!res.ok) return null;
@@ -30,7 +32,7 @@ export async function isInvitationSessionAuthenticated(): Promise<boolean> {
 /** Supprime la session serveur (cookie `invitation_access`). */
 export async function destroyInvitationSession(): Promise<void> {
   try {
-    await fetch("/api/invitation/access/session", {
+    await fetch(publicPath("/api/invitation/access/session"), {
       method: "DELETE",
       credentials: "include",
     });

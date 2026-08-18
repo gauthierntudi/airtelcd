@@ -13,6 +13,7 @@ import {
 import type { AdminWhatsAppRecipientsSummary } from "@/lib/messaging/send-admin-whatsapp";
 import { formatInvitationDateTime } from "@/lib/format-invitation-date";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 type IndividualSendConfirm = {
   guestId: string;
@@ -57,7 +58,7 @@ export function AdminMessagesPanel({
     setLoading(true);
     onLoadingChange(true);
     try {
-      const res = await fetch(`/api/admin/messages?day=${day}`, {
+      const res = await fetch(publicPath(`/api/admin/messages?day=${day}`), {
         headers: { "x-admin-secret": adminSecret },
         cache: "no-store",
       });
@@ -109,7 +110,7 @@ export function AdminMessagesPanel({
   }
 
   async function postMessage(body: { day: number; templateId: string; guestId?: string }) {
-    const res = await fetch("/api/admin/messages", {
+    const res = await fetch(publicPath("/api/admin/messages"), {
       method: "POST",
       headers,
       body: JSON.stringify(body),

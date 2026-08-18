@@ -1,3 +1,5 @@
+import { publicPath } from "@/lib/branding";
+
 const ACTION_PREFIX = "action=";
 
 /** Chemin public d’invitation : /api/confirm/action=aBcD1234 */
@@ -38,5 +40,5 @@ export function getConfirmOrigin(fallback?: string): string {
 }
 
 export function invitationAbsoluteUrl(token: string, baseUrl?: string): string {
-  return `${getConfirmOrigin(baseUrl)}${invitationPath(token)}`;
+  return `${getConfirmOrigin(baseUrl)}${publicPath(invitationPath(token))}`;
 }

@@ -17,6 +17,7 @@ import {
   type KioskExperienceFlags,
 } from "@/lib/kiosk-experience";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 export function useExperienceAccess() {
   const [dialerOpen, setDialerOpen] = useState(false);
@@ -130,7 +131,7 @@ export function useExperienceAccess() {
     try {
       const redirectPath = await fetchInvitationSessionRedirect();
       if (redirectPath) {
-        window.location.href = redirectPath;
+        window.location.href = publicPath(redirectPath);
         return;
       }
       openAccessModal("invitation");
@@ -173,7 +174,7 @@ export function useExperienceAccess() {
     const startedAt = Date.now();
 
     try {
-      const res = await fetch("/api/privilege/forfait-activated", {
+      const res = await fetch(publicPath("/api/privilege/forfait-activated"), {
         method: "POST",
         credentials: "include",
       });

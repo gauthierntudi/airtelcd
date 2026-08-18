@@ -8,6 +8,7 @@ import { EventSelect } from "@/components/admin/EventSelect";
 import type { EventSummary } from "@/lib/events";
 import { AdminPhoneInput } from "@/components/admin/AdminPhoneInput";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   onCreated: () => void;
@@ -33,7 +34,7 @@ export function GuestCreateForm({
 
   useEffect(() => {
     const secret = headers["x-admin-secret"];
-    void fetch("/api/events", {
+    void fetch(publicPath("/api/events"), {
       headers: secret ? { "x-admin-secret": secret } : {},
     })
       .then((res) => res.json())
@@ -55,7 +56,7 @@ export function GuestCreateForm({
     }
     setCreating(true);
     try {
-      const res = await fetch("/api/guests", {
+      const res = await fetch(publicPath("/api/guests"), {
         method: "POST",
         headers,
         body: JSON.stringify({

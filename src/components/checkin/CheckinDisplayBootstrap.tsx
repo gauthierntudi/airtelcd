@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import { checkinDisplayPath } from "@/lib/checkin/urls";
 import type { CheckinKioskView } from "@/lib/checkin/kiosk-service";
+import { publicPath } from "@/lib/branding";
 
 const STORAGE_KEY = "golf2026-checkin-display-token";
 
@@ -30,7 +31,7 @@ export function CheckinDisplayBootstrap() {
           }
         }
 
-        const res = await fetch("/api/checkin/kiosk", { method: "POST" });
+        const res = await fetch(publicPath("/api/checkin/kiosk"), { method: "POST" });
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.error ?? "Impossible d'ouvrir la borne");

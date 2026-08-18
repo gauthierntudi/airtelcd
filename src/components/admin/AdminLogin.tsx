@@ -6,6 +6,7 @@ import { LucideIcon } from "@/components/ui/lucide-icon";
 import { useState } from "react";
 import { VodacomIcon } from "@/components/branding/VodacomIcon";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 export function AdminLogin() {
   const [secret, setSecret] = useState("");
@@ -15,7 +16,7 @@ export function AdminLogin() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch("/api/admin/session", {
+    const res = await fetch(publicPath("/api/admin/session"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ secret }),

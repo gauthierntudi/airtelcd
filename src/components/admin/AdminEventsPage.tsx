@@ -12,6 +12,7 @@ import {
   type EventRow,
 } from "@/lib/events";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   adminSecret: string;
@@ -38,7 +39,7 @@ export function AdminEventsPage({ adminSecret }: Props) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/events", {
+      const res = await fetch(publicPath("/api/events"), {
         headers: { "x-admin-secret": adminSecret },
       });
       const data = await res.json();
@@ -59,7 +60,7 @@ export function AdminEventsPage({ adminSecret }: Props) {
     e.preventDefault();
     setCreating(true);
     try {
-      const res = await fetch("/api/events", {
+      const res = await fetch(publicPath("/api/events"), {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -87,7 +88,7 @@ export function AdminEventsPage({ adminSecret }: Props) {
   async function confirmDelete() {
     if (!deleting) return;
     try {
-      const res = await fetch(`/api/events/${deleting.id}`, {
+      const res = await fetch(publicPath(`/api/events/${deleting.id}`), {
         method: "DELETE",
         headers,
       });

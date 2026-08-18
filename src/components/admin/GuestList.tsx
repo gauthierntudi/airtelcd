@@ -47,6 +47,7 @@ import {
   invitationTimeRangeForEventDays,
 } from "@/lib/invitation-time-range";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 const FILTERS: { id: RsvpFilter; label: string }[] = [
   { id: "ALL", label: "Tous" },
@@ -118,7 +119,7 @@ export function GuestList({
 
   useEffect(() => {
     const secret = headers["x-admin-secret"];
-    void fetch("/api/events", {
+    void fetch(publicPath("/api/events"), {
       headers: secret ? { "x-admin-secret": secret } : {},
     })
       .then((res) => res.json())
@@ -180,7 +181,7 @@ export function GuestList({
     }
     setSendingId(g.id);
     try {
-      const res = await fetch(`/api/guests/${g.id}/send`, {
+      const res = await fetch(publicPath(`/api/guests/${g.id}/send`), {
         method: "POST",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify(sendOptions),
@@ -239,7 +240,7 @@ export function GuestList({
     setBulkDeleteConfirm(false);
     setBulkDeleting(true);
     try {
-      const res = await fetch("/api/guests/delete", {
+      const res = await fetch(publicPath("/api/guests/delete"), {
         method: "POST",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify({ guestIds: ids }),
@@ -269,7 +270,7 @@ export function GuestList({
     setBulkSendConfirm(false);
     setBulkSending(true);
     try {
-      const res = await fetch("/api/guests/send", {
+      const res = await fetch(publicPath("/api/guests/send"), {
         method: "POST",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -733,7 +734,7 @@ function GuestEditModal({
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch(`/api/guests/${guest.id}`, {
+      const res = await fetch(publicPath(`/api/guests/${guest.id}`), {
         method: "PATCH",
         headers,
         body: JSON.stringify({
@@ -845,7 +846,7 @@ function ConfirmDeleteModal({
   async function handleDelete() {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/guests/${guest.id}`, {
+      const res = await fetch(publicPath(`/api/guests/${guest.id}`), {
         method: "DELETE",
         headers,
       });

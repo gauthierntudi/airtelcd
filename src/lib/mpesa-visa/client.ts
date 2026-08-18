@@ -1,5 +1,6 @@
 import type { MpesaVisaExperienceState } from "@/lib/mpesa-visa/service";
 import type { UssdPersistAction } from "@/lib/mpesa-ussd/side-effects";
+import { publicPath } from "@/lib/branding";
 
 let mpesaVisaCache: MpesaVisaExperienceState | null = null;
 
@@ -23,7 +24,7 @@ export async function fetchMpesaVisaState(options?: {
     return mpesaVisaCache;
   }
 
-  const res = await fetch("/api/mpesa/visa", { credentials: "include" });
+  const res = await fetch(publicPath("/api/mpesa/visa"), { credentials: "include" });
   const data = await res.json();
   if (!res.ok) {
     const err = new Error(data.error ?? "Session requise") as Error & {
@@ -39,7 +40,7 @@ export async function fetchMpesaVisaState(options?: {
 export async function runMpesaVisaAction(
   action: UssdPersistAction,
 ): Promise<MpesaVisaExperienceState> {
-  const res = await fetch("/api/mpesa/visa", {
+  const res = await fetch(publicPath("/api/mpesa/visa"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

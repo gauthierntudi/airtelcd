@@ -47,6 +47,7 @@ import {
 import { RSVP_CONFIG, type GuestRow } from "@/lib/guest-types";
 import type { WhatsAppTemplateKind } from "@prisma/client";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   adminSecret: string;
@@ -87,10 +88,10 @@ export function AdminEventDetailPage({ adminSecret, eventId }: Props) {
     setLoading(true);
     try {
       const [eventRes, guestsRes] = await Promise.all([
-        fetch(`/api/events/${eventId}`, {
+        fetch(publicPath(`/api/events/${eventId}`), {
           headers: { "x-admin-secret": adminSecret },
         }),
-        fetch(`/api/guests?eventId=${encodeURIComponent(eventId)}`, {
+        fetch(publicPath(`/api/guests?eventId=${encodeURIComponent(eventId)}`), {
           headers: { "x-admin-secret": adminSecret },
         }),
       ]);
@@ -158,7 +159,7 @@ export function AdminEventDetailPage({ adminSecret, eventId }: Props) {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch(`/api/events/${eventId}`, {
+      const res = await fetch(publicPath(`/api/events/${eventId}`), {
         method: "PATCH",
         headers,
         body: JSON.stringify({
@@ -185,7 +186,7 @@ export function AdminEventDetailPage({ adminSecret, eventId }: Props) {
     e.preventDefault();
     setAddingTemplate(true);
     try {
-      const res = await fetch(`/api/events/${eventId}/templates`, {
+      const res = await fetch(publicPath(`/api/events/${eventId}/templates`), {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -211,7 +212,7 @@ export function AdminEventDetailPage({ adminSecret, eventId }: Props) {
   async function deleteTemplate(templateId: string) {
     try {
       const res = await fetch(
-        `/api/events/${eventId}/templates/${templateId}`,
+        publicPath(`/api/events/${eventId}/templates/${templateId}`),
         { method: "DELETE", headers },
       );
       const data = await res.json();
@@ -227,7 +228,7 @@ export function AdminEventDetailPage({ adminSecret, eventId }: Props) {
     if (!sendConfirm) return;
     setSendingId(sendConfirm.id);
     try {
-      const res = await fetch(`/api/events/${eventId}/messages/send`, {
+      const res = await fetch(publicPath(`/api/events/${eventId}/messages/send`), {
         method: "POST",
         headers,
         body: JSON.stringify({ templateId: sendConfirm.id }),

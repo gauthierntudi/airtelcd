@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { InvitationBottomSheet } from "@/components/invitation/InvitationBottomSheet";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import type { CheckinGuestView } from "@/lib/checkin/kiosk-service";
-import { logoSrc } from "@/lib/branding";
+import { logoSrc, publicPath } from "@/lib/branding";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
 import { notify } from "@/lib/toast";
 
@@ -31,7 +31,7 @@ export function CheckinGuestFlow({ token }: Props) {
     channel === "email" ? setEmailContact : setSmsContact;
 
   const refresh = useCallback(async () => {
-    const res = await fetch(`/api/checkin/kiosk/${token}`, {
+    const res = await fetch(publicPath(`/api/checkin/kiosk/${token}`), {
       cache: "no-store",
     });
     const data = await res.json();
@@ -50,7 +50,7 @@ export function CheckinGuestFlow({ token }: Props) {
       try {
         if (!scannedRef.current) {
           scannedRef.current = true;
-          const scanRes = await fetch(`/api/checkin/kiosk/${token}/scan`, {
+          const scanRes = await fetch(publicPath(`/api/checkin/kiosk/${token}/scan`), {
             method: "POST",
           });
           const scanData = await scanRes.json();
@@ -96,7 +96,7 @@ export function CheckinGuestFlow({ token }: Props) {
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/checkin/kiosk/${token}/authenticate`, {
+      const res = await fetch(publicPath(`/api/checkin/kiosk/${token}/authenticate`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel, contact: value }),
@@ -114,7 +114,7 @@ export function CheckinGuestFlow({ token }: Props) {
   async function handleConfirmRsvp() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/checkin/kiosk/${token}/confirm`, {
+      const res = await fetch(publicPath(`/api/checkin/kiosk/${token}/confirm`), {
         method: "POST",
       });
       const data = await res.json();

@@ -18,6 +18,7 @@ import {
   type GuestImportRow,
 } from "@/lib/parse-guest-csv";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   onImported: (summary?: string) => void;
@@ -41,7 +42,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose, defaul
 
   useEffect(() => {
     const secret = headers["x-admin-secret"];
-    void fetch("/api/events", {
+    void fetch(publicPath("/api/events"), {
       headers: secret ? { "x-admin-secret": secret } : {},
     })
       .then((res) => res.json())
@@ -108,7 +109,7 @@ export function GuestImportForm({ onImported, headers, embedded, onClose, defaul
     }
     setImporting(true);
     try {
-      const res = await fetch("/api/guests/import", {
+      const res = await fetch(publicPath("/api/guests/import"), {
         method: "POST",
         headers,
         body: JSON.stringify({

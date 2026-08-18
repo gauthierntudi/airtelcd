@@ -9,6 +9,7 @@ import { GuestList } from "@/components/admin/GuestList";
 import type { GuestRow } from "@/lib/guest-types";
 import type { MessagingStatus } from "@/lib/messaging/config";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   adminSecret: string;
@@ -30,7 +31,7 @@ export function AdminDashboard({ adminSecret, messagingStatus }: Props) {
   const loadGuests = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/guests", {
+      const res = await fetch(publicPath("/api/guests"), {
         headers: { "x-admin-secret": adminSecret },
       });
       const data = await res.json();

@@ -1,3 +1,4 @@
+import { publicPath } from "@/lib/branding";
 import { getAppBaseUrl } from "@/lib/invitation-url";
 
 export function checkinScanPath(token: string): string {
@@ -5,7 +6,7 @@ export function checkinScanPath(token: string): string {
 }
 
 export function checkinScanAbsoluteUrl(token: string, baseUrl?: string): string {
-  return `${getAppBaseUrl(baseUrl)}${checkinScanPath(token)}`;
+  return `${getAppBaseUrl(baseUrl)}${publicPath(checkinScanPath(token))}`;
 }
 
 export function checkinDisplayPath(token?: string): string {
@@ -16,5 +17,5 @@ export function checkinDisplayAbsoluteUrl(
   token: string,
   baseUrl?: string,
 ): string {
-  return `${getAppBaseUrl(baseUrl)}${checkinDisplayPath(token)}`;
+  return `${getAppBaseUrl(baseUrl)}${publicPath(checkinDisplayPath(token))}`;
 }

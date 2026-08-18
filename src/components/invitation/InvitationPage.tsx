@@ -14,6 +14,7 @@ import type { InvitationGuestView } from "@/lib/load-invitation-guest";
 import { useInvitationPassDownload } from "@/hooks/use-invitation-pass-download";
 import { notify } from "@/lib/toast";
 import { clearAirtelSplashSkip } from "@/lib/airtel-splash";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   guest: InvitationGuestView;
@@ -68,7 +69,7 @@ export function InvitationPage({
 
     try {
       const data = await notify.promise(
-        fetch("/api/rsvp", {
+        fetch(publicPath("/api/rsvp"), {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

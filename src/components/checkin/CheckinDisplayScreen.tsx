@@ -20,7 +20,7 @@ import {
   CHECKIN_SUCCESS_COUNTDOWN_SEC,
 } from "@/lib/checkin/constants";
 import type { CheckinKioskView } from "@/lib/checkin/kiosk-service";
-import { logoSrc } from "@/lib/branding";
+import { logoSrc, publicPath } from "@/lib/branding";
 import { EVENT } from "@/lib/event";
 
 const POLL_MS = 1500;
@@ -112,7 +112,7 @@ export function CheckinDisplayScreen({ token }: Props) {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(`/api/checkin/kiosk/${token}/display`, {
+      const res = await fetch(publicPath(`/api/checkin/kiosk/${token}/display`), {
         cache: "no-store",
       });
       const data = await res.json();
@@ -144,7 +144,7 @@ export function CheckinDisplayScreen({ token }: Props) {
 
     setCancelling(true);
     try {
-      const res = await fetch(`/api/checkin/kiosk/${token}/reset`, {
+      const res = await fetch(publicPath(`/api/checkin/kiosk/${token}/reset`), {
         method: "POST",
       });
       const data = await res.json();

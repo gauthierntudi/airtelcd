@@ -6,6 +6,7 @@ import { LucideIcon } from "@/components/ui/lucide-icon";
 import { VODACOM_MARKET_NAME } from "@/lib/mpesa-visa/constants";
 import type { AdminMpesaCardRow } from "@/lib/mpesa-visa/service";
 import { formatGuestDate } from "@/lib/guest-types";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   guestId: string;
@@ -19,7 +20,7 @@ export function GuestMpesaSummary({ guestId, adminSecret }: Props) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch("/api/admin/mpesa", {
+    fetch(publicPath("/api/admin/mpesa"), {
       headers: { "x-admin-secret": adminSecret },
     })
       .then(async (res) => {

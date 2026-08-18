@@ -22,6 +22,7 @@ import {
 } from "@/lib/mpesa-visa/constants";
 import { formatGuestDate } from "@/lib/guest-types";
 import { notify } from "@/lib/toast";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   adminSecret: string;
@@ -47,7 +48,7 @@ export function AdminMpesaPanel({
     setLoading(true);
     onLoadingChange?.(true);
     try {
-      const res = await fetch("/api/admin/mpesa", {
+      const res = await fetch(publicPath("/api/admin/mpesa"), {
         headers: { "x-admin-secret": adminSecret },
       });
       const data = await res.json();
