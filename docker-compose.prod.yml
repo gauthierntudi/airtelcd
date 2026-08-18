@@ -39,9 +39,18 @@ services:
       ADMIN_SECRET: ${ADMIN_SECRET:-change-me-in-production}
       PRISMA_CONNECTION_LIMIT: ${PRISMA_CONNECTION_LIMIT:-10}
       SKIP_DB_MIGRATE: "1"
+    container_name: airtelcd-app
+    networks:
+      - mission-outil_default
     depends_on:
       db:
         condition: service_healthy
+
+networks:
+  # Réseau Docker existant créé par le projet "mission-outil" sur le VPS.
+  # Le Nginx de mission-outil pourra router vers `airtelcd-app:3000`.
+  mission-outil_default:
+    external: true
 
 volumes:
   postgres_data:
