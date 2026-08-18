@@ -15,7 +15,7 @@ services:
       retries: 10
       start_period: 10s
 
-  app:
+  airtel_app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -23,6 +23,7 @@ services:
       args:
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
         URL_ORIGIN_CONFIRM: ${URL_ORIGIN_CONFIRM:-http://localhost:3000}
+        NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
     restart: unless-stopped
     # Coexistence VPS : n'expose pas l'app en public (bind localhost uniquement).
     # Nginx (ou reverse proxy) pourra router vers 127.0.0.1:<APP_HOST_PORT>.
@@ -36,11 +37,13 @@ services:
       DIRECT_URL: postgresql://${POSTGRES_USER:-golf}:${POSTGRES_PASSWORD:-golf}@db:5432/${POSTGRES_DB:-airteldb}?schema=public
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       URL_ORIGIN_CONFIRM: ${URL_ORIGIN_CONFIRM:-http://localhost:3000}
+      NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
       ADMIN_SECRET: ${ADMIN_SECRET:-change-me-in-production}
       PRISMA_CONNECTION_LIMIT: ${PRISMA_CONNECTION_LIMIT:-10}
       SKIP_DB_MIGRATE: "1"
     container_name: airtelcd-app
     networks:
+      - default
       - mission-outil_default
     depends_on:
       db:

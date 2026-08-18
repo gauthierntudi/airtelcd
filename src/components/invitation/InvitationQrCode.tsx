@@ -1,6 +1,7 @@
 "use client";
 
 import QRCode from "react-qr-code";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   value: string;
@@ -45,7 +46,7 @@ export function InvitationQrCode({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/img/airtel-a.svg"
+            src={publicPath("/img/airtel-a.svg")}
             alt=""
             className="h-[72%] w-auto object-contain"
           />

@@ -31,8 +31,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
 ARG URL_ORIGIN_CONFIRM=http://localhost:3000
+ARG NEXT_PUBLIC_BASE_PATH=
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL \
     URL_ORIGIN_CONFIRM=$URL_ORIGIN_CONFIRM \
+    NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH \
     DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build" \
     DIRECT_URL="postgresql://build:build@127.0.0.1:5432/build"
 RUN npx prisma generate
@@ -40,9 +42,11 @@ RUN npx next build
 
 # --- production runtime ---
 FROM base AS runner
+ARG NEXT_PUBLIC_BASE_PATH=
 ENV NODE_ENV=production \
     PORT=3000 \
-    HOSTNAME=0.0.0.0
+    HOSTNAME=0.0.0.0 \
+    NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
@@ -64,6 +68,6 @@ RUN mkdir -p node_modules/.bin \
 USER nextjs
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=25s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3000').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "const b=(process.env.NEXT_PUBLIC_BASE_PATH||'').replace(/\\/+$/,''); fetch('http://127.0.0.1:3000'+b+'/').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "server.js"]

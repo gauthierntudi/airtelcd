@@ -1,4 +1,12 @@
-/** Chemins des assets dans `public/img/` */
+/** Préfixe `NEXT_PUBLIC_BASE_PATH` pour les balises `<img>` brutes (pas `next/image`). */
+export function publicPath(path: string): string {
+  const raw = process.env.NEXT_PUBLIC_BASE_PATH?.trim() ?? "";
+  const base =
+    raw && raw !== "/" ? `/${raw.replace(/^\/+|\/+$/g, "")}` : "";
+  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/** Chemins des assets dans `public/img/` — sans basePath (`next/image` le préfixe). */
 export const BRAND = {
   logoWhite: "/img/airtel-logo-white.png",
   logoBlack: "/img/airtel-logo.png",
