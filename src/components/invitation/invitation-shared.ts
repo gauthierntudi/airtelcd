@@ -1,11 +1,12 @@
 import type { RsvpStatus } from "@prisma/client";
 import type { InvitationGuestView } from "@/lib/load-invitation-guest";
+import { publicPath } from "@/lib/branding";
 
 export const INVITATION_HERO_IMAGES = [
-  "/img/img-01.jpg",
-  "/img/img-02.jpg",
-  "/img/img-03.jpg",
-  "/img/img-04.jpg",
+  publicPath("/img/img-01.jpg"),
+  publicPath("/img/img-02.jpg"),
+  publicPath("/img/img-03.jpg"),
+  publicPath("/img/img-04.jpg"),
 ] as const;
 
 export type InvitationHeroImage = (typeof INVITATION_HERO_IMAGES)[number];

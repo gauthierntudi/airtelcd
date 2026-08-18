@@ -6,7 +6,10 @@ import { useEffect, useState } from "react";
 import { AirtelSplashLoader } from "@/components/home/AirtelSplashLoader";
 import { InvitationAccessForm } from "@/components/home/InvitationAccessForm";
 import { VodacomLogo } from "@/components/branding/VodacomLogo";
-import { pickInvitationHeroImage } from "@/components/invitation/invitation-shared";
+import {
+  INVITATION_HERO_IMAGES,
+  pickInvitationHeroImage,
+} from "@/components/invitation/invitation-shared";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import {
   destroyInvitationSession,
@@ -17,7 +20,7 @@ export function InvitationLoginPage() {
   const [sessionPath, setSessionPath] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const [authenticating, setAuthenticating] = useState(false);
-  const [heroSrc, setHeroSrc] = useState("/img/img-04.jpg");
+  const [heroSrc, setHeroSrc] = useState(INVITATION_HERO_IMAGES[0]);
 
   useEffect(() => {
     setHeroSrc(pickInvitationHeroImage());
