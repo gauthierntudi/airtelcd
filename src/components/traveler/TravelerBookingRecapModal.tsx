@@ -19,8 +19,8 @@ import type {
   TravelerBilletOption,
   TravelerHotelOption,
 } from "@/lib/traveler-journey";
-import {
 import { publicPath } from "@/lib/branding";
+import {
   computeTravelerBookingTotalUsd,
   formatTravelerPriceUsd,
   parseTravelerPriceUsd,
