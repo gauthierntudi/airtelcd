@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { AppProviders } from "@/components/providers/AppProviders";
-import { BRAND } from "@/lib/branding";
+import { BRAND, brandIconSrc } from "@/lib/branding";
 import { EVENT } from "@/lib/event";
 import "./globals.css";
 
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   description:
     "Plateforme événementielle — invitation, expériences et activités enfants.",
   icons: {
-    icon: [{ url: BRAND.favicon, type: "image/png" }],
-    apple: [{ url: BRAND.icon, type: "image/png" }],
+    icon: [{ url: brandIconSrc(), type: "image/png" }],
+    apple: [{ url: brandIconSrc(), type: "image/png" }],
   },
 };
 

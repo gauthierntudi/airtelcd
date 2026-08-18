@@ -13,7 +13,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { LucideIcon } from "@/components/ui/lucide-icon";
-import { BRAND } from "@/lib/branding";
+import { brandIconSrc } from "@/lib/branding";
 import { getCarrefourProductUi } from "@/lib/mpesa-visa/carrefour-products-ui";
 import {
   getCarrefourProduct,
@@ -264,7 +264,7 @@ export function VodacomMarketModal({
           <div className="flex items-center gap-3 px-4 py-3 sm:px-5">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-md ring-2 ring-white/90">
               <Image
-                src={BRAND.icon}
+                src={brandIconSrc()}
                 alt=""
                 width={40}
                 height={40}
@@ -558,7 +558,7 @@ function NoCardState({
     <div className="flex flex-col items-center bg-white px-4 py-14 text-center sm:px-8">
       <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-vodacom-cream shadow-md ring-2 ring-vodacom-red/20">
         <Image
-          src={BRAND.icon}
+          src={brandIconSrc()}
           alt=""
           width={48}
           height={48}

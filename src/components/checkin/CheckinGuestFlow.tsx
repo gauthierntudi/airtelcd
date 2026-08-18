@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { InvitationBottomSheet } from "@/components/invitation/InvitationBottomSheet";
 import { LucideIcon } from "@/components/ui/lucide-icon";
 import type { CheckinGuestView } from "@/lib/checkin/kiosk-service";
-import { BRAND } from "@/lib/branding";
+import { logoSrc } from "@/lib/branding";
 import type { InvitationAccessChannel } from "@/lib/invitation-access/types";
 import { notify } from "@/lib/toast";
 
@@ -163,7 +163,7 @@ export function CheckinGuestFlow({ token }: Props) {
     <>
       <div className="min-h-[100dvh] bg-vodacom-cream px-5 py-8">
         <Image
-          src={BRAND.logoBlack}
+          src={logoSrc("black")}
           alt="Vodacom Privilège"
           width={140}
           height={40}

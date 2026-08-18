@@ -1,4 +1,4 @@
-/** Préfixe `NEXT_PUBLIC_BASE_PATH` pour les balises `<img>` brutes (pas `next/image`). */
+/** Préfixe `NEXT_PUBLIC_BASE_PATH` pour les URLs servies au navigateur. */
 export function publicPath(path: string): string {
   const raw = process.env.NEXT_PUBLIC_BASE_PATH?.trim() ?? "";
   const base =
@@ -6,7 +6,7 @@ export function publicPath(path: string): string {
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
-/** Chemins des assets dans `public/img/` — sans basePath (`next/image` le préfixe). */
+/** Chemins dans `public/img/` — sans préfixe. Passer par `publicPath` / `logoSrc`. */
 export const BRAND = {
   logoWhite: "/img/airtel-logo-white.png",
   logoBlack: "/img/airtel-logo.png",
@@ -26,5 +26,9 @@ export function logoSrc(variant: LogoVariant): string {
     light: BRAND.logoLight,
     color: BRAND.logoColor,
   };
-  return map[variant];
+  return publicPath(map[variant]);
+}
+
+export function brandIconSrc(): string {
+  return publicPath(BRAND.icon);
 }

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BRAND } from "@/lib/branding";
+import { brandIconSrc } from "@/lib/branding";
 
 type Props = {
   href?: string;
@@ -17,10 +17,11 @@ export function VodacomIcon({
 }: Props) {
   const image = (
     <Image
-      src={BRAND.icon}
+      src={brandIconSrc()}
       alt="Airtel RSVP"
       width={size}
       height={size}
+      unoptimized
       className={`rounded-xl object-contain ${className}`}
       priority={priority}
     />

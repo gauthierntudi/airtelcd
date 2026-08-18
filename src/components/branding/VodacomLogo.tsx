@@ -28,7 +28,7 @@ export function VodacomLogo({
       alt="Airtel RSVP"
       width={width}
       height={height}
-      unoptimized={isSvg}
+      unoptimized
       className={`h-auto w-auto object-contain object-left ${className}`}
       style={{ maxHeight: height }}
       priority={priority}

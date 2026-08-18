@@ -20,7 +20,7 @@ import {
   CHECKIN_SUCCESS_COUNTDOWN_SEC,
 } from "@/lib/checkin/constants";
 import type { CheckinKioskView } from "@/lib/checkin/kiosk-service";
-import { BRAND } from "@/lib/branding";
+import { logoSrc } from "@/lib/branding";
 import { EVENT } from "@/lib/event";
 
 const POLL_MS = 1500;
@@ -181,7 +181,7 @@ export function CheckinDisplayScreen({ token }: Props) {
       <header className="relative z-10 flex items-center justify-between px-6 py-5 sm:px-10 sm:py-6">
         <div className="flex items-center gap-4 sm:gap-6">
           <Image
-            src={BRAND.logoWhite}
+            src={logoSrc("white")}
             alt="Vodacom Privilège"
             width={200}
             height={52}

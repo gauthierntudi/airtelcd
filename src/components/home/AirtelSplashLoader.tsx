@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { publicPath } from "@/lib/branding";
 
 type Props = {
   className?: string;
@@ -16,7 +17,7 @@ export function AirtelSplashLoader({ className = "" }: Props) {
     >
       <div className="flex flex-col items-center">
         <Image
-          src="/img/airtel-a.svg"
+          src={publicPath("/img/airtel-a.svg")}
           alt="Airtel"
           width={96}
           height={128}
