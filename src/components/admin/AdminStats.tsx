@@ -62,20 +62,20 @@ function StatCard({
   const shell = featured
     ? "border-vodacom-red bg-vodacom-red text-white shadow-lg shadow-vodacom-red/25"
     : outline
-      ? "border-white/15 bg-transparent text-white"
-      : "border-white/10 bg-[#161616] text-white";
+      ? "border-zinc-200 bg-transparent text-zinc-900"
+      : "border-zinc-200 bg-white text-zinc-900";
 
-  const labelClass = featured ? "text-white/80" : "text-white/50";
-  const subClass = featured ? "text-white/70" : "text-white/40";
+  const labelClass = featured ? "text-white/85" : "text-zinc-500";
+  const subClass = featured ? "text-white/80" : "text-zinc-400";
   const iconWrap = featured
-    ? "bg-white/15 text-white"
+    ? "bg-white/20 text-white"
     : outline
-      ? "bg-white/10 text-white"
-      : "bg-white/5 text-white/70";
+      ? "bg-zinc-100 text-zinc-700"
+      : "bg-zinc-100 text-zinc-600";
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-2xl border p-5 transition hover:border-white/20 ${shell}`}
+      className={`group relative overflow-hidden rounded-2xl border p-5 transition hover:border-zinc-300 ${shell}`}
     >
       <div className="mb-4 flex items-start justify-between">
         <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconWrap}`}>
@@ -84,7 +84,7 @@ function StatCard({
         <LucideIcon
           icon={ArrowUpRight}
           size={16}
-          className="text-white/20 opacity-0 transition group-hover:opacity-100"
+          className="text-zinc-300 opacity-0 transition group-hover:opacity-100"
         />
       </div>
       <p className={`text-xs font-semibold uppercase tracking-wide ${labelClass}`}>{label}</p>

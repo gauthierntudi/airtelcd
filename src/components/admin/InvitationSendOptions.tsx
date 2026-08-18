@@ -34,7 +34,7 @@ export function InvitationSendOptions({
       className={
         compact
           ? "w-full space-y-3"
-          : "w-fit max-w-full rounded-2xl border border-white/[0.08] bg-[#121212] p-4 sm:p-5"
+          : "w-fit max-w-full rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5"
       }
     >
       {!compact ? (
@@ -46,7 +46,7 @@ export function InvitationSendOptions({
       ) : null}
 
       <section className="shrink-0 space-y-2">
-        <p className="text-xs font-semibold text-white/60">Canaux</p>
+        <p className="text-xs font-semibold text-zinc-500">Canaux</p>
         <div className="flex flex-wrap gap-2">
           <ChannelSwitchRow
             icon={Mail}
@@ -66,7 +66,7 @@ export function InvitationSendOptions({
       </section>
 
       {noChannel ? (
-        <p className="mt-3 text-xs text-amber-400/90">Activez au moins un canal.</p>
+        <p className="mt-3 text-xs text-amber-700">Activez au moins un canal.</p>
       ) : null}
     </div>
   );
@@ -96,19 +96,19 @@ function ChannelSwitchRow({
       className={`inline-flex items-center gap-2.5 rounded-xl border py-2 pl-2.5 pr-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vodacom-red/50 disabled:cursor-not-allowed disabled:opacity-50 ${
         checked && !disabled
           ? "border-vodacom-red/35 bg-vodacom-red/[0.08]"
-          : "border-white/10 bg-[#1a1a1a] hover:border-white/18"
+          : "border-zinc-200 bg-zinc-50 hover:border-zinc-300"
       }`}
     >
       <span
         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
           checked && !disabled
             ? "bg-vodacom-red/20 text-vodacom-red"
-            : "bg-white/5 text-white/45"
+            : "bg-zinc-100 text-zinc-500"
         }`}
       >
         <LucideIcon icon={icon} size={16} />
       </span>
-      <span className="text-sm font-medium text-white">{label}</span>
+      <span className="text-sm font-medium text-zinc-900">{label}</span>
       <ToggleSwitchVisual checked={checked && !disabled} />
     </button>
   );
@@ -119,7 +119,7 @@ function ToggleSwitchVisual({ checked }: { checked: boolean }) {
     <span
       aria-hidden
       className={`invite-toggle relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors duration-200 ${
-        checked ? "bg-vodacom-red" : "bg-white/15"
+        checked ? "bg-vodacom-red" : "bg-zinc-200"
       }`}
     >
       <span

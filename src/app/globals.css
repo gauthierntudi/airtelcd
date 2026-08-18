@@ -1,45 +1,13 @@
 @import "tailwindcss";
 
-/* Vodafone brand — public/fonts/ */
-@font-face {
-  font-family: Vodafone;
-  src: url("/fonts/VodafoneLt.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Vodafone;
-  src: url("/fonts/VodafoneRg.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Vodafone;
-  src: url("/fonts/VodafoneRg_Bd.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: Vodafone;
-  src: url("/fonts/VodafoneExB.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --vodacom-red: #e60000;
   --vodacom-red-dark: #b30000;
   --vodacom-silver: #c0c0c0;
   --vodacom-black: #1a1a1a;
   --vodacom-cream: #faf8f5;
-  --font-vodafone: Vodafone, system-ui, sans-serif;
+  --font-app: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
@@ -48,74 +16,69 @@
   --color-vodacom-silver: var(--vodacom-silver);
   --color-vodacom-black: var(--vodacom-black);
   --color-vodacom-cream: var(--vodacom-cream);
-  --font-sans: var(--font-vodafone);
+  --font-sans: var(--font-app);
 }
 
-/* Fichiers dédiés — évite le faux gras navigateur sur la pile Vodafone */
-@font-face {
-  font-family: "Vodafone ExB";
-  src: url("/fonts/VodafoneExB.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+/* Anciennes classes Vodafone → graisses de la police système */
+.font-vodafone-exb,
+.font-vodafone-exb.font-normal {
+  font-family: var(--font-app);
+  font-weight: 800;
 }
 
-@font-face {
-  font-family: "Vodafone Rg";
-  src: url("/fonts/VodafoneRg.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+.font-vodafone-rg,
+.font-vodafone-rg.font-normal {
+  font-family: var(--font-app);
+  font-weight: 400;
 }
 
-@font-face {
-  font-family: "Vodafone Rg Bd";
-  src: url("/fonts/VodafoneRg_Bd.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+.font-vodafone-rg-bd,
+.font-vodafone-rg-bd.font-normal {
+  font-family: var(--font-app);
+  font-weight: 700;
 }
 
-@font-face {
-  font-family: "Vodafone Lt";
-  src: url("/fonts/VodafoneLt.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-.font-vodafone-exb {
-  font-family: "Vodafone ExB", var(--font-vodafone), sans-serif;
-  font-weight: normal;
-  font-synthesis: none;
-}
-
-.font-vodafone-rg {
-  font-family: "Vodafone Rg", var(--font-vodafone), sans-serif;
-  font-weight: normal;
-  font-synthesis: none;
-}
-
-.font-vodafone-rg-bd {
-  font-family: "Vodafone Rg Bd", var(--font-vodafone), sans-serif;
-  font-weight: normal;
-  font-synthesis: none;
-}
-
-.font-vodafone-lt {
-  font-family: "Vodafone Lt", var(--font-vodafone), sans-serif;
-  font-weight: normal;
-  font-synthesis: none;
+.font-vodafone-lt,
+.font-vodafone-lt.font-normal {
+  font-family: var(--font-app);
+  font-weight: 300;
 }
 
 html,
 body {
-  font-family: var(--font-vodafone);
+  font-family: var(--font-app);
 }
 
 body {
   background: var(--vodacom-cream);
   color: var(--vodacom-black);
+}
+
+@keyframes airtel-splash-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  45% {
+    transform: scaleX(0.48);
+  }
+  75% {
+    transform: scaleX(0.78);
+  }
+  100% {
+    transform: scaleX(0.92);
+  }
+}
+
+.airtel-splash-progress {
+  transform-origin: left center;
+  animation: airtel-splash-progress 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .airtel-splash-progress {
+    animation: none;
+    transform: scaleX(0.5);
+  }
 }
 
 /* Animatic PWA — plein écran, sans bande blanche (safe areas iOS / Android) */
@@ -154,19 +117,19 @@ html:has(.animatic-pwa-root) body {
   z-index: 1;
 }
 
-/* Admin dashboard — thème sombre */
-.admin-dark {
-  --admin-bg: #0c0c0c;
-  --admin-surface: #161616;
-  --admin-surface-2: #1f1f1f;
-  --admin-border: rgb(255 255 255 / 0.08);
-  --admin-muted: rgb(255 255 255 / 0.55);
+/* Admin dashboard — thème clair */
+.admin-light {
+  --admin-bg: #f4f5f7;
+  --admin-surface: #ffffff;
+  --admin-surface-2: #f4f4f5;
+  --admin-border: rgb(24 24 27 / 0.1);
+  --admin-muted: rgb(82 82 91);
 }
 
 /* react-toastify — alignement charte Vodacom */
 .toastify-container {
   z-index: 9999;
-  font-family: var(--font-vodafone);
+  font-family: var(--font-app);
 }
 
 .toastify-toast {
@@ -231,6 +194,13 @@ html:has(.animatic-pwa-root) body {
 
 .Toastify__toast-theme--dark .Toastify__progress-bar-theme--dark {
   background: rgb(255 255 255 / 0.35);
+}
+
+/* Invitation RSVP — plein écran, pas de scroll page */
+html:has(.invitation-rsvp-shell),
+html:has(.invitation-rsvp-shell) body {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* Invitation mobile onboarding */

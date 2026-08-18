@@ -1,12 +1,12 @@
 export const EVENT = {
-  title: "Vodacom Privilège Golf 2026",
+  title: "Airtel RSVP",
   dateLabel: "Du 12 au 14 juin 2026",
   timeLabel: "14h00 à 19h00",
   venue: "Golf Club de Kinshasa, Gombe",
   dressCode: "Casual golf / Polo",
   contactEmail: "contact@vodacomprivilege.com",
   contactPhone: "+243 81 000 0000",
-  organizer: "Vodacom Privilège",
+  organizer: "Airtel RSVP",
   mapsUrl:
     "https://www.google.com/maps/search/?api=1&query=Golf+Club+de+Kinshasa+Gombe",
 } as const;

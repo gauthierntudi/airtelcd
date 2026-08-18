@@ -57,9 +57,10 @@ export async function sendInvitationWhatsApp(
 export type GenericWhatsAppParams = {
   phoneE164: string;
   contentSid: string;
+  contentVariables?: Record<string, string>;
 };
 
-/** Template WhatsApp sans variables (contenu fixe Twilio). */
+/** Template WhatsApp (SID événement ou générique). */
 export async function sendGenericWhatsApp(
   params: GenericWhatsAppParams,
 ): Promise<void> {
@@ -75,5 +76,8 @@ export async function sendGenericWhatsApp(
     from,
     to: toWhatsAppAddress(params.phoneE164),
     contentSid: params.contentSid,
+    ...(params.contentVariables
+      ? { contentVariables: JSON.stringify(params.contentVariables) }
+      : {}),
   });
 }

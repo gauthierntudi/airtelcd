@@ -155,13 +155,13 @@ export function AdminMpesaPanel({
 
       <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
         <div className="space-y-4 xl:col-span-8">
-          <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#161616]">
-            <div className="flex flex-col gap-4 border-b border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+            <div className="flex flex-col gap-4 border-b border-zinc-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-base font-bold text-white">
+                <h2 className="text-base font-bold text-zinc-900">
                   Registre des cartes Visa
                 </h2>
-                <p className="mt-0.5 text-sm text-white/50">
+                <p className="mt-0.5 text-sm text-zinc-500">
                   Une carte par invité connecté via OTP
                 </p>
               </div>
@@ -169,14 +169,14 @@ export function AdminMpesaPanel({
                 <LucideIcon
                   icon={Search}
                   size={16}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/35"
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
                 />
                 <input
                   type="search"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Rechercher invité, e-mail, carte…"
-                  className="w-full rounded-xl border border-white/10 bg-[#1f1f1f] py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-white/35 focus:border-vodacom-red/50 focus:outline-none focus:ring-1 focus:ring-vodacom-red/30"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pl-9 pr-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-vodacom-red/50 focus:outline-none focus:ring-1 focus:ring-vodacom-red/30"
                 />
               </div>
             </div>
@@ -189,7 +189,7 @@ export function AdminMpesaPanel({
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-white/10 bg-[#1a1a1a] text-[11px] font-semibold uppercase tracking-wider text-white/45">
+                    <tr className="border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                       <th className="px-5 py-3">Invité</th>
                       <th className="px-4 py-3">Carte</th>
                       <th className="px-4 py-3">Statut</th>
@@ -219,7 +219,7 @@ export function AdminMpesaPanel({
             )}
 
             {!loading && filtered.length > 0 && (
-              <p className="border-t border-white/10 px-5 py-3 text-xs text-white/40">
+              <p className="border-t border-zinc-200 px-5 py-3 text-xs text-zinc-400">
                 {filtered.length} carte{filtered.length !== 1 ? "s" : ""}
                 {search.trim() ? ` (filtré sur ${rows.length})` : ""}
               </p>
@@ -251,7 +251,7 @@ export function AdminMpesaPanel({
               <StatTile
                 label="Bonus émis"
                 value={`${metrics.bonusIssued} $`}
-                dotClass="bg-white/30"
+                dotClass="bg-zinc-300"
               />
               <StatTile
                 label="Encore disponible"
@@ -270,13 +270,13 @@ export function AdminMpesaPanel({
               {metrics.productCounts.map((p) => (
                 <li
                   key={p.id}
-                  className="flex items-center justify-between rounded-xl border border-white/10 bg-[#1f1f1f] px-4 py-3"
+                  className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3"
                 >
                   <div className="min-w-0 pr-3">
-                    <p className="truncate text-sm font-medium text-white">
+                    <p className="truncate text-sm font-medium text-zinc-900">
                       {p.name}
                     </p>
-                    <p className="mt-0.5 text-xs text-white/45">
+                    <p className="mt-0.5 text-xs text-zinc-500">
                       {p.count} vente{p.count !== 1 ? "s" : ""}
                     </p>
                   </div>
@@ -298,23 +298,23 @@ export function AdminMpesaPanel({
             }
           >
             {metrics.recentPurchases.length === 0 ? (
-              <p className="text-sm text-white/45">Aucun achat enregistré.</p>
+              <p className="text-sm text-zinc-500">Aucun achat enregistré.</p>
             ) : (
               <ul className="space-y-2">
                 {metrics.recentPurchases.map((p) => (
                   <li
                     key={p.id}
-                    className="rounded-xl border border-white/10 bg-[#1f1f1f] px-3 py-2.5"
+                    className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-medium leading-snug text-white">
+                      <p className="text-sm font-medium leading-snug text-zinc-900">
                         {p.productName}
                       </p>
                       <span className="shrink-0 font-mono text-xs font-bold text-vodacom-red">
                         {p.priceUsd.toFixed(0)} $
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-white/45">
+                    <p className="mt-1 text-xs text-zinc-500">
                       {p.guestName} · {formatGuestDate(p.createdAt)}
                     </p>
                   </li>
@@ -340,47 +340,47 @@ function CardTableGroup({
   return (
     <>
       <tr
-        className={`cursor-pointer border-b border-white/5 transition hover:bg-white/[0.03] ${
-          open ? "bg-white/[0.04]" : ""
+        className={`cursor-pointer border-b border-zinc-100 transition hover:bg-zinc-50 ${
+          open ? "bg-zinc-50" : ""
         }`}
         onClick={onToggle}
       >
         <td className="px-5 py-3.5">
-          <p className="font-semibold text-white">{row.guestName}</p>
-          <p className="mt-0.5 truncate text-xs text-white/45">
+          <p className="font-semibold text-zinc-900">{row.guestName}</p>
+          <p className="mt-0.5 truncate text-xs text-zinc-500">
             {row.guestEmail ?? row.guestPhone ?? "—"}
           </p>
         </td>
         <td className="px-4 py-3.5">
-          <p className="font-mono text-xs text-white/80">{row.cardMasked}</p>
-          <p className="mt-0.5 text-[10px] text-white/40">
+          <p className="font-mono text-xs text-zinc-600">{row.cardMasked}</p>
+          <p className="mt-0.5 text-[10px] text-zinc-400">
             ···· {row.cardLastFour}
           </p>
         </td>
         <td className="px-4 py-3.5">
           <StatusBadge blocked={row.blocked} />
         </td>
-        <td className="px-4 py-3.5 text-right font-mono tabular-nums text-emerald-400">
+        <td className="px-4 py-3.5 text-right font-mono tabular-nums text-emerald-700">
           {row.bonusBalanceUsd.toFixed(2)} $
         </td>
-        <td className="px-4 py-3.5 text-right font-mono tabular-nums text-white/75">
+        <td className="px-4 py-3.5 text-right font-mono tabular-nums text-zinc-600">
           {row.totalSpentUsd.toFixed(0)} $
         </td>
         <td className="px-4 py-3.5 text-center">
-          <span className="inline-flex min-w-[2rem] justify-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-white/70">
+          <span className="inline-flex min-w-[2rem] justify-center rounded-full border border-zinc-200 bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
             {row.purchases.length}
           </span>
         </td>
-        <td className="px-5 py-3.5 text-xs text-white/50">
+        <td className="px-5 py-3.5 text-xs text-zinc-500">
           {formatGuestDate(row.cardCreatedAt)}
         </td>
       </tr>
       {open && (
-        <tr className="border-b border-white/10 bg-[#121212]">
+        <tr className="border-b border-zinc-200 bg-white">
           <td colSpan={7} className="px-5 py-4">
             <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-xl border border-white/10 bg-[#1a1a1a] p-4">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-white/40">
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                   Coordonnées invité
                 </p>
                 <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
@@ -393,13 +393,13 @@ function CardTableGroup({
                   <Field label="Création carte" value={formatGuestDate(row.cardCreatedAt)} />
                 </dl>
               </div>
-              <div className="rounded-xl border border-white/10 bg-[#1a1a1a] p-4">
-                <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/40">
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+                <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                   <LucideIcon icon={ShoppingBag} size={12} />
                   Historique {VODACOM_MARKET_NAME}
                 </p>
                 {row.purchases.length === 0 ? (
-                  <p className="mt-3 text-sm text-white/45">
+                  <p className="mt-3 text-sm text-zinc-500">
                     Aucun achat pour cet invité.
                   </p>
                 ) : (
@@ -407,12 +407,12 @@ function CardTableGroup({
                     {row.purchases.map((p) => (
                       <li
                         key={p.id}
-                        className="flex items-center justify-between rounded-lg bg-black/30 px-3 py-2"
+                        className="flex items-center justify-between rounded-lg bg-white px-3 py-2"
                       >
-                        <span className="text-sm text-white/90">
+                        <span className="text-sm text-zinc-700">
                           {p.productName}
                         </span>
-                        <span className="text-xs font-mono text-white/50">
+                        <span className="text-xs font-mono text-zinc-500">
                           {p.priceUsd.toFixed(0)} $ ·{" "}
                           {formatGuestDate(p.createdAt)}
                         </span>
@@ -447,20 +447,20 @@ function KpiCard({
   const shell = featured
     ? "border-vodacom-red bg-vodacom-red text-white shadow-lg shadow-vodacom-red/25"
     : outline
-      ? "border-white/15 bg-transparent text-white"
-      : "border-white/10 bg-[#161616] text-white";
+      ? "border-zinc-200 bg-transparent text-zinc-900"
+      : "border-zinc-200 bg-white text-zinc-900";
 
-  const labelClass = featured ? "text-white/80" : "text-white/50";
-  const subClass = featured ? "text-white/70" : "text-white/40";
+  const labelClass = featured ? "text-white/85" : "text-zinc-500";
+  const subClass = featured ? "text-white/80" : "text-zinc-400";
   const iconWrap = featured
-    ? "bg-white/15 text-white"
+    ? "bg-white/20 text-white"
     : outline
-      ? "bg-white/10 text-white"
-      : "bg-white/5 text-white/70";
+      ? "bg-zinc-100 text-zinc-700"
+      : "bg-zinc-100 text-zinc-600";
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-2xl border p-5 transition hover:border-white/20 ${shell}`}
+      className={`group relative overflow-hidden rounded-2xl border p-5 transition hover:border-zinc-300 ${shell}`}
     >
       <div className="mb-4 flex items-start justify-between">
         <span
@@ -471,7 +471,7 @@ function KpiCard({
         <LucideIcon
           icon={ArrowUpRight}
           size={16}
-          className="text-white/20 opacity-0 transition group-hover:opacity-100"
+          className="text-zinc-300 opacity-0 transition group-hover:opacity-100"
         />
       </div>
       <p className={`text-xs font-semibold uppercase tracking-wide ${labelClass}`}>
@@ -486,14 +486,14 @@ function KpiCard({
 function StatusBadge({ blocked }: { blocked: boolean }) {
   if (blocked) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-400">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
         <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
         Bloquée
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-400">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
       <LucideIcon icon={CircleCheck} size={12} />
       Active
     </span>
@@ -503,8 +503,8 @@ function StatusBadge({ blocked }: { blocked: boolean }) {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[10px] uppercase tracking-wider text-white/40">{label}</dt>
-      <dd className="mt-0.5 text-white/85">{value}</dd>
+      <dt className="text-[10px] uppercase tracking-wider text-zinc-400">{label}</dt>
+      <dd className="mt-0.5 text-zinc-600">{value}</dd>
     </div>
   );
 }
@@ -512,13 +512,13 @@ function Field({ label, value }: { label: string; value: string }) {
 function EmptyState({ hasData }: { hasData: boolean }) {
   return (
     <div className="flex flex-col items-center px-6 py-16 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-white/30">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-400">
         <LucideIcon icon={CreditCard} size={28} />
       </span>
-      <p className="mt-4 text-base font-semibold text-white">
+      <p className="mt-4 text-base font-semibold text-zinc-900">
         {hasData ? "Aucun résultat" : "Aucune carte créée"}
       </p>
-      <p className="mt-1 max-w-sm text-sm text-white/45">
+      <p className="mt-1 max-w-sm text-sm text-zinc-500">
         {hasData
           ? "Modifiez votre recherche pour afficher d'autres invités."
           : "Les cartes apparaîtront ici lorsque les invités auront validé l'OTP et créé leur Visa M-Pesa."}
@@ -533,11 +533,11 @@ function TableSkeleton() {
       {Array.from({ length: 5 }).map((_, i) => (
         <div
           key={i}
-          className="flex gap-4 border-b border-white/5 py-4 last:border-0"
+          className="flex gap-4 border-b border-zinc-100 py-4 last:border-0"
         >
-          <div className="h-10 flex-1 animate-pulse rounded-lg bg-white/5" />
-          <div className="h-10 w-24 animate-pulse rounded-lg bg-white/5" />
-          <div className="h-10 w-16 animate-pulse rounded-lg bg-white/5" />
+          <div className="h-10 flex-1 animate-pulse rounded-lg bg-zinc-100" />
+          <div className="h-10 w-24 animate-pulse rounded-lg bg-zinc-100" />
+          <div className="h-10 w-16 animate-pulse rounded-lg bg-zinc-100" />
         </div>
       ))}
     </div>

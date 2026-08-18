@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { InvitationPage } from "@/components/invitation/InvitationPage";
 import { EVENT, guestInvitationDisplayName } from "@/lib/event";
+import { AIRTEL_SKIP_SPLASH_COOKIE } from "@/lib/airtel-splash";
 import {
   buildGoogleCalendarUrl,
   buildIcsDownloadUrl,
@@ -19,13 +21,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!token) return { title: "Invitation" };
   const guest = await prisma.guest.findUnique({
     where: { token },
-    select: { fullName: true },
+    select: { fullName: true, event: { select: { name: true } } },
   });
   if (!guest) return { title: "Invitation" };
   const name = guestInvitationDisplayName(guest.fullName);
+  const eventName = guest.event?.name ?? EVENT.title;
   return {
-    title: name ? `${name} — ${EVENT.title}` : `Votre invitation — ${EVENT.title}`,
-    description: `Confirmez votre présence à ${EVENT.title}.`,
+    title: name ? `${name} — ${eventName}` : `Votre invitation — ${eventName}`,
+    description: `Confirmez votre présence à ${eventName}.`,
   };
 }
 
@@ -36,13 +39,30 @@ export default async function ConfirmInvitationPage({ params }: Props) {
 
   const guest = await loadInvitationGuestByToken(token);
   const invitationUrl = invitationAbsoluteUrl(token);
+  const skipSplash =
+    (await cookies()).get(AIRTEL_SKIP_SPLASH_COOKIE)?.value === "1";
   return (
     <InvitationPage
       guest={guest}
+      skipSplash={skipSplash}
       invitationUrl={invitationUrl}
       qrImageUrl={invitationQrCodeImageUrl(invitationUrl)}
-      googleCalendarUrl={buildGoogleCalendarUrl(invitationUrl, guest.eventDays)}
-      icsDownloadUrl={buildIcsDownloadUrl(invitationUrl, guest.eventDays)}
+      googleCalendarUrl={buildGoogleCalendarUrl({
+        invitationUrl,
+        eventName: guest.event.name,
+        venue: guest.event.venue,
+        eventDays: guest.eventDays,
+        dayTimes: guest.event.dayTimes,
+        fallbackRange: guest.event.timeRange,
+      })}
+      icsDownloadUrl={buildIcsDownloadUrl({
+        invitationUrl,
+        eventName: guest.event.name,
+        venue: guest.event.venue,
+        eventDays: guest.eventDays,
+        dayTimes: guest.event.dayTimes,
+        fallbackRange: guest.event.timeRange,
+      })}
     />
   );
 }

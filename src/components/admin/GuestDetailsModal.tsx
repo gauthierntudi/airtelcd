@@ -57,7 +57,7 @@ export function GuestDetailsModal({
   return (
     <AdminModal title="" onClose={onClose} size="xl">
       <div className="-mt-2">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#222] via-[#1a1a1a] to-[#121212] p-5">
+        <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
           <div
             className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-vodacom-red/20 blur-2xl"
             aria-hidden
@@ -68,8 +68,8 @@ export function GuestDetailsModal({
                 {initials}
               </span>
               <div>
-                <h3 className="text-xl font-bold text-white">{guest.displayName}</h3>
-                <p className="mt-0.5 font-mono text-xs tracking-wide text-white/45">
+                <h3 className="text-xl font-bold text-zinc-900">{guest.displayName}</h3>
+                <p className="mt-0.5 font-mono text-xs tracking-wide text-zinc-500">
                   {guest.token}
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -85,7 +85,7 @@ export function GuestDetailsModal({
                       Invitation envoyée
                     </span>
                   ) : (
-                    <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/45">
+                    <span className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-[11px] text-zinc-500">
                       Invitation non envoyée
                     </span>
                   )}
@@ -182,18 +182,18 @@ export function GuestDetailsModal({
 
         <GuestMpesaSummary guestId={guest.id} adminSecret={adminSecret} />
 
-        <div className="mt-4 rounded-xl border border-white/10 bg-[#121212] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-white/40">
+        <div className="mt-4 rounded-xl border border-zinc-200 bg-white p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
             Lien d&apos;invitation
           </p>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <code className="min-w-0 flex-1 truncate rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/75">
+            <code className="min-w-0 flex-1 truncate rounded-lg border border-zinc-200 bg-zinc-100 px-3 py-2 text-xs text-zinc-700">
               {guest.invitationUrl}
             </code>
             <button
               type="button"
               onClick={onCopy}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1f1f1f] px-4 py-2 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/5"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-900 transition hover:border-zinc-300 hover:bg-zinc-50"
             >
               <LucideIcon icon={copied ? Check : Copy} size={15} />
               {copied ? "Copié" : "Copier"}
@@ -201,17 +201,17 @@ export function GuestDetailsModal({
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-3 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4 sm:grid-cols-3">
           <MetaItem label="ID" value={guest.id} mono />
           <MetaItem label="Créé le" value={formatGuestDate(guest.createdAt)} />
           <MetaItem label="Modifié le" value={formatGuestDate(guest.updatedAt)} />
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-white/10 pt-5">
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 pt-5">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-white/70 transition hover:bg-white/5"
+            className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50"
           >
             Fermer
           </button>
@@ -219,7 +219,7 @@ export function GuestDetailsModal({
             href={guest.invitationUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#1f1f1f] px-4 py-2 text-sm font-medium text-white transition hover:border-white/20"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-900 transition hover:border-zinc-300"
           >
             <LucideIcon icon={ExternalLink} size={15} />
             Prévisualiser
@@ -230,7 +230,7 @@ export function GuestDetailsModal({
               onClose();
               onEdit();
             }}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#1f1f1f] px-4 py-2 text-sm font-medium text-white transition hover:border-white/20"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-900 transition hover:border-zinc-300"
           >
             <LucideIcon icon={Pencil} size={15} />
             Modifier
@@ -264,12 +264,12 @@ function DetailSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-[#141414] p-4">
+    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
       <div className="mb-3 flex items-center gap-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white/60">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-500">
           <LucideIcon icon={icon} size={16} />
         </span>
-        <h4 className="text-sm font-semibold text-white">{title}</h4>
+        <h4 className="text-sm font-semibold text-zinc-900">{title}</h4>
       </div>
       <dl className="space-y-3">{children}</dl>
     </div>
@@ -293,8 +293,8 @@ function DetailItem({
 }) {
   return (
     <div>
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-white/40">{label}</dt>
-      <dd className="mt-0.5 text-sm text-white">
+      <dt className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">{label}</dt>
+      <dd className="mt-0.5 text-sm text-zinc-900">
         {href && value !== "—" ? (
           <a
             href={href}
@@ -308,7 +308,7 @@ function DetailItem({
         ) : (
           value
         )}
-        {hint && <p className="mt-0.5 text-xs text-white/40">{hint}</p>}
+        {hint && <p className="mt-0.5 text-xs text-zinc-400">{hint}</p>}
       </dd>
     </div>
   );
@@ -325,12 +325,12 @@ function MetaItem({
 }) {
   return (
     <div className="min-w-0">
-      <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-white/35">
+      <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
         <LucideIcon icon={Hash} size={10} />
         {label}
       </p>
       <p
-        className={`mt-1 truncate text-xs text-white/55 ${mono ? "font-mono" : ""}`}
+        className={`mt-1 truncate text-xs text-zinc-500 ${mono ? "font-mono" : ""}`}
         title={value}
       >
         {value}

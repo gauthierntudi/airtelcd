@@ -1,10 +1,29 @@
-# Vodacom Privilège Golf 2026
+# Airtel RSVP
 
 Plateforme Next.js pour l'événement : invitations, expériences Vodacom RDC, jeux enfants.
 
-**Base de données :** [Neon](https://neon.tech) (PostgreSQL) + Prisma — compatible Vercel.
+**Base de données :** PostgreSQL (Docker) + Prisma. Neon reste possible hors Docker / sur Vercel.
 
-## Configuration Neon
+## Démarrage (Docker)
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+- Accueil : http://localhost:3000
+- Admin : http://localhost:3000/admin
+- Postgres : `localhost:5432` (user/password/db : `golf` / `golf` / `airteldb`)
+
+Les migrations Prisma s’appliquent au démarrage du conteneur `app`. Hot reload : le code de l’hôte est monté dans le conteneur.
+
+```bash
+docker compose down          # arrêter
+docker compose down -v       # arrêter + supprimer les volumes (données Postgres)
+docker compose -f docker-compose.prod.yml up --build -d   # image standalone
+```
+
+## Configuration Neon (sans Docker)
 
 1. Créer un projet sur [console.neon.tech](https://console.neon.tech).
 2. Dans **Connect**, copier :
@@ -35,17 +54,17 @@ Fichiers servis depuis `public/img/` :
 
 Le dossier racine `img/` peut servir de source ; les fichiers actifs sont dans `public/img/`.
 
-## Démarrage
+## Démarrage (sans Docker)
 
 ```bash
 npm install
-npm run db:migrate    # applique les migrations sur Neon
+npm run db:migrate
 npm run dev
 ```
 
 - Accueil : http://localhost:3000
 - Admin : http://localhost:3000/admin
-- Invitation : http://localhost:3001/api/confirm/action=aBcD1234 (ajuster le port et `NEXT_PUBLIC_APP_URL`)
+- Invitation : http://localhost:3000/api/confirm/action=aBcD1234 (ajuster `NEXT_PUBLIC_APP_URL`)
 
 En développement, l'admin est accessible sans secret si `ADMIN_SECRET` vaut encore la valeur par défaut. En production (Vercel), définir `ADMIN_SECRET` dans les variables d'environnement.
 
@@ -93,7 +112,10 @@ Voir [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md).
 
 | Commande | Description |
 |----------|-------------|
-| `npm run dev` | Serveur de développement |
+| `npm run docker:dev` | Stack Docker (Postgres + Next, hot reload) |
+| `npm run docker:prod` | Stack Docker production (détachée) |
+| `npm run docker:down` | Arrêter Compose |
+| `npm run dev` | Serveur de développement (hôte) |
 | `npm run build` | Migrations + build production |
 | `npm run db:migrate` | Appliquer migrations (prod / CI) |
 | `npm run db:migrate:dev` | Créer/appliquer migrations en dev |

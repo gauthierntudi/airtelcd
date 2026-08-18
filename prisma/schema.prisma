@@ -21,13 +21,55 @@ enum CheckinKioskStatus {
   SUCCESS
 }
 
+enum WhatsAppTemplateKind {
+  INVITATION
+  CONFIRMATION
+  REMINDER
+  THANK_YOU
+  CUSTOM
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  name      String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  /// Lieu affiché sur l’invitation
+  venue     String   @default("")
+  timeRange String   @default("14h00 – 19h00")
+  /// Horaires par jour : { "2026-08-27": { "start": "14:00", "end": "19:00" } }
+  dayTimes  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  guests    Guest[]
+  templates EventWhatsAppTemplate[]
+
+  @@index([startDate])
+}
+
+/// SID Twilio Content (HX…) par type de message, lié à un événement
+model EventWhatsAppTemplate {
+  id         String               @id @default(cuid())
+  eventId    String
+  event      Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  kind       WhatsAppTemplateKind
+  label      String
+  contentSid String
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  @@index([eventId])
+}
+
 model Guest {
   id                 String     @id @default(cuid())
   fullName           String?
   email              String?
   phone              String?
   token              String     @unique
-  /// Jours d'invitation : 12, 13 et/ou 14 juin 2026 (1 à n)
+  eventId            String?
+  event              Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  /// Jours d'invitation — aligné sur Event.startDate…endDate si eventId renseigné
   eventDays          DateTime[] @db.Date
   /// Horaire affiché dans l'email et la page invitation — ex. « 14h00 – 19h00 »
   invitationTimeRange String    @default("14h00 – 19h00")
@@ -45,6 +87,8 @@ model Guest {
   accessOtps         InvitationAccessOtp[]
   mpesaVisaCard      MpesaVisaCard?
   checkinSessions    CheckinKioskSession[]
+
+  @@index([eventId])
 }
 
 /// Session borne check-in self-service (écran QR + parcours mobile)

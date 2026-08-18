@@ -32,13 +32,13 @@ export function ConfirmDialog({
 
   return (
     <AdminModal title={title} onClose={loading ? () => {} : onClose}>
-      <div className="text-sm text-white/75">{message}</div>
+      <div className="text-sm text-zinc-600">{message}</div>
       <div className="mt-6 flex justify-end gap-2">
         <button
           type="button"
           onClick={onClose}
           disabled={loading}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-white/70 hover:bg-white/10 disabled:opacity-50"
+          className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 disabled:opacity-50"
         >
           {cancelLabel}
         </button>

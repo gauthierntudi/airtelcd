@@ -103,7 +103,7 @@ export function GuestTable({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-white/10 bg-[#121212]">
+            <tr className="border-b border-zinc-200 bg-white">
               <th className="w-12 pl-4 pr-0">
                 <PageSelectCheckbox
                   checked={allPageSelected}
@@ -154,20 +154,20 @@ export function GuestTable({
                 className="hidden xl:table-cell"
               />
               <th className="w-[232px] pr-4 text-right">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
                   Actions
                 </span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/[0.06]">
+          <tbody className="divide-y divide-zinc-100">
             {paginated.map((g) => {
               const isSelected = selectedIds.has(g.id);
               return (
               <tr
                 key={g.id}
-                className={`group transition-colors hover:bg-[#1c1c1c] ${
-                  isSelected ? "bg-vodacom-red/[0.07]" : "bg-[#161616]"
+                className={`group transition-colors hover:bg-zinc-50 ${
+                  isSelected ? "bg-vodacom-red/[0.07]" : "bg-white"
                 }`}
               >
                 <td className="py-4 pl-4 pr-0">
@@ -258,7 +258,7 @@ function PageSelectCheckbox({
       disabled={disabled}
       onChange={(e) => onChange(e.target.checked)}
       aria-label={label}
-      className="h-4 w-4 rounded border-white/25 bg-[#0c0c0c] text-vodacom-red focus:ring-vodacom-red/30 disabled:opacity-40"
+      className="h-4 w-4 rounded border-zinc-300 bg-white text-vodacom-red focus:ring-vodacom-red/30 disabled:opacity-40"
     />
   );
 }
@@ -281,7 +281,7 @@ function RowSelectCheckbox({
       disabled={disabled}
       onChange={(e) => onChange(e.target.checked)}
       aria-label={label}
-      className="h-4 w-4 rounded border-white/25 bg-[#0c0c0c] text-vodacom-red focus:ring-vodacom-red/30 disabled:opacity-40"
+      className="h-4 w-4 rounded border-zinc-300 bg-white text-vodacom-red focus:ring-vodacom-red/30 disabled:opacity-40"
     />
   );
 }
@@ -292,14 +292,14 @@ function GuestIdentity({ guest }: { guest: GuestRow }) {
   return (
     <div className="flex items-center gap-3">
       <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white ring-1 ring-white/10"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-bold text-zinc-900 ring-1 ring-zinc-200"
         aria-hidden
       >
         {initials}
       </span>
       <div className="min-w-0">
-        <p className="truncate font-medium text-white">{guest.displayName}</p>
-        <p className="mt-0.5 font-mono text-[11px] tracking-wide text-white/35">
+        <p className="truncate font-medium text-zinc-900">{guest.displayName}</p>
+        <p className="mt-0.5 font-mono text-[11px] tracking-wide text-zinc-400">
           {guest.token}
         </p>
       </div>
@@ -310,7 +310,7 @@ function GuestIdentity({ guest }: { guest: GuestRow }) {
 function InvitationCell({ guest }: { guest: GuestRow }) {
   if (!guest.invitationSentAt) {
     return (
-      <span className="inline-flex items-center rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-medium text-white/40">
+      <span className="inline-flex items-center rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-[11px] font-medium text-zinc-400">
         Non envoyée
       </span>
     );
@@ -326,7 +326,7 @@ function InvitationCell({ guest }: { guest: GuestRow }) {
 
 function DateCell({ value, emptyLabel = "—" }: { value: string | null; emptyLabel?: string }) {
   if (!value) {
-    return <span className="text-xs text-white/25">{emptyLabel}</span>;
+    return <span className="text-xs text-zinc-300">{emptyLabel}</span>;
   }
   const d = new Date(value);
   const short = d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
@@ -334,8 +334,8 @@ function DateCell({ value, emptyLabel = "—" }: { value: string | null; emptyLa
 
   return (
     <div>
-      <p className="text-xs font-medium text-white/80">{short}</p>
-      <p className="text-[11px] text-white/40">{time}</p>
+      <p className="text-xs font-medium text-zinc-600">{short}</p>
+      <p className="text-[11px] text-zinc-400">{time}</p>
     </div>
   );
 }
@@ -361,25 +361,25 @@ function TableFooter({
   const to = Math.min(page * pageSize, total);
 
   return (
-    <div className="flex flex-col gap-4 border-t border-white/10 bg-[#121212] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <p className="text-xs text-white/50">
+    <div className="flex flex-col gap-4 border-t border-zinc-200 bg-white px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-xs text-zinc-500">
         {total === 0 ? (
           "Aucun invité"
         ) : (
           <>
-            Affichage <span className="font-medium text-white/80">{from}–{to}</span> sur{" "}
-            <span className="font-medium text-white/80">{total}</span>
+            Affichage <span className="font-medium text-zinc-600">{from}–{to}</span> sur{" "}
+            <span className="font-medium text-zinc-600">{total}</span>
           </>
         )}
       </p>
 
       <div className="flex flex-wrap items-center gap-4">
-        <label className="flex items-center gap-2 text-xs text-white/50">
+        <label className="flex items-center gap-2 text-xs text-zinc-500">
           Lignes
           <select
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="rounded-lg border border-white/10 bg-[#1a1a1a] px-2.5 py-1.5 text-xs font-medium text-white outline-none focus:border-vodacom-red/40"
+            className="rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-xs font-medium text-zinc-900 outline-none focus:border-vodacom-red/40"
           >
             {GUEST_PAGE_SIZES.map((n) => (
               <option key={n} value={n}>
@@ -393,7 +393,7 @@ function TableFooter({
           <PaginationBtn onClick={onPrev} disabled={page <= 1} label="Page précédente">
             <LucideIcon icon={ChevronLeft} size={16} />
           </PaginationBtn>
-          <span className="min-w-[4.5rem] px-2 text-center text-xs font-medium tabular-nums text-white/70">
+          <span className="min-w-[4.5rem] px-2 text-center text-xs font-medium tabular-nums text-zinc-600">
             {page} / {totalPages}
           </span>
           <PaginationBtn onClick={onNext} disabled={page >= totalPages} label="Page suivante">
@@ -422,7 +422,7 @@ function PaginationBtn({
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a1a] text-white/80 transition hover:border-white/20 hover:bg-white/5 disabled:pointer-events-none disabled:opacity-30"
+      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-600 transition hover:border-zinc-300 hover:bg-zinc-50 disabled:pointer-events-none disabled:opacity-30"
     >
       {children}
     </button>
@@ -453,14 +453,14 @@ function SortHeader({
         type="button"
         onClick={() => onSort(sortKey)}
         className={`inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider transition ${
-          isActive ? "text-white" : "text-white/40 hover:text-white/70"
+          isActive ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-600"
         }`}
       >
         {label}
         <LucideIcon
           icon={Icon}
           size={12}
-          className={isActive ? "text-vodacom-red" : "text-white/30"}
+          className={isActive ? "text-vodacom-red" : "text-zinc-400"}
         />
       </button>
     </th>

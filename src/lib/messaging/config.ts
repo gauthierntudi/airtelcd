@@ -78,7 +78,7 @@ export function getMessagingConfig() {
       apiKey: process.env.BREVO_API_KEY?.trim(),
       senderEmail: process.env.BREVO_SENDER_EMAIL?.trim(),
       senderName:
-        process.env.BREVO_SENDER_NAME?.trim() ?? "Vodacom Privilège Golf",
+        process.env.BREVO_SENDER_NAME?.trim() ?? "Airtel RSVP",
     },
     twilio: {
       whatsapp: twilioWhatsappCredentials(),
@@ -95,14 +95,16 @@ export function isBrevoConfigured(): boolean {
   return Boolean(brevo.apiKey && brevo.senderEmail);
 }
 
+export function isTwilioWhatsappCredentialsConfigured(): boolean {
+  const { whatsapp } = getMessagingConfig().twilio;
+  return Boolean(whatsapp.accountSid && whatsapp.authToken && whatsapp.from);
+}
+
 export function isTwilioWhatsappConfigured(): boolean {
   const { whatsapp } = getMessagingConfig().twilio;
-  return Boolean(
-    whatsapp.accountSid &&
-      whatsapp.authToken &&
-      whatsapp.from &&
-      whatsapp.contentInviteThreeDaysSid &&
-      whatsapp.contentInviteOneDaySid,
+  return (
+    isTwilioWhatsappCredentialsConfigured() &&
+    Boolean(whatsapp.contentInviteThreeDaysSid && whatsapp.contentInviteOneDaySid)
   );
 }
 
@@ -164,7 +166,7 @@ export function getMessagingStatus(): MessagingStatus {
     twilioWhatsapp,
     twilioSms,
     twilioVerify,
-    canSendAny: brevo || twilioWhatsapp,
+    canSendAny: brevo || twilioWhatsapp || isTwilioWhatsappCredentialsConfigured(),
   };
 }
 
@@ -323,7 +325,7 @@ export function getSendableMessageChannels(
 ): ContactChannel[] {
   const channels: ContactChannel[] = [];
   if (guest.email?.trim() && isBrevoConfigured()) channels.push("email");
-  if (guest.phone?.trim() && isTwilioWhatsappConfigured()) {
+  if (guest.phone?.trim() && isTwilioWhatsappCredentialsConfigured()) {
     channels.push("whatsapp");
   }
   return channels;
@@ -346,9 +348,9 @@ export function assertChannelConfigured(channel: ContactChannel): void {
       "Envoi email impossible : BREVO_API_KEY et BREVO_SENDER_EMAIL non configurés dans .env",
     );
   }
-  if (channel === "whatsapp" && !isTwilioWhatsappConfigured()) {
+  if (channel === "whatsapp" && !isTwilioWhatsappCredentialsConfigured()) {
     throw new Error(
-      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, TWILIO_WHATSAPP_CONTENT_INVITE_ONE_DAY_SID et TWILIO_WHATSAPP_CONTENT_INVITE_THREE_DAYS_SID requis.",
+      "Envoi WhatsApp impossible : TWILIO_WHATSAPP_ACCOUNT_SID, TWILIO_WHATSAPP_AUTH_TOKEN et TWILIO_WHATSAPP_FROM requis.",
     );
   }
 }

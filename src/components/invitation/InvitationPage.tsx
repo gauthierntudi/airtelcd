@@ -1,20 +1,19 @@
 "use client";
 
 import { RsvpStatus } from "@prisma/client";
-import { useState } from "react";
-import { InvitationDesktopView } from "@/components/invitation/InvitationDesktopView";
-import { InvitationMobileOnboarding } from "@/components/invitation/InvitationMobileOnboarding";
+import { useEffect, useState } from "react";
+import { AirtelSplashLoader } from "@/components/home/AirtelSplashLoader";
 import {
   InvitationRsvpNameSheet,
   type RsvpNamePayload,
 } from "@/components/invitation/InvitationRsvpNameSheet";
-import { WelcomeHashtagLoader } from "@/components/invitation/WelcomeHashtagLoader";
+import { InvitationView } from "@/components/invitation/InvitationView";
 import type { InvitationSharedProps } from "@/components/invitation/invitation-shared";
-import { useIsLgViewport } from "@/hooks/use-is-lg-viewport";
 import { guestInvitationDisplayName, hasGuestFullName } from "@/lib/event";
 import type { InvitationGuestView } from "@/lib/load-invitation-guest";
 import { useInvitationPassDownload } from "@/hooks/use-invitation-pass-download";
 import { notify } from "@/lib/toast";
+import { clearAirtelSplashSkip } from "@/lib/airtel-splash";
 
 type Props = {
   guest: InvitationGuestView;
@@ -22,6 +21,8 @@ type Props = {
   qrImageUrl: string;
   googleCalendarUrl: string;
   icsDownloadUrl: string;
+  /** True si on arrive du login : ne pas rejouer le splash. */
+  skipSplash?: boolean;
 };
 
 type RsvpResponse = {
@@ -37,6 +38,7 @@ export function InvitationPage({
   qrImageUrl,
   googleCalendarUrl,
   icsDownloadUrl,
+  skipSplash = false,
 }: Props) {
   const [guest, setGuest] = useState(initialGuest);
   const displayName = guestInvitationDisplayName(guest.fullName);
@@ -44,8 +46,14 @@ export function InvitationPage({
   const [confirmedAt, setConfirmedAt] = useState(guest.confirmedAt);
   const [loading, setLoading] = useState(false);
   const [nameSheetOpen, setNameSheetOpen] = useState(false);
-  const [welcomeLoaderDone, setWelcomeLoaderDone] = useState(false);
-  const isLg = useIsLgViewport();
+  const [splash, setSplash] = useState(!skipSplash);
+
+  useEffect(() => {
+    clearAirtelSplashSkip();
+    if (skipSplash) return;
+    const id = window.setTimeout(() => setSplash(false), 1400);
+    return () => window.clearTimeout(id);
+  }, [skipSplash]);
   const { downloadInvitation, downloadingInvitation, passCard } =
     useInvitationPassDownload({
       invitationUrl,
@@ -118,28 +126,11 @@ export function InvitationPage({
     onDecline: () => updateRsvp(RsvpStatus.DECLINED),
   };
 
-  const welcomeLoader = !welcomeLoaderDone && (
-    <WelcomeHashtagLoader onDone={() => setWelcomeLoaderDone(true)} />
-  );
-
-  if (isLg === null) {
-    return (
-      <>
-        {welcomeLoader}
-        <div className="min-h-screen bg-vodacom-cream" aria-busy="true" />
-      </>
-    );
-  }
-
   return (
     <>
       {passCard}
-      {welcomeLoader}
-      {isLg ? (
-        <InvitationDesktopView {...shared} />
-      ) : (
-        <InvitationMobileOnboarding {...shared} />
-      )}
+      {splash && <AirtelSplashLoader />}
+      <InvitationView {...shared} />
       {nameSheetOpen && (
         <InvitationRsvpNameSheet
           loading={loading}

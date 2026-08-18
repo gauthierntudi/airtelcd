@@ -4,7 +4,7 @@ import { getMessagingStatus } from "@/lib/messaging/config";
 import { sendInvitationToGuest } from "@/lib/messaging/send-invitation";
 import { parseSendInvitationOptions } from "@/lib/messaging/send-options";
 import { prisma } from "@/lib/prisma";
-import { serializeGuest } from "@/lib/serialize-guest";
+import { serializeGuest, guestEventInclude } from "@/lib/serialize-guest";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -42,7 +42,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const result = await sendInvitationToGuest(guest, baseUrl, options);
-    const updated = await prisma.guest.findUniqueOrThrow({ where: { id } });
+    const updated = await prisma.guest.findUniqueOrThrow({
+      where: { id },
+      include: guestEventInclude,
+    });
     return NextResponse.json({
       ...result,
       guest: serializeGuest(updated, baseUrl),

@@ -4,9 +4,10 @@ import { isAdminAuthorized } from "@/lib/auth-admin";
 import { prisma } from "@/lib/prisma";
 import { parseGuestPhoneField } from "@/lib/parse-guest-phone-field";
 import { createUniqueGuestToken } from "@/lib/guest-token";
+import { dateToIsoDay, eventInvitationTimeRange, eventRangeToDbDates } from "@/lib/events";
 import { parseEventDaysInput, eventDaysToDbDates } from "@/lib/parse-event-day";
 import { parseInvitationTimeRangeInput } from "@/lib/invitation-time-range";
-import { serializeGuest } from "@/lib/serialize-guest";
+import { serializeGuest, guestEventInclude } from "@/lib/serialize-guest";
 
 export async function GET(request: NextRequest) {
   const secret = request.headers.get("x-admin-secret");
@@ -23,9 +24,12 @@ export async function GET(request: NextRequest) {
       ? (statusParam as RsvpStatus)
       : undefined;
 
+  const eventId = searchParams.get("eventId")?.trim() || undefined;
+
   const guests = await prisma.guest.findMany({
     where: {
       ...(statusFilter && { rsvpStatus: statusFilter }),
+      ...(eventId && { eventId }),
       ...(search && {
         OR: [
           { fullName: { contains: search, mode: "insensitive" } },
@@ -34,6 +38,7 @@ export async function GET(request: NextRequest) {
         ],
       }),
     },
+    include: guestEventInclude,
     orderBy: { createdAt: "desc" },
   });
 
@@ -51,6 +56,7 @@ export async function POST(request: NextRequest) {
     fullName?: string;
     email?: string;
     phone?: string;
+    eventId?: string;
     eventDay?: string | string[];
     eventDays?: string | string[];
     invitationTimeRange?: string;
@@ -81,16 +87,38 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: timeResult.error }, { status: 400 });
   }
 
+  const eventId = body.eventId?.trim() || null;
+  let eventDays = dayResult.eventDays;
+  let eventDaysDb: Date[] | undefined;
+  let invitationTimeRange = timeResult.invitationTimeRange;
+
+  if (eventId) {
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
+    if (!event) {
+      return NextResponse.json({ error: "Événement introuvable" }, { status: 400 });
+    }
+    eventDaysDb = eventRangeToDbDates(
+      dateToIsoDay(event.startDate),
+      dateToIsoDay(event.endDate),
+    );
+    eventDays = [];
+    if (!body.invitationTimeRange?.trim()) {
+      invitationTimeRange = eventInvitationTimeRange(event);
+    }
+  }
+
   const token = await createUniqueGuestToken(prisma);
   const guest = await prisma.guest.create({
     data: {
       fullName,
       email: body.email?.trim() || null,
       phone: phoneResult.phone,
-      eventDays: eventDaysToDbDates(dayResult.eventDays),
-      invitationTimeRange: timeResult.invitationTimeRange,
+      eventId,
+      eventDays: eventId ? eventDaysDb : eventDaysToDbDates(eventDays),
+      invitationTimeRange,
       token,
     },
+    include: guestEventInclude,
   });
 
   const baseUrl = request.nextUrl.origin;

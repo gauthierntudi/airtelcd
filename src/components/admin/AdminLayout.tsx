@@ -17,7 +17,7 @@ export function AdminLayout({
   loading,
 }: Props) {
   return (
-    <div className="admin-dark min-h-screen bg-[#0c0c0c] text-white">
+    <div className="admin-light min-h-screen bg-[#F4F5F7] text-zinc-900">
       <AdminSidebar />
       <div className="flex min-h-screen flex-col lg:pl-[240px]">
         <AdminTopBar

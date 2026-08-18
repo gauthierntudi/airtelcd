@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { PrivilegeHome } from "@/components/home/PrivilegeHome";
+import { InvitationLoginPage } from "@/components/home/InvitationLoginPage";
 import { EVENT } from "@/lib/event";
 
 export const metadata: Metadata = {
-  title: `${EVENT.organizer} — ${EVENT.title}`,
+  title: `Accéder à votre invitation — ${EVENT.title}`,
 };
 
 export default function HomePage() {
-  return <PrivilegeHome />;
+  return <InvitationLoginPage />;
 }

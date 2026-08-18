@@ -133,7 +133,11 @@ export function InvitationDesktopView({
                     value={formatInvitedDaysLong(guest.eventDays)}
                     sub={guest.invitationTimeRange}
                   />
-                  <InfoChip icon={MapPin} label="Lieu" value={EVENT.venue} />
+                  <InfoChip
+                    icon={MapPin}
+                    label="Lieu"
+                    value={guest.event.venue || "Lieu à préciser"}
+                  />
                   <InfoChip icon={Shirt} label="Tenue" value={EVENT.dressCode} />
                 </ul>
               </div>
@@ -189,7 +193,7 @@ export function InvitationDesktopView({
                   label="Ajouter au calendrier"
                 />
                 <DesktopActionLink
-                  href={EVENT.mapsUrl}
+                  href={guest.event.mapsUrl}
                   external
                   icon={Navigation}
                   label="Itinéraire"

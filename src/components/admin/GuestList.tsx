@@ -40,13 +40,8 @@ import {
   getGuestSendBlockReason,
   type SendInvitationOptions,
 } from "@/lib/messaging/send-options";
+import type { EventSummary } from "@/lib/events";
 import { AdminPhoneInput } from "@/components/admin/AdminPhoneInput";
-import {
-  GUEST_EVENT_DAY_LOTS,
-  getGuestEventDayLotLabel,
-  guestMatchesEventDayLot,
-  type GuestEventDayLotId,
-} from "@/lib/guest-event-day-lots";
 import {
   DEFAULT_INVITATION_TIME_RANGE,
   invitationTimeRangeForEventDays,
@@ -77,7 +72,8 @@ export function GuestList({
 }: Props) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<RsvpFilter>("ALL");
-  const [dayLot, setDayLot] = useState<GuestEventDayLotId>("ALL");
+  const [eventFilter, setEventFilter] = useState("");
+  const [events, setEvents] = useState<EventSummary[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [details, setDetails] = useState<GuestRow | null>(null);
   const [editing, setEditing] = useState<GuestRow | null>(null);
@@ -96,7 +92,7 @@ export function GuestList({
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return guests.filter((g) => {
-      if (!guestMatchesEventDayLot(g.eventDays, dayLot)) return false;
+      if (eventFilter && g.eventId !== eventFilter) return false;
       if (filter !== "ALL" && g.rsvpStatus !== filter) return false;
       if (!q) return true;
       return (
@@ -105,7 +101,7 @@ export function GuestList({
         (g.phone?.toLowerCase().includes(q) ?? false)
       );
     });
-  }, [guests, search, filter, dayLot]);
+  }, [guests, search, filter, eventFilter]);
 
   const selectedCount = selectedIds.size;
 
@@ -120,17 +116,17 @@ export function GuestList({
     });
   }, [filtered]);
 
-  const dayLotCounts = useMemo(() => {
-    const c = Object.fromEntries(
-      GUEST_EVENT_DAY_LOTS.map((lot) => [lot.id, 0]),
-    ) as Record<GuestEventDayLotId, number>;
-    for (const g of guests) {
-      for (const lot of GUEST_EVENT_DAY_LOTS) {
-        if (guestMatchesEventDayLot(g.eventDays, lot.id)) c[lot.id]++;
-      }
-    }
-    return c;
-  }, [guests]);
+  useEffect(() => {
+    const secret = headers["x-admin-secret"];
+    void fetch("/api/events", {
+      headers: secret ? { "x-admin-secret": secret } : {},
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setEvents(data);
+      })
+      .catch(() => undefined);
+  }, [headers]);
 
   const counts = useMemo(() => {
     const c: Record<RsvpFilter, number> = {
@@ -312,20 +308,20 @@ export function GuestList({
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#161616]">
-      <div className="border-b border-white/10 px-6 py-5">
+    <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+      <div className="border-b border-zinc-200 px-6 py-5">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-vodacom-red">
               Invités
             </p>
-            <h2 className="mt-1 text-lg font-bold text-white">Registre des participants</h2>
-            <p className="mt-1 text-sm text-white/45">
+            <h2 className="mt-1 text-lg font-bold text-zinc-900">Registre des participants</h2>
+            <p className="mt-1 text-sm text-zinc-500">
               {filtered.length} affiché{filtered.length !== 1 ? "s" : ""} sur {guests.length}
-              {dayLot !== "ALL" && (
-                <span className="text-white/35">
+              {eventFilter && (
+                <span className="text-zinc-400">
                   {" "}
-                  · lot « {getGuestEventDayLotLabel(dayLot)} »
+                  · {events.find((e) => e.id === eventFilter)?.name}
                 </span>
               )}
               {selectedCount > 0 && (
@@ -335,7 +331,7 @@ export function GuestList({
                 </span>
               )}
               {notSentCount > 0 && (
-                <span className="text-white/35"> · {notSentCount} sans invitation</span>
+                <span className="text-zinc-400"> · {notSentCount} sans invitation</span>
               )}
             </p>
           </div>
@@ -386,25 +382,25 @@ export function GuestList({
           />
         </div>
 
-        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-[#121212] p-3 lg:flex-row lg:items-center">
+        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-zinc-100 bg-white p-3 lg:flex-row lg:items-center">
           <div className="relative flex-1 lg:max-w-md">
             <LucideIcon
               icon={Search}
               size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
             />
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Nom, email ou téléphone…"
-              className="w-full rounded-xl border border-white/10 bg-[#0c0c0c] py-2.5 pl-9 pr-9 text-sm text-white outline-none placeholder:text-white/30 focus:border-vodacom-red/50 focus:ring-2 focus:ring-vodacom-red/20"
+              className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-9 pr-9 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-vodacom-red/50 focus:ring-2 focus:ring-vodacom-red/20"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-white/50 hover:bg-white/10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 hover:bg-zinc-100"
                 aria-label="Effacer la recherche"
               >
                 <LucideIcon icon={X} size={14} />
@@ -412,7 +408,7 @@ export function GuestList({
             )}
           </div>
           <div
-            className="inline-flex flex-wrap gap-0.5 rounded-lg border border-white/10 bg-[#0c0c0c] p-0.5"
+            className="inline-flex flex-wrap gap-0.5 rounded-lg border border-zinc-200 bg-white p-0.5"
             role="tablist"
             aria-label="Filtrer par RSVP"
           >
@@ -426,11 +422,11 @@ export function GuestList({
                 className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
                   filter === f.id
                     ? "bg-vodacom-red text-white shadow-sm"
-                    : "text-white/55 hover:bg-white/5 hover:text-white"
+                    : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
                 }`}
               >
                 {f.label}
-                <span className={`ml-1.5 tabular-nums ${filter === f.id ? "text-white/80" : "text-white/35"}`}>
+                <span className={`ml-1.5 tabular-nums ${filter === f.id ? "text-zinc-600" : "text-zinc-400"}`}>
                   {counts[f.id]}
                 </span>
               </button>
@@ -439,43 +435,29 @@ export function GuestList({
         </div>
 
         <div className="mt-3">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/40">
-            Lot d&apos;invitation (envoi groupé)
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+            Événement (date)
           </p>
-          <div
-            className="flex flex-wrap gap-1.5"
-            role="tablist"
-            aria-label="Filtrer par lot de jours"
+          <select
+            value={eventFilter}
+            onChange={(e) => setEventFilter(e.target.value)}
+            className="max-w-md rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
+            aria-label="Filtrer par événement"
           >
-            {GUEST_EVENT_DAY_LOTS.map((lot) => (
-              <button
-                key={lot.id}
-                type="button"
-                role="tab"
-                aria-selected={dayLot === lot.id}
-                onClick={() => setDayLot(lot.id)}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
-                  dayLot === lot.id
-                    ? "border-vodacom-red/50 bg-vodacom-red/15 text-white"
-                    : "border-white/10 bg-[#0c0c0c] text-white/55 hover:border-white/20 hover:text-white"
-                }`}
-              >
-                {lot.label}
-                <span
-                  className={`ml-1.5 tabular-nums ${
-                    dayLot === lot.id ? "text-white/75" : "text-white/35"
-                  }`}
-                >
-                  {dayLotCounts[lot.id]}
-                </span>
-              </button>
+            <option value="">Tous les événements</option>
+            {events.map((event) => (
+              <option key={event.id} value={event.id}>
+                {event.name} — {event.startDate === event.endDate
+                  ? event.startDate.split("-").reverse().join("/")
+                  : `${event.startDate.split("-").reverse().join("/")} – ${event.endDate.split("-").reverse().join("/")}`} ({event.guestCount})
+              </option>
             ))}
-          </div>
+          </select>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center gap-3 py-20 text-white/45">
+        <div className="flex flex-col items-center justify-center gap-3 py-20 text-zinc-500">
           <LucideIcon icon={Loader2} size={28} className="animate-spin text-vodacom-red" />
           <p className="text-sm">Chargement du registre…</p>
         </div>
@@ -483,17 +465,17 @@ export function GuestList({
         <EmptyState />
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-          <p className="text-sm font-medium text-white/70">Aucun résultat</p>
-          <p className="mt-1 max-w-sm text-xs text-white/40">
+          <p className="text-sm font-medium text-zinc-600">Aucun résultat</p>
+          <p className="mt-1 max-w-sm text-xs text-zinc-400">
             Modifiez la recherche, le lot ou le filtre RSVP pour afficher des invités.
           </p>
         </div>
       ) : (
         <>
           {selectedCount > 0 && (
-            <div className="flex flex-wrap items-center gap-3 border-b border-white/10 bg-[#121212] px-6 py-2.5">
-              <p className="text-sm text-white/70">
-                <span className="font-vodafone-rg-bd text-white">
+            <div className="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-white px-6 py-2.5">
+              <p className="text-sm text-zinc-600">
+                <span className="font-vodafone-rg-bd text-zinc-900">
                   {selectedCount}
                 </span>{" "}
                 invité{selectedCount !== 1 ? "s" : ""} sélectionné
@@ -511,14 +493,14 @@ export function GuestList({
               <button
                 type="button"
                 onClick={clearSelection}
-                className="text-xs font-medium text-white/50 hover:text-white/80"
+                className="text-xs font-medium text-zinc-500 hover:text-zinc-600"
               >
                 Tout désélectionner
               </button>
             </div>
           )}
           <GuestTable
-            key={`${dayLot}-${filter}-${search.trim()}`}
+            key={`${eventFilter}-${filter}-${search.trim()}`}
             rows={filtered}
             selectedIds={selectedIds}
             messagingStatus={messagingStatus}
@@ -543,6 +525,7 @@ export function GuestList({
           <GuestCreateForm
             embedded
             headers={headers}
+            defaultEventId={eventFilter || undefined}
             onClose={() => setShowCreate(false)}
             onCreated={() => {
               setShowCreate(false);
@@ -557,6 +540,7 @@ export function GuestList({
           <GuestImportForm
             embedded
             headers={headers}
+            defaultEventId={eventFilter || undefined}
             onClose={() => setShowImport(false)}
             onImported={(summary) => {
               setShowImport(false);
@@ -578,7 +562,7 @@ export function GuestList({
                 {selectedCount !== 1 ? "s" : ""} ? Les liens d&apos;invitation ne
                 fonctionneront plus.
               </p>
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-zinc-500">
                 Cette action est irréversible (RSVP, OTP, carte M-Pesa liés inclus).
               </p>
             </div>
@@ -601,10 +585,10 @@ export function GuestList({
                 <strong>{sendableFiltered.length}</strong> invité
                 {sendableFiltered.length !== 1 ? "s" : ""} affiché
                 {sendableFiltered.length !== 1 ? "s" : ""}
-                {dayLot !== "ALL" ? (
+                {eventFilter ? (
                   <>
                     {" "}
-                    du lot <strong>{getGuestEventDayLotLabel(dayLot)}</strong>
+                    de <strong>{events.find((e) => e.id === eventFilter)?.name}</strong>
                   </>
                 ) : null}
                 ?
@@ -689,7 +673,7 @@ function ToolbarBtn({
   const className =
     variant === "primary"
       ? "inline-flex items-center gap-2 rounded-xl bg-vodacom-red px-3 py-2 text-sm font-medium text-white hover:bg-vodacom-red-dark disabled:opacity-50"
-      : "inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#1f1f1f] px-3 py-2 text-sm font-medium text-white hover:border-vodacom-red/40 hover:bg-white/10 disabled:opacity-50";
+      : "inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 hover:border-vodacom-red/40 hover:bg-zinc-100 disabled:opacity-50";
 
   return (
     <button type="button" onClick={onClick} disabled={disabled} className={className}>
@@ -702,11 +686,11 @@ function ToolbarBtn({
 function EmptyState() {
   return (
     <div className="flex flex-col items-center px-6 py-20 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
-        <LucideIcon icon={MailOpen} size={28} strokeWidth={1.5} className="text-white/25" />
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-100">
+        <LucideIcon icon={MailOpen} size={28} strokeWidth={1.5} className="text-zinc-300" />
       </span>
-      <p className="mt-4 font-medium text-white">Registre vide</p>
-      <p className="mt-1 max-w-xs text-sm text-white/45">
+      <p className="mt-4 font-medium text-zinc-900">Registre vide</p>
+      <p className="mt-1 max-w-xs text-sm text-zinc-500">
         Ajoutez un invité manuellement ou importez une liste CSV pour commencer.
       </p>
     </div>
@@ -807,7 +791,7 @@ function GuestEditModal({
             className={modalInputClass}
             placeholder={DEFAULT_INVITATION_TIME_RANGE}
           />
-          <p className="mt-1 text-xs text-white/45">
+          <p className="mt-1 text-xs text-zinc-500">
             Utilisé dans l&apos;email (variables horaires) et la page invitation.
           </p>
         </ModalField>
@@ -828,7 +812,7 @@ function GuestEditModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white/70 hover:bg-white/10"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100"
           >
             Annuler
           </button>

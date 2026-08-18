@@ -49,12 +49,12 @@ export function AdminPhoneInput({ id, value, onChange, inputClass }: Props) {
         placeholder="0815191631"
         autoComplete="tel"
       />
-      <p className="mt-1 text-xs text-white/45">{PHONE_INPUT_HINT}</p>
+      <p className="mt-1 text-xs text-zinc-500">{PHONE_INPUT_HINT}</p>
       {preview ? (
-        <p className="mt-1 text-xs text-emerald-400/80">Enregistré : {preview}</p>
+        <p className="mt-1 text-xs text-emerald-700">Enregistré : {preview}</p>
       ) : null}
       {error ? (
-        <p className="mt-1 text-xs text-amber-400/90">{error}</p>
+        <p className="mt-1 text-xs text-amber-700">{error}</p>
       ) : null}
     </>
   );

@@ -11,7 +11,11 @@ if (process.env.ALLOWED_DEV_ORIGIN) {
 }
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   allowedDevOrigins,
+  outputFileTracingIncludes: {
+    "*": ["./node_modules/.prisma/client/**/*"],
+  },
   images: {
     remotePatterns: [
       {

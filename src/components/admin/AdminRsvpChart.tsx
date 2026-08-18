@@ -24,7 +24,7 @@ export function AdminRsvpChart({ guests }: Props) {
     {
       label: RSVP_CONFIG.PENDING.label,
       count: pending,
-      bar: "bg-white",
+      bar: "bg-zinc-300",
       width: total > 0 ? (pending / total) * 100 : 0,
     },
     {
@@ -42,7 +42,7 @@ export function AdminRsvpChart({ guests }: Props) {
       badge="En direct"
     >
       {total === 0 ? (
-        <p className="flex flex-1 items-center justify-center text-sm text-white/40">
+        <p className="flex flex-1 items-center justify-center text-sm text-zinc-400">
           Aucune donnée RSVP
         </p>
       ) : (

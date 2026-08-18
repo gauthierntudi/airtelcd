@@ -1,7 +1,6 @@
 import {
   DEFAULT_EVENT_DAY_ID,
   EVENT_DAY_IDS,
-  EVENT_DAYS,
   type EventDayId,
 } from "@/lib/event-days";
 
@@ -12,10 +11,7 @@ const DAY_NUM_TO_ID: Record<number, EventDayId> = {
 };
 
 function sortEventDayIds(ids: EventDayId[]): EventDayId[] {
-  const order = new Map(EVENT_DAY_IDS.map((id, i) => [id, i]));
-  return [...new Set(ids)].sort(
-    (a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0),
-  );
+  return [...new Set(ids)].sort();
 }
 
 /** Valide et normalise 1 à n jours d'invitation. */
@@ -68,8 +64,12 @@ export function parseEventDaysInput(
     return parseEventDaysInput(tokens);
   }
 
-  if (EVENT_DAY_IDS.includes(raw as EventDayId)) {
-    return { eventDays: [raw as EventDayId] };
+  if (EVENT_DAY_IDS.includes(raw)) {
+    return { eventDays: [raw] };
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return { eventDays: [raw] };
   }
 
   const dayNum = parseInt(raw.replace(/^0+/, ""), 10);
@@ -99,11 +99,7 @@ export function eventDayFromDbDate(date: Date): EventDayId {
   const y = date.getUTCFullYear();
   const m = String(date.getUTCMonth() + 1).padStart(2, "0");
   const d = String(date.getUTCDate()).padStart(2, "0");
-  const iso = `${y}-${m}-${d}`;
-  if (EVENT_DAY_IDS.includes(iso as EventDayId)) {
-    return iso as EventDayId;
-  }
-  return DEFAULT_EVENT_DAY_ID;
+  return `${y}-${m}-${d}`;
 }
 
 export function eventDaysFromDbDates(dates: Date[]): EventDayId[] {

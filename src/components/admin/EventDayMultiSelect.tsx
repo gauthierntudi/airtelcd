@@ -33,7 +33,7 @@ export function EventDayMultiSelect({ value, onChange }: Props) {
         variant="mobile"
         selectableEventDays
       />
-      <p className="text-xs text-white/50">
+      <p className="text-xs text-zinc-500">
         {formatInvitedDaysLong(sorted)} — au moins 1 jour (12, 13 ou 14)
       </p>
     </div>

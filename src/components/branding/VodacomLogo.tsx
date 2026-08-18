@@ -19,14 +19,16 @@ export function VodacomLogo({
   priority = false,
 }: Props) {
   const src = logoSrc(variant);
-  const width = Math.round(height * 4.2);
+  const isSvg = src.endsWith(".svg");
+  const width = Math.round(height * (isSvg ? 2.6 : 4.2));
 
   const image = (
     <Image
       src={src}
-      alt="Vodacom Privilège"
+      alt="Airtel RSVP"
       width={width}
       height={height}
+      unoptimized={isSvg}
       className={`h-auto w-auto object-contain object-left ${className}`}
       style={{ maxHeight: height }}
       priority={priority}

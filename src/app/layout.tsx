@@ -1,16 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { BRAND } from "@/lib/branding";
+import { EVENT } from "@/lib/event";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vodacom Privilège Golf 2026",
+  title: EVENT.title,
   description:
     "Plateforme événementielle — invitation, expériences et activités enfants.",
   icons: {
     icon: [{ url: BRAND.favicon, type: "image/png" }],
     apple: [{ url: BRAND.icon, type: "image/png" }],
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: BRAND.themeColor,
 };
 
 export default function RootLayout({

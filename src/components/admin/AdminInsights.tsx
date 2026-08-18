@@ -30,7 +30,7 @@ export function AdminInsights({ guests, messagingStatus }: Props) {
       badge={apiBadge}
     >
       {total === 0 ? (
-        <p className="flex flex-1 items-center justify-center text-sm text-white/40">
+        <p className="flex flex-1 items-center justify-center text-sm text-zinc-400">
           Aucune donnée d&apos;invitation
         </p>
       ) : (
@@ -38,7 +38,7 @@ export function AdminInsights({ guests, messagingStatus }: Props) {
           <ProgressBar
             segments={[
               { label: "Envoyées", className: "bg-vodacom-red", width: sentPct },
-              { label: "En attente", className: "bg-white/25", width: notSentPct },
+              { label: "En attente", className: "bg-zinc-300", width: notSentPct },
             ]}
           />
           <ul className="mt-auto grid flex-1 grid-cols-3 gap-3">
@@ -52,7 +52,7 @@ export function AdminInsights({ guests, messagingStatus }: Props) {
               label="Email"
               value={emailChannel}
               sub={messagingStatus.brevo ? "Brevo actif" : "Inactif"}
-              dotClass="bg-white/80"
+              dotClass="bg-zinc-400"
             />
             <StatTile
               label="WhatsApp"
@@ -61,7 +61,7 @@ export function AdminInsights({ guests, messagingStatus }: Props) {
               dotClass="bg-vodacom-red/60"
             />
           </ul>
-          <p className="mt-4 shrink-0 text-center text-xs text-white/40">
+          <p className="mt-4 shrink-0 text-center text-xs text-zinc-400">
             <span className="font-semibold text-vodacom-red">{sendable}</span> invité
             {sendable !== 1 ? "s" : ""} prêt{sendable !== 1 ? "s" : ""} à l&apos;envoi
           </p>

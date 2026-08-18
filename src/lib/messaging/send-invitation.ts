@@ -11,7 +11,8 @@ import {
   buildInvitationWhatsAppVariables,
   resolveInvitationWhatsAppTemplate,
 } from "@/lib/messaging/invitation-whatsapp-vars";
-import { sendInvitationWhatsApp } from "@/lib/messaging/twilio-whatsapp";
+import { buildEventWhatsAppVariables } from "@/lib/messaging/event-whatsapp";
+import { sendGenericWhatsApp, sendInvitationWhatsApp } from "@/lib/messaging/twilio-whatsapp";
 import { guestDisplayName } from "@/lib/event";
 import { prisma } from "@/lib/prisma";
 
@@ -43,6 +44,26 @@ async function sendOnChannel(
       email: guest.email!.trim(),
     });
     return;
+  }
+
+  if (guest.eventId) {
+    const event = await prisma.event.findUnique({
+      where: { id: guest.eventId },
+      include: { templates: true },
+    });
+    const invite = event?.templates.find((t) => t.kind === "INVITATION");
+    if (event && invite) {
+      await sendGenericWhatsApp({
+        phoneE164: guest.phone!,
+        contentSid: invite.contentSid,
+        contentVariables: buildEventWhatsAppVariables(
+          guest,
+          event.startDate,
+          event.endDate,
+        ),
+      });
+      return;
+    }
   }
 
   const whatsappTemplate = resolveInvitationWhatsAppTemplate(guest);

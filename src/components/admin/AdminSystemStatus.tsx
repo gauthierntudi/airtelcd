@@ -21,13 +21,13 @@ const OVERALL_CONFIG = {
     label: "Opérationnel",
     description: "Email (Brevo) et WhatsApp (Twilio) sont configurés.",
     icon: CheckCircle2,
-    className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+    className: "border-emerald-200 bg-emerald-50 text-emerald-800",
   },
   partial: {
     label: "Envoi partiel",
     description: "Un seul canal est actif. L'autre reste indisponible jusqu'à configuration du .env.",
     icon: AlertTriangle,
-    className: "border-amber-500/30 bg-amber-500/10 text-amber-400",
+    className: "border-amber-200 bg-amber-50 text-amber-800",
   },
   offline: {
     label: "Envoi désactivé",
@@ -51,8 +51,8 @@ export function AdminSystemStatus({ report }: Props) {
       >
         <LucideIcon icon={overall.icon} size={28} className="shrink-0" />
         <div>
-          <p className="text-lg font-bold text-white">{overall.label}</p>
-          <p className="mt-1 text-sm text-white/70">{overall.description}</p>
+          <p className="text-lg font-bold text-zinc-900">{overall.label}</p>
+          <p className="mt-1 text-sm text-zinc-600">{overall.description}</p>
         </div>
       </div>
 
@@ -111,34 +111,34 @@ export function AdminSystemStatus({ report }: Props) {
         />
       </div>
 
-      <section className="mt-4 rounded-2xl border border-white/10 bg-[#161616] p-5">
+      <section className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5">
         <div className="mb-4 flex items-center gap-2">
-          <LucideIcon icon={Globe} size={18} className="text-white/50" />
-          <h2 className="text-base font-bold text-white">Application</h2>
+          <LucideIcon icon={Globe} size={18} className="text-zinc-500" />
+          <h2 className="text-base font-bold text-zinc-900">Application</h2>
         </div>
         <dl className="space-y-3">
           <div>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-white/40">
+            <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
               NEXT_PUBLIC_APP_URL
             </dt>
-            <dd className="mt-1 font-mono text-sm text-white/80">
+            <dd className="mt-1 font-mono text-sm text-zinc-600">
               {report.appUrl ?? (
                 <span className="text-vodacom-red">Non défini — liens d&apos;invitation incorrects</span>
               )}
             </dd>
           </div>
           <div>
-            <dt className="text-[11px] font-semibold uppercase tracking-wide text-white/40">
+            <dt className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
               Règle d&apos;envoi
             </dt>
-            <dd className="mt-1 text-sm leading-relaxed text-white/60">{report.sendPriority}</dd>
+            <dd className="mt-1 text-sm leading-relaxed text-zinc-500">{report.sendPriority}</dd>
           </div>
         </dl>
       </section>
 
-      <p className="mt-6 text-center text-xs text-white/35">
+      <p className="mt-6 text-center text-xs text-zinc-400">
         Les secrets (clés API, tokens) ne sont jamais affichés — seule leur présence dans{" "}
-        <code className="rounded bg-white/5 px-1">.env</code> est contrôlée.
+        <code className="rounded bg-zinc-100 px-1">.env</code> est contrôlée.
       </p>
     </AdminLayout>
   );
@@ -158,17 +158,17 @@ function ProviderCard({
   extras?: React.ReactNode;
 }) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-[#161616] p-5">
+    <article className="rounded-2xl border border-zinc-200 bg-white p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <span
             className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-              configured ? "bg-vodacom-red/20 text-vodacom-red" : "bg-white/5 text-white/40"
+              configured ? "bg-vodacom-red/20 text-vodacom-red" : "bg-zinc-100 text-zinc-400"
             }`}
           >
             <LucideIcon icon={icon} size={20} />
           </span>
-          <h2 className="text-base font-bold text-white">{title}</h2>
+          <h2 className="text-base font-bold text-zinc-900">{title}</h2>
         </div>
         <StatusPill ok={configured} />
       </div>
@@ -177,18 +177,18 @@ function ProviderCard({
         {checks.map((c) => (
           <li
             key={c.name}
-            className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-[#1f1f1f] px-3 py-2.5"
+            className="flex items-center justify-between gap-3 rounded-xl border border-zinc-100 bg-zinc-50 px-3 py-2.5"
           >
             <div className="min-w-0">
-              <p className="text-sm text-white/90">{c.label}</p>
-              <p className="font-mono text-[10px] text-white/35">{c.name}</p>
+              <p className="text-sm text-zinc-700">{c.label}</p>
+              <p className="font-mono text-[10px] text-zinc-400">{c.name}</p>
             </div>
             <VarStatus ok={c.configured} />
           </li>
         ))}
       </ul>
 
-      {extras && <div className="mt-4 space-y-2 border-t border-white/10 pt-4">{extras}</div>}
+      {extras && <div className="mt-4 space-y-2 border-t border-zinc-200 pt-4">{extras}</div>}
     </article>
   );
 }
@@ -198,8 +198,8 @@ function StatusPill({ ok }: { ok: boolean }) {
     <span
       className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${
         ok
-          ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30"
-          : "bg-white/5 text-white/45 ring-1 ring-white/10"
+          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+          : "bg-zinc-100 text-zinc-500 ring-1 ring-zinc-200"
       }`}
     >
       {ok ? "Actif" : "Inactif"}
@@ -209,9 +209,9 @@ function StatusPill({ ok }: { ok: boolean }) {
 
 function VarStatus({ ok }: { ok: boolean }) {
   return ok ? (
-    <LucideIcon icon={CheckCircle2} size={18} className="shrink-0 text-emerald-400" />
+    <LucideIcon icon={CheckCircle2} size={18} className="shrink-0 text-emerald-600" />
   ) : (
-    <LucideIcon icon={MinusCircle} size={18} className="shrink-0 text-white/25" />
+    <LucideIcon icon={MinusCircle} size={18} className="shrink-0 text-zinc-300" />
   );
 }
 
@@ -226,8 +226,8 @@ function ExtraRow({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-medium uppercase tracking-wide text-white/40">{label}</p>
-      <p className={`mt-0.5 text-sm text-white/80 ${mono ? "font-mono text-xs" : ""}`}>{value}</p>
+      <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">{label}</p>
+      <p className={`mt-0.5 text-sm text-zinc-600 ${mono ? "font-mono text-xs" : ""}`}>{value}</p>
     </div>
   );
 }

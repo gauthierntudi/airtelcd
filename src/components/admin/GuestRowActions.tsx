@@ -130,12 +130,12 @@ function IconBtn({
     "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition disabled:pointer-events-none disabled:opacity-35";
 
   const className = danger
-    ? `${base} border-white/10 bg-[#1f1f1f] text-white/55 hover:border-vodacom-red/35 hover:bg-vodacom-red/20 hover:text-vodacom-red`
+    ? `${base} border-zinc-200 bg-zinc-50 text-zinc-500 hover:border-vodacom-red/35 hover:bg-vodacom-red/20 hover:text-vodacom-red`
     : highlight
       ? `${base} border-vodacom-red/30 bg-vodacom-red/15 text-vodacom-red hover:border-vodacom-red/50 hover:bg-vodacom-red/25`
       : success
-        ? `${base} border-emerald-500/30 bg-emerald-500/15 text-emerald-400 hover:border-emerald-500/45 hover:bg-emerald-500/25`
-        : `${base} border-white/10 bg-[#1f1f1f] text-white/60 hover:border-white/20 hover:bg-[#2a2a2a] hover:text-white`;
+        ? `${base} border-emerald-500/30 bg-emerald-50 text-emerald-700 hover:border-emerald-500/45 hover:bg-emerald-100`
+        : `${base} border-zinc-200 bg-zinc-50 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-100 hover:text-zinc-900`;
 
   const content = (
     <LucideIcon icon={icon} size={15} className={spin ? "animate-spin" : ""} />

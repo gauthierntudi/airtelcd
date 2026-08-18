@@ -32,12 +32,13 @@ export function InvitationRsvpNameSheet({ loading, onClose, onSubmit }: Props) {
       onClose={onClose}
       titleId="rsvp-name-title"
       backdropLabel="Fermer"
+      tone="light"
     >
       <form onSubmit={handleSubmit} className="flex flex-col">
         <header className="flex shrink-0 items-center justify-between gap-3 px-5 pb-3 pt-0">
           <h2
             id="rsvp-name-title"
-            className="font-vodafone-exb text-xl leading-tight text-white"
+            className="font-vodafone-exb text-xl leading-tight text-zinc-900"
           >
             Votre identité
           </h2>
@@ -45,19 +46,19 @@ export function InvitationRsvpNameSheet({ loading, onClose, onSubmit }: Props) {
             type="button"
             onClick={onClose}
             aria-label="Fermer"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white active:bg-white/20"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-zinc-700 active:bg-zinc-200"
           >
             <LucideIcon icon={X} size={20} />
           </button>
         </header>
 
         <div className="px-5 pb-4">
-          <p className="font-vodafone-lt text-sm leading-relaxed text-white/70">
+          <p className="text-sm leading-relaxed text-zinc-500">
             Indiquez votre nom complet pour confirmer votre présence.
           </p>
 
           <label htmlFor="rsvp-full-name" className="mt-4 block">
-            <span className="font-vodafone-rg-bd text-sm text-white">
+            <span className="text-sm font-semibold text-zinc-800">
               Nom complet *
             </span>
             <input
@@ -67,7 +68,7 @@ export function InvitationRsvpNameSheet({ loading, onClose, onSubmit }: Props) {
               onChange={(e) => setFullName(e.target.value)}
               autoComplete="name"
               placeholder="Jean Dupont"
-              className="mt-2 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 font-vodafone-lt text-base text-white outline-none placeholder:text-white/35 focus:border-vodacom-red/60 focus:ring-2 focus:ring-vodacom-red/25"
+              className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-base text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-vodacom-red/50 focus:ring-2 focus:ring-vodacom-red/15"
             />
           </label>
         </div>

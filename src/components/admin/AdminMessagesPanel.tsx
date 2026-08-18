@@ -172,7 +172,7 @@ export function AdminMessagesPanel({
       >
         <div className="space-y-6">
           <fieldset>
-            <legend className="text-xs font-bold uppercase tracking-wider text-white/50">
+            <legend className="text-xs font-bold uppercase tracking-wider text-zinc-500">
               Jour de l&apos;événement
             </legend>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -184,7 +184,7 @@ export function AdminMessagesPanel({
                   className={`rounded-xl px-4 py-2.5 text-sm font-medium transition ${
                     day === d.id
                       ? "bg-vodacom-red text-white shadow-lg shadow-vodacom-red/25"
-                      : "border border-white/10 bg-[#1f1f1f] text-white/70 hover:bg-white/10"
+                      : "border border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100"
                   }`}
                 >
                   {d.label}
@@ -194,7 +194,7 @@ export function AdminMessagesPanel({
           </fieldset>
 
           <fieldset>
-            <legend className="text-xs font-bold uppercase tracking-wider text-white/50">
+            <legend className="text-xs font-bold uppercase tracking-wider text-zinc-500">
               Template
             </legend>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -205,12 +205,12 @@ export function AdminMessagesPanel({
                   onClick={() => setTemplateId(t.id)}
                   className={`rounded-xl border px-4 py-3 text-left transition ${
                     templateId === t.id
-                      ? "border-vodacom-red/50 bg-vodacom-red/15 text-white"
-                      : "border-white/10 bg-[#1f1f1f] text-white/75 hover:border-white/20"
+                      ? "border-vodacom-red/50 bg-vodacom-red/10 text-zinc-900"
+                      : "border-zinc-200 bg-zinc-50 text-zinc-600 hover:border-zinc-300"
                   }`}
                 >
                   <p className="font-semibold">{t.label}</p>
-                  <p className="mt-1 truncate font-mono text-[10px] text-white/35">
+                  <p className="mt-1 truncate font-mono text-[10px] text-zinc-400">
                     {t.contentSid}
                   </p>
                 </button>
@@ -218,20 +218,20 @@ export function AdminMessagesPanel({
             </div>
           </fieldset>
 
-          <div className="rounded-xl border border-white/10 bg-[#1f1f1f] p-4">
+          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
             {loading ? (
-              <div className="flex items-center gap-2 text-sm text-white/50">
+              <div className="flex items-center gap-2 text-sm text-zinc-500">
                 <LucideIcon icon={Loader2} size={18} className="animate-spin" />
                 Calcul des destinataires…
               </div>
             ) : summary ? (
-              <div className="space-y-2 text-sm text-white/70">
+              <div className="space-y-2 text-sm text-zinc-600">
                 <p>
-                  <span className="font-bold text-white">{summary.withPhone}</span>{" "}
+                  <span className="font-bold text-zinc-900">{summary.withPhone}</span>{" "}
                   invité(s) avec check-in le {summary.dayLabel.toLowerCase()} et
                   numéro WhatsApp
                 </p>
-                <p className="text-white/45">
+                <p className="text-zinc-500">
                   {summary.totalCheckedIn} check-in(s) au total ce jour
                   {summary.totalCheckedIn > summary.withPhone
                     ? ` — ${summary.totalCheckedIn - summary.withPhone} sans mobile`
@@ -239,7 +239,7 @@ export function AdminMessagesPanel({
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-white/50">Aucune donnée</p>
+              <p className="text-sm text-zinc-500">Aucune donnée</p>
             )}
           </div>
 
@@ -274,12 +274,12 @@ export function AdminMessagesPanel({
       >
         {loading ? (
           <div className="flex flex-1 items-center justify-center py-16">
-            <LucideIcon icon={Loader2} size={32} className="animate-spin text-white/30" />
+            <LucideIcon icon={Loader2} size={32} className="animate-spin text-zinc-400" />
           </div>
         ) : !summary || summary.recipients.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
-            <LucideIcon icon={MessageCircle} size={40} className="text-white/20" />
-            <p className="text-sm text-white/45">
+            <LucideIcon icon={MessageCircle} size={40} className="text-zinc-300" />
+            <p className="text-sm text-zinc-500">
               Aucun invité check-in avec mobile pour ce jour
             </p>
           </div>
@@ -291,16 +291,16 @@ export function AdminMessagesPanel({
               return (
                 <li
                   key={guest.id}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#1f1f1f] px-4 py-3"
+                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-white">
+                    <p className="truncate font-medium text-zinc-900">
                       {guest.displayName}
                     </p>
-                    <p className="truncate font-mono text-xs text-white/45">
+                    <p className="truncate font-mono text-xs text-zinc-500">
                       {guest.phone}
                     </p>
-                    <p className="mt-1 text-[11px] text-white/40">
+                    <p className="mt-1 text-[11px] text-zinc-400">
                       {formatInvitationDateTime(guest.checkedInAt)}
                     </p>
                   </div>
@@ -340,25 +340,25 @@ export function AdminMessagesPanel({
                 Envoyer <strong>{templateLabel}</strong> à{" "}
                 <strong>{individualConfirm.displayName}</strong> ?
               </p>
-              <dl className="space-y-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm">
+              <dl className="space-y-2 rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-3 text-sm">
                 <div className="flex justify-between gap-4">
-                  <dt className="text-white/50">Jour</dt>
-                  <dd className="text-right font-medium text-white">{dayLabel}</dd>
+                  <dt className="text-zinc-500">Jour</dt>
+                  <dd className="text-right font-medium text-zinc-900">{dayLabel}</dd>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <dt className="text-white/50">Mobile</dt>
-                  <dd className="font-mono text-right text-white/90">
+                  <dt className="text-zinc-500">Mobile</dt>
+                  <dd className="font-mono text-right text-zinc-700">
                     {individualConfirm.phone}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <dt className="text-white/50">Template</dt>
-                  <dd className="text-right font-medium text-white">
+                  <dt className="text-zinc-500">Template</dt>
+                  <dd className="text-right font-medium text-zinc-900">
                     {templateLabel}
                   </dd>
                 </div>
               </dl>
-              <p className="text-xs text-white/45">
+              <p className="text-xs text-zinc-500">
                 Message générique sans variables — envoyé via Twilio WhatsApp.
               </p>
             </div>

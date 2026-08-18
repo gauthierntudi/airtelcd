@@ -8,12 +8,12 @@ const CONFIG: Record<
 > = {
   email: {
     label: "Email",
-    className: "bg-white/10 text-white ring-white/15",
+    className: "bg-zinc-100 text-zinc-900 ring-zinc-200",
     icon: Mail,
   },
   whatsapp: {
     label: "WhatsApp",
-    className: "bg-vodacom-red/20 text-white ring-vodacom-red/40",
+    className: "bg-red-50 text-vodacom-red ring-vodacom-red/30",
     icon: MessageCircle,
   },
 };
@@ -31,7 +31,7 @@ export function ContactChannelBadges({
 }: Props) {
   if (channels.length === 0) {
     return (
-      <span className="text-xs text-white/35" title="Aucun canal de contact">
+      <span className="text-xs text-zinc-400" title="Aucun canal de contact">
         Aucun envoi
       </span>
     );

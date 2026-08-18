@@ -30,24 +30,24 @@ export function AdminLogin() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0c0c0c] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#F4F5F7] px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#161616] p-8 shadow-2xl"
+        className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-xl"
       >
         <VodacomIcon size={56} className="mb-4" priority />
-        <h1 className="mb-2 text-xl font-bold text-white">Accès administrateur</h1>
-        <p className="mb-6 text-sm text-white/55">
+        <h1 className="mb-2 text-xl font-bold text-zinc-900">Accès administrateur</h1>
+        <p className="mb-6 text-sm text-zinc-500">
           Entrez le secret défini dans <code className="text-xs text-vodacom-red">ADMIN_SECRET</code>.
         </p>
         <label className="block">
-          <span className="text-sm font-medium text-white">Secret</span>
+          <span className="text-sm font-medium text-zinc-800">Secret</span>
           <input
             type="password"
             required
             value={secret}
             onChange={(e) => setSecret(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/15 bg-[#0c0c0c] px-3 py-2 text-white outline-none focus:border-vodacom-red/50 focus:ring-2 focus:ring-vodacom-red/20"
+            className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-vodacom-red/50 focus:ring-2 focus:ring-vodacom-red/20"
           />
         </label>
         <button

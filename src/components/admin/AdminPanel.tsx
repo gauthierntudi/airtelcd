@@ -10,14 +10,14 @@ type PanelProps = {
 /** Carte dashboard — hauteur et en-tête uniformes */
 export function AdminPanel({ title, description, badge, children }: PanelProps) {
   return (
-    <section className="flex h-full min-h-[300px] flex-col rounded-2xl border border-white/10 bg-[#161616] p-5">
+    <section className="flex h-full min-h-[300px] flex-col rounded-2xl border border-zinc-200 bg-white p-5">
       <div className="mb-5 flex shrink-0 items-start justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-white">{title}</h2>
-          <p className="mt-0.5 text-sm text-white/50">{description}</p>
+          <h2 className="text-base font-bold text-zinc-900">{title}</h2>
+          <p className="mt-0.5 text-sm text-zinc-500">{description}</p>
         </div>
         {badge && (
-          <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/60">
+          <span className="shrink-0 rounded-full border border-zinc-200 bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-500">
             {badge}
           </span>
         )}
@@ -36,7 +36,7 @@ export function ProgressBar({
 
   return (
     <div
-      className="mb-5 flex h-3 shrink-0 overflow-hidden rounded-full bg-white/10"
+      className="mb-5 flex h-3 shrink-0 overflow-hidden rounded-full bg-zinc-100"
       role="img"
       aria-label={segments.map((s) => `${s.label} ${s.width}%`).join(", ")}
     >
@@ -53,7 +53,7 @@ export function ProgressBar({
             ),
         )
       ) : (
-        <div className="h-full w-full bg-white/5" />
+        <div className="h-full w-full bg-zinc-100" />
       )}
     </div>
   );
@@ -77,21 +77,21 @@ export function StatTile({
       className={`flex flex-col rounded-xl border px-4 py-3.5 ${
         highlight
           ? "border-vodacom-red/30 bg-vodacom-red/10"
-          : "border-white/10 bg-[#1f1f1f]"
+          : "border-zinc-200 bg-zinc-50"
       }`}
     >
       <div className="flex items-center gap-2">
         {dotClass && <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />}
-        <span className="text-xs font-medium text-white/55">{label}</span>
+        <span className="text-xs font-medium text-zinc-500">{label}</span>
       </div>
       <p
         className={`mt-2 text-2xl font-bold tabular-nums ${
-          highlight ? "text-vodacom-red" : "text-white"
+          highlight ? "text-vodacom-red" : "text-zinc-900"
         }`}
       >
         {value}
       </p>
-      {sub && <p className="mt-0.5 text-xs text-white/40">{sub}</p>}
+      {sub && <p className="mt-0.5 text-xs text-zinc-400">{sub}</p>}
     </li>
   );
 }

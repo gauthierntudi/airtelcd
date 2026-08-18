@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthorized } from "@/lib/auth-admin";
 import { prisma } from "@/lib/prisma";
 import { parseGuestPhoneField } from "@/lib/parse-guest-phone-field";
+import { dateToIsoDay, eventInvitationTimeRange, eventRangeToDbDates } from "@/lib/events";
 import { parseEventDaysInput, eventDaysToDbDates } from "@/lib/parse-event-day";
 import { parseInvitationTimeRangeInput } from "@/lib/invitation-time-range";
-import { serializeGuest } from "@/lib/serialize-guest";
+import { serializeGuest, guestEventInclude } from "@/lib/serialize-guest";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -23,6 +24,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     rsvpStatus?: RsvpStatus;
     eventDay?: string | string[];
     eventDays?: string | string[];
+    eventId?: string | null;
     invitationTimeRange?: string;
   };
   try {
@@ -72,6 +74,29 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     };
   }
 
+  let eventLink:
+    | { eventId: string | null; eventDays?: Date[]; invitationTimeRange?: string }
+    | undefined;
+  if (body.eventId !== undefined) {
+    const nextEventId = body.eventId?.trim() || null;
+    if (nextEventId) {
+      const event = await prisma.event.findUnique({ where: { id: nextEventId } });
+      if (!event) {
+        return NextResponse.json({ error: "Événement introuvable" }, { status: 400 });
+      }
+      eventLink = {
+        eventId: nextEventId,
+        eventDays: eventRangeToDbDates(
+          dateToIsoDay(event.startDate),
+          dateToIsoDay(event.endDate),
+        ),
+        invitationTimeRange: eventInvitationTimeRange(event),
+      };
+    } else {
+      eventLink = { eventId: null };
+    }
+  }
+
   const updated = await prisma.guest.update({
     where: { id },
     data: {
@@ -82,6 +107,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       ...phoneData,
       ...eventDaysData,
       ...invitationTimeRangeData,
+      ...eventLink,
       ...(rsvpStatus !== undefined && {
         rsvpStatus,
         confirmedAt:
@@ -90,6 +116,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
             : null,
       }),
     },
+    include: guestEventInclude,
   });
 
   const baseUrl = request.nextUrl.origin;

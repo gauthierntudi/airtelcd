@@ -1,5 +1,14 @@
-import { EVENT } from "@/lib/event";
 import type { EventDayId } from "@/lib/event-days";
+import { parseFrTimeRange, type DaySchedule } from "@/lib/events";
+
+type CalendarInput = {
+  invitationUrl: string;
+  eventName: string;
+  venue: string;
+  eventDays: EventDayId[];
+  dayTimes?: Record<string, DaySchedule>;
+  fallbackRange?: string;
+};
 
 function icsDateTime(dayId: EventDayId, hour: number, minute: number): string {
   const compact = dayId.replace(/-/g, "");
@@ -8,10 +17,17 @@ function icsDateTime(dayId: EventDayId, hour: number, minute: number): string {
   return `${compact}T${h}${m}00`;
 }
 
-function dayIcsRange(dayId: EventDayId) {
+function dayIcsRange(
+  dayId: EventDayId,
+  dayTimes: Record<string, DaySchedule> | undefined,
+  fallbackRange: string,
+) {
+  const schedule = dayTimes?.[dayId] ?? parseFrTimeRange(fallbackRange);
+  const [startH, startM] = schedule.start.split(":").map(Number);
+  const [endH, endM] = schedule.end.split(":").map(Number);
   return {
-    start: icsDateTime(dayId, 8, 0),
-    end: icsDateTime(dayId, 17, 0),
+    start: icsDateTime(dayId, startH || 14, startM || 0),
+    end: icsDateTime(dayId, endH || 19, endM || 0),
   };
 }
 
@@ -19,43 +35,51 @@ function icsEscape(text: string): string {
   return text.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 }
 
-export function buildGoogleCalendarUrl(
-  invitationUrl: string,
-  eventDays: EventDayId[],
-): string {
+export function buildGoogleCalendarUrl({
+  invitationUrl,
+  eventName,
+  venue,
+  eventDays,
+  dayTimes,
+  fallbackRange = "14h00 – 19h00",
+}: CalendarInput): string {
   const primary = eventDays[0] ?? "2026-06-12";
-  const { start, end } = dayIcsRange(primary);
+  const { start, end } = dayIcsRange(primary, dayTimes, fallbackRange);
   const params = new URLSearchParams({
     action: "TEMPLATE",
-    text: EVENT.title,
+    text: eventName,
     dates: `${start}/${end}`,
-    details: `Invitation Vodacom Privilège Golf.\nConfirmer : ${invitationUrl}`,
-    location: EVENT.venue,
+    details: `Invitation.\nConfirmer : ${invitationUrl}`,
+    location: venue,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-export function buildIcsDownloadUrl(
-  invitationUrl: string,
-  eventDays: EventDayId[],
-): string {
+export function buildIcsDownloadUrl({
+  invitationUrl,
+  eventName,
+  venue,
+  eventDays,
+  dayTimes,
+  fallbackRange = "14h00 – 19h00",
+}: CalendarInput): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Vodacom Privilège//Golf 2026//FR",
+    "PRODID:-//Airtel RSVP//Invitation//FR",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
   ];
 
   eventDays.forEach((dayId, index) => {
-    const { start, end } = dayIcsRange(dayId);
+    const { start, end } = dayIcsRange(dayId, dayTimes, fallbackRange);
     lines.push(
       "BEGIN:VEVENT",
-      `UID:golf2026-${index}-${icsEscape(invitationUrl)}@vodacomprivilege.com`,
+      `UID:rsvp-${index}-${icsEscape(invitationUrl)}@airtel.cd`,
       `DTSTART:${start}`,
       `DTEND:${end}`,
-      `SUMMARY:${icsEscape(EVENT.title)}`,
-      `LOCATION:${icsEscape(EVENT.venue)}`,
+      `SUMMARY:${icsEscape(eventName)}`,
+      `LOCATION:${icsEscape(venue)}`,
       `DESCRIPTION:${icsEscape(`Confirmer votre présence : ${invitationUrl}`)}`,
       "END:VEVENT",
     );

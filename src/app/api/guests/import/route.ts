@@ -4,10 +4,11 @@ import type { GuestImportRow } from "@/lib/parse-guest-csv";
 import { prisma } from "@/lib/prisma";
 import { parseGuestPhoneField } from "@/lib/parse-guest-phone-field";
 import { createUniqueGuestToken } from "@/lib/guest-token";
+import { dateToIsoDay, eventInvitationTimeRange, eventRangeToDbDates } from "@/lib/events";
 import { parseEventDaysInput, eventDaysToDbDates } from "@/lib/parse-event-day";
 import { parseInvitationTimeRangeInput } from "@/lib/invitation-time-range";
 import { normalizePhone } from "@/lib/phone";
-import { serializeGuest } from "@/lib/serialize-guest";
+import { serializeGuest, guestEventInclude } from "@/lib/serialize-guest";
 
 async function loadExistingPhoneE164Set(): Promise<Set<string>> {
   const rows = await prisma.guest.findMany({
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
   let body: {
     guests?: GuestImportRow[];
     eventDays?: string | string[];
+    eventId?: string;
     invitationTimeRange?: string;
   };
   try {
@@ -44,8 +46,6 @@ export async function POST(request: NextRequest) {
   if ("error" in dayResult) {
     return NextResponse.json({ error: dayResult.error }, { status: 400 });
   }
-  const eventDaysDb = eventDaysToDbDates(dayResult.eventDays);
-
   const timeResult = parseInvitationTimeRangeInput(
     body.invitationTimeRange,
     dayResult.eventDays,
@@ -53,7 +53,24 @@ export async function POST(request: NextRequest) {
   if ("error" in timeResult) {
     return NextResponse.json({ error: timeResult.error }, { status: 400 });
   }
-  const invitationTimeRange = timeResult.invitationTimeRange;
+
+  const eventId = body.eventId?.trim() || null;
+  let eventDaysDb = eventDaysToDbDates(dayResult.eventDays);
+  let invitationTimeRange = timeResult.invitationTimeRange;
+
+  if (eventId) {
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
+    if (!event) {
+      return NextResponse.json({ error: "Événement introuvable" }, { status: 400 });
+    }
+    eventDaysDb = eventRangeToDbDates(
+      dateToIsoDay(event.startDate),
+      dateToIsoDay(event.endDate),
+    );
+    if (!body.invitationTimeRange?.trim()) {
+      invitationTimeRange = eventInvitationTimeRange(event);
+    }
+  }
 
   const guests = body.guests;
   if (!Array.isArray(guests) || guests.length === 0) {
@@ -112,10 +129,12 @@ export async function POST(request: NextRequest) {
           fullName,
           email: row.email?.trim() || null,
           phone: phoneE164,
+          eventId,
           eventDays: eventDaysDb,
           invitationTimeRange,
           token,
         },
+        include: guestEventInclude,
       });
       if (phoneE164) {
         knownPhones.add(phoneE164);

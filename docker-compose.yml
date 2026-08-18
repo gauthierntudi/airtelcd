@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-golf}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-golf}
+      POSTGRES_DB: ${POSTGRES_DB:-airteldb}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${POSTGRES_USER:-golf}:${POSTGRES_PASSWORD:-golf}@db:5432/${POSTGRES_DB:-airteldb}?schema=public
+      DIRECT_URL: postgresql://${POSTGRES_USER:-golf}:${POSTGRES_PASSWORD:-golf}@db:5432/${POSTGRES_DB:-airteldb}?schema=public
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      URL_ORIGIN_CONFIRM: ${URL_ORIGIN_CONFIRM:-http://localhost:3000}
+      ADMIN_SECRET: ${ADMIN_SECRET:-change-me-in-production}
+      PRISMA_CONNECTION_LIMIT: ${PRISMA_CONNECTION_LIMIT:-10}
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/app
+      - app_node_modules:/app/node_modules
+      - app_next:/app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  app_node_modules:
+  app_next:

@@ -10,6 +10,7 @@ type Props = {
   /** Label accessibilité du fond cliquable */
   backdropLabel: string;
   maxHeightClass?: string;
+  tone?: "dark" | "light";
   children: ReactNode;
 };
 
@@ -19,6 +20,7 @@ export function InvitationBottomSheet({
   titleId,
   backdropLabel,
   maxHeightClass = "max-h-[min(92dvh,40rem)]",
+  tone = "dark",
   children,
 }: Props) {
   const { panelStyle, backdropStyle, handleProps } = useBottomSheetDragClose({
@@ -45,7 +47,9 @@ export function InvitationBottomSheet({
     >
       <button
         type="button"
-        className="invitation-bottom-sheet-backdrop absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className={`invitation-bottom-sheet-backdrop absolute inset-0 backdrop-blur-sm ${
+          tone === "light" ? "bg-zinc-900/40" : "bg-black/50"
+        }`}
         style={backdropStyle}
         aria-label={backdropLabel}
         onClick={onClose}
@@ -56,10 +60,18 @@ export function InvitationBottomSheet({
         aria-modal="true"
         {...(titleId ? { "aria-labelledby": titleId } : {})}
         style={panelStyle}
-        className={`invitation-bottom-sheet-panel relative flex w-full flex-col overflow-hidden rounded-t-[1.75rem] bg-[#141414] shadow-[0_-12px_48px_rgba(0,0,0,0.55)] ${maxHeightClass}`}
+        className={`invitation-bottom-sheet-panel relative flex w-full flex-col overflow-hidden rounded-t-[1.75rem] ${
+          tone === "light"
+            ? "bg-white shadow-[0_-12px_48px_rgba(24,24,27,0.18)]"
+            : "bg-[#141414] shadow-[0_-12px_48px_rgba(0,0,0,0.55)]"
+        } ${maxHeightClass}`}
       >
         <div {...handleProps}>
-          <span className="h-1 w-11 rounded-full bg-white/30" />
+          <span
+            className={`h-1 w-11 rounded-full ${
+              tone === "light" ? "bg-zinc-300" : "bg-white/30"
+            }`}
+          />
         </div>
         {children}
       </div>

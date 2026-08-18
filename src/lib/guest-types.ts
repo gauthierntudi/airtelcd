@@ -9,6 +9,10 @@ export type GuestRow = {
   email: string | null;
   phone: string | null;
   token: string;
+  eventId: string | null;
+  eventName: string | null;
+  eventDate: string | null;
+  eventEndDate: string | null;
   eventDays: EventDayId[];
   invitationTimeRange: string;
   rsvpStatus: RsvpStatus;
@@ -33,8 +37,8 @@ export const RSVP_CONFIG: Record<
 > = {
   PENDING: {
     label: "En attente",
-    badge: "bg-white/10 text-white ring-white/20",
-    dot: "bg-white",
+    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    dot: "bg-zinc-400",
   },
   CONFIRMED: {
     label: "Confirmé",
@@ -43,8 +47,8 @@ export const RSVP_CONFIG: Record<
   },
   DECLINED: {
     label: "Décliné",
-    badge: "bg-white/5 text-white/50 ring-white/15",
-    dot: "bg-vodacom-silver",
+    badge: "bg-zinc-50 text-zinc-500 ring-zinc-200",
+    dot: "bg-zinc-300",
   },
 };
 

@@ -23,7 +23,7 @@ export const EVENT_DAYS = [
   },
 ] as const;
 
-export type EventDayId = (typeof EVENT_DAYS)[number]["id"];
+export type EventDayId = string;
 
 export const DEFAULT_EVENT_DAY_ID: EventDayId = "2026-06-12";
 
@@ -47,27 +47,32 @@ export type CalendarMonthCell =
       isEventDay: boolean;
     };
 
-/** Grille juin 2026 (semaine commence lundi) */
-export function buildEventMonthCalendarCells(): CalendarMonthCell[] {
-  const { year, month } = EVENT_CALENDAR;
+/** Grille d’un mois (semaine commence lundi), jours invités marqués. */
+export function buildMonthCalendarCells(
+  year: number,
+  month: number,
+  invitedDayIds: EventDayId[] = [],
+): CalendarMonthCell[] {
+  const invitedSet = new Set(invitedDayIds);
   const monthIndex = month - 1;
-  const first = new Date(year, monthIndex, 1);
-  const mondayOffset = (first.getDay() + 6) % 7;
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const first = new Date(Date.UTC(year, monthIndex, 1));
+  const mondayOffset = (first.getUTCDay() + 6) % 7;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const cells: CalendarMonthCell[] = [];
+  const mm = String(month).padStart(2, "0");
 
   for (let i = 0; i < mondayOffset; i++) {
     cells.push({ kind: "pad", key: `pad-${i}` });
   }
 
   for (let date = 1; date <= daysInMonth; date++) {
-    const iso = `${year}-06-${String(date).padStart(2, "0")}` as EventDayId;
-    const isEventDay = EVENT_DAY_IDS.includes(iso);
+    const iso = `${year}-${mm}-${String(date).padStart(2, "0")}` as EventDayId;
+    const isEventDay = invitedSet.has(iso);
     cells.push({
       kind: "day",
       key: iso,
       date,
-      dayId: isEventDay ? iso : null,
+      dayId: iso,
       isEventDay,
     });
   }
@@ -75,13 +80,88 @@ export function buildEventMonthCalendarCells(): CalendarMonthCell[] {
   return cells;
 }
 
+/** Semaine(s) lundi–dimanche qui couvrent les jours invités. */
+export function buildInvitedWeekCalendarCells(
+  invitedDayIds: EventDayId[],
+  anchorDayId?: EventDayId,
+): CalendarMonthCell[] {
+  const invitedSet = new Set(invitedDayIds);
+  const anchors =
+    invitedDayIds.length > 0
+      ? invitedDayIds
+      : anchorDayId
+        ? [anchorDayId]
+        : [];
+  const mondayKeys = new Set<string>();
+
+  for (const id of anchors) {
+    const d = new Date(`${id}T12:00:00.000Z`);
+    if (Number.isNaN(d.getTime())) continue;
+    const offset = (d.getUTCDay() + 6) % 7;
+    d.setUTCDate(d.getUTCDate() - offset);
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
+    mondayKeys.add(`${y}-${m}-${day}`);
+  }
+
+  const cells: CalendarMonthCell[] = [];
+  for (const mondayIso of [...mondayKeys].sort()) {
+    const monday = new Date(`${mondayIso}T12:00:00.000Z`);
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setUTCDate(monday.getUTCDate() + i);
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      const iso = `${y}-${m}-${day}` as EventDayId;
+      cells.push({
+        kind: "day",
+        key: iso,
+        date: d.getUTCDate(),
+        dayId: iso,
+        isEventDay: invitedSet.has(iso),
+      });
+    }
+  }
+
+  return cells;
+}
+
+/** Grille juin 2026 (semaine commence lundi) */
+export function buildEventMonthCalendarCells(): CalendarMonthCell[] {
+  return buildMonthCalendarCells(
+    EVENT_CALENDAR.year,
+    EVENT_CALENDAR.month,
+    EVENT_DAY_IDS,
+  );
+}
+
 export function getEventDayById(id: EventDayId) {
-  return EVENT_DAYS.find((d) => d.id === id)!;
+  const known = EVENT_DAYS.find((d) => d.id === id);
+  if (known) return known;
+  const day = Number(id.slice(8, 10)) || 0;
+  return {
+    id,
+    day,
+    weekday: "",
+    label: id,
+    pillLabel: String(day || id),
+  };
 }
 
 export function formatInvitedDayLong(dayId: EventDayId): string {
-  const d = getEventDayById(dayId);
-  return `${d.weekday} ${d.label}`;
+  const known = EVENT_DAYS.find((d) => d.id === dayId);
+  if (known) return `${known.weekday} ${known.label}`;
+  const d = new Date(`${dayId}T12:00:00.000Z`);
+  if (Number.isNaN(d.getTime())) return dayId;
+  return d.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 export function formatInvitedDayShort(dayId: EventDayId): string {
@@ -90,11 +170,7 @@ export function formatInvitedDayShort(dayId: EventDayId): string {
 
 /** Liste lisible pour 1 à n jours — ex. « Vendredi 12 juin », « 12 et 13 juin » */
 export function formatInvitedDaysLong(dayIds: EventDayId[]): string {
-  const sorted = [...new Set(dayIds)].sort(
-    (a, b) =>
-      EVENT_DAYS.findIndex((d) => d.id === a) -
-      EVENT_DAYS.findIndex((d) => d.id === b),
-  );
+  const sorted = [...new Set(dayIds)].sort();
   if (sorted.length === 0) return formatInvitedDayLong(DEFAULT_EVENT_DAY_ID);
   if (sorted.length === 1) return formatInvitedDayLong(sorted[0]);
   if (sorted.length === 2) {
@@ -106,11 +182,7 @@ export function formatInvitedDaysLong(dayIds: EventDayId[]): string {
 }
 
 export function formatInvitedDaysShort(dayIds: EventDayId[]): string {
-  const sorted = [...new Set(dayIds)].sort(
-    (a, b) =>
-      EVENT_DAYS.findIndex((d) => d.id === a) -
-      EVENT_DAYS.findIndex((d) => d.id === b),
-  );
+  const sorted = [...new Set(dayIds)].sort();
   if (sorted.length <= 1) {
     return sorted[0] ? formatInvitedDayShort(sorted[0]) : formatInvitedDayShort(DEFAULT_EVENT_DAY_ID);
   }

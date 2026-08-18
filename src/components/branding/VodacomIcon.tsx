@@ -18,7 +18,7 @@ export function VodacomIcon({
   const image = (
     <Image
       src={BRAND.icon}
-      alt="Vodacom Privilège"
+      alt="Airtel RSVP"
       width={size}
       height={size}
       className={`rounded-xl object-contain ${className}`}
